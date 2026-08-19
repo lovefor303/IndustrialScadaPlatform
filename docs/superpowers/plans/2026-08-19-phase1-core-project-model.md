@@ -48,7 +48,7 @@ The old repository at `D:\wpf_XM\配液系统湖南\配液系统2\.worktrees\med
 - Create: `IndustrialScadaPlatform.sln`
 - Create: all seven `.csproj` files listed in the file map
 
-- [ ] **Step 1: Write the project skeleton files**
+- [x] **Step 1: Write the project skeleton files**
 
 Use SDK-style projects targeting `net10.0` with nullable enabled. Library projects reference only lower layers. Test projects reference the project under test and xUnit packages.
 
@@ -70,7 +70,7 @@ Use SDK-style projects targeting `net10.0` with nullable enabled. Library projec
 
 Each library `.csproj` must set `<OutputType>Library</OutputType>`. `Scada.Scene` references `Scada.Core`; `Scada.Storage` references both; `Scada.Simulator` references `Scada.Core`; tests reference their corresponding libraries. Do not add WPF or ASP.NET dependencies.
 
-- [ ] **Step 2: Generate the solution and verify project graph**
+- [x] **Step 2: Generate the solution and verify project graph**
 
 Run:
 
@@ -81,7 +81,7 @@ dotnet restore IndustrialScadaPlatform.sln
 
 Expected: restore succeeds with no NU1900/NU1903/NU1904 vulnerability warning and `dotnet sln ... list` prints exactly seven projects.
 
-- [ ] **Step 3: Commit the skeleton**
+- [x] **Step 3: Commit the skeleton**
 
 ```powershell
 git add Directory.Build.props Directory.Packages.props IndustrialScadaPlatform.sln src tests
