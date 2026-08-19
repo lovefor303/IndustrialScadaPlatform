@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scada.Storage.Tests", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scada.Simulator.Tests", "tests\Scada.Simulator.Tests\Scada.Simulator.Tests.csproj", "{44E8DE44-4289-4518-A376-11A7D831BC3E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scada.Acceptance.Tests", "tests\Scada.Acceptance.Tests\Scada.Acceptance.Tests.csproj", "{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,18 @@ Global
 		{44E8DE44-4289-4518-A376-11A7D831BC3E}.Release|x64.Build.0 = Release|Any CPU
 		{44E8DE44-4289-4518-A376-11A7D831BC3E}.Release|x86.ActiveCfg = Release|Any CPU
 		{44E8DE44-4289-4518-A376-11A7D831BC3E}.Release|x86.Build.0 = Release|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Debug|x64.Build.0 = Debug|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Debug|x86.Build.0 = Debug|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Release|x64.ActiveCfg = Release|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Release|x64.Build.0 = Release|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Release|x86.ActiveCfg = Release|Any CPU
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,5 +141,6 @@ Global
 		{E0C025FC-32FD-48AD-B361-158BB31ABC9B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{007164B5-0DA3-448C-A1F6-57572D5ACE3C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{44E8DE44-4289-4518-A376-11A7D831BC3E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{BD76AA28-A7F3-4628-93AE-9C1EF243EE15} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

@@ -379,11 +379,11 @@ git commit -m "feat: add deterministic offline simulator"
 - Create: `docs/phase1-acceptance.md`
 - Create: `docs/handoff-2026-08-19-phase1.md`
 
-- [ ] **Step 1: Write the end-to-end acceptance test**
+- [x] **Step 1: Write the end-to-end acceptance test**
 
 The test must create an empty project, add one screen with one pipe and one control, save a draft, export, import into a second temporary store, publish, list the revision, restore it to draft, and compare IDs, bounds, pipe endpoints, bindings and schema version. It must not instantiate WPF or contact a PLC.
 
-- [ ] **Step 2: Document the acceptance matrix**
+- [x] **Step 2: Document the acceptance matrix**
 
 `docs/phase1-acceptance.md` must record commands and expected results for:
 
@@ -395,7 +395,7 @@ dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build
 
 It must state that the gate passes only with 0 warnings, 0 errors, all tests passing, valid fixture accepted, invalid fixture rejected, and no files changed under the legacy repository.
 
-- [ ] **Step 3: Run the complete gate**
+- [x] **Step 3: Run the complete gate**
 
 Run:
 
@@ -409,7 +409,7 @@ git status --short --branch
 
 Expected: Release build has 0 warnings and 0 errors; every test passes; `git diff --check` is clean; only the new platform repository has changes.
 
-- [ ] **Step 4: Commit the phase gate**
+- [x] **Step 4: Commit the phase gate**
 
 ```powershell
 git add IndustrialScadaPlatform.sln tests/Scada.Acceptance.Tests docs/phase1-acceptance.md docs/handoff-2026-08-19-phase1.md

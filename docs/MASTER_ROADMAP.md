@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
 Updated: 2026-08-19  
-Status: Long-term direction approved; only Phase 1 is authorized for implementation.
+Status: Long-term direction approved; Phase 1 is complete; Phase 2 planning is the next authorized activity.
 
 ## Product Outcome
 
@@ -28,11 +28,11 @@ Purpose: preserve recovery paths and prevent the old and new products from conta
 
 Gate: the legacy baseline and data locations are documented; the new repository is independent.
 
-### Phase 1 - Core project model (current)
+### Phase 1 - Core project model (complete)
 
 Deliverables: .NET 10 solution, project/variable/scene contracts, JSON Schema and migrations, SQLite draft/publish/version/restore storage, import/export, deterministic offline simulator and acceptance tests.
 
-Gate: create, validate, save, reopen, export, import, publish, list revisions, restore and simulate an empty project without PLC access; Release build has zero warnings and errors and all tests pass.
+Gate: create, validate, save, reopen, export, import, publish, list revisions, restore and simulate an empty project without PLC access; Release build has zero warnings and errors and all tests pass. Passed; see `docs/handoff-2026-08-19-phase1.md`.
 
 Excluded: WPF, Web, PLC, WinCC, alarms, trends, recipes, batches and legacy migration.
 
@@ -96,8 +96,8 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 1.  
-Current task: Task 1 - create and verify the seven-project traditional `.sln` solution.  
+Current phase: Phase 2 planning.
+Current task: write and approve the Industrial Control SDK plan.
 Single operational checkpoint: `docs/handoff-current.md`.
 
-No Phase 1 business code has been implemented yet, and no later phase has started.
+Phase 1 is complete; no Phase 2 implementation, WPF editor, Web Runtime, PLC adapter or WinCC adapter has started.

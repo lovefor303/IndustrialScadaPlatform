@@ -32,11 +32,11 @@ The new platform must not silently read, migrate, overwrite or share any of thos
 
 Freeze the old editor baseline, record artifacts and data locations, and keep the new repository separate.
 
-### Phase 1: Core project model (current)
+### Phase 1: Core project model (complete)
 
 Build the .NET 10 SDK solution, project/variable/scene contracts, JSON Schema and migrations, SQLite draft/publish/restore/import/export storage, deterministic offline simulator and automated acceptance gate.
 
-Phase 1 deliberately excludes WPF canvas, Web Runtime, PLC/S7/PLCSIM communication, WinCC deployment, recipes, batches, alarms, trends and legacy migration.
+Phase 1 deliberately excluded WPF canvas, Web Runtime, PLC/S7/PLCSIM communication, WinCC deployment, recipes, batches, alarms, trends and legacy migration. Its gate is recorded in `docs/handoff-2026-08-19-phase1.md`.
 
 ### Phase 2: Industrial control SDK
 
@@ -100,6 +100,6 @@ If any answer is missing or contradictory, stop implementation and repair `docs/
 
 ## Phase Gate
 
-Phase 1 is complete only when a new empty project can be created, validated, saved, reopened, exported, imported, published, listed, restored and simulated offline, with a Release build containing zero warnings and zero errors and all tests passing.
+Phase 1 is complete only when a new empty project can be created, validated, saved, reopened, exported, imported, published, listed, restored and simulated offline, with a Release build containing zero warnings and zero errors and all tests passing. This gate is now recorded in `docs/handoff-2026-08-19-phase1.md`.
 
 No later phase may be started before that gate is recorded in a handoff document.
