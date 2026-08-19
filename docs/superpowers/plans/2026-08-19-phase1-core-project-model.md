@@ -286,7 +286,7 @@ git commit -m "feat: add project json serialization and schema migrations"
 - Create: `src/Scada.Storage/RevisionStore.cs`
 - Create: `tests/Scada.Storage.Tests/RevisionStoreTests.cs`
 
-- [ ] **Step 1: Write failing revision tests**
+- [x] **Step 1: Write failing revision tests**
 
 Cover these exact behaviors:
 
@@ -300,7 +300,7 @@ Cover these exact behaviors:
 
 Each test must use a unique temporary SQLite file and delete it in `finally`; no test may touch `C:\MedicalMixingSystem.Next` or the legacy database.
 
-- [ ] **Step 2: Implement the SQLite store**
+- [x] **Step 2: Implement the SQLite store**
 
 `RevisionStore` must create tables `Projects(ProjectId TEXT PRIMARY KEY, Name TEXT NOT NULL, DraftJson TEXT NOT NULL, UpdatedAt TEXT NOT NULL)` and `Revisions(ProjectId TEXT NOT NULL, RevisionId TEXT PRIMARY KEY, RevisionNumber INTEGER NOT NULL, Json TEXT NOT NULL, CreatedAt TEXT NOT NULL, PRIMARY KEY(ProjectId, RevisionNumber))` using parameterized commands. Expose:
 
@@ -317,7 +317,7 @@ Task<Guid> ImportAsync(string filePath, CancellationToken cancellationToken = de
 
 `PublishAsync` must validate JSON before inserting a revision, assign a monotonically increasing revision number, and never update the draft. `RestoreToDraftAsync` copies the selected immutable JSON into `Projects.DraftJson` and never deletes or edits `Revisions`.
 
-- [ ] **Step 3: Run persistence tests and commit**
+- [x] **Step 3: Run persistence tests and commit**
 
 Run:
 

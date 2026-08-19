@@ -26,6 +26,8 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 - Valid and invalid Schema fixtures are checked automatically; independent pipe geometry is covered.
 - Task 4 deterministic JSON serializer and version-0 migration are implemented and verified by 5 passing tests.
 - Full Release build remains at 0 warnings and 0 errors.
+- Task 5 SQLite draft, publish, revision, restore and import/export storage is implemented.
+- Storage is verified by 10 passing tests using isolated temporary database files.
 
 ## Current Incomplete State
 
@@ -34,22 +36,22 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 
 ## Next Action
 
-Start Task 5 only: write the failing SQLite revision-store tests in `tests/Scada.Storage.Tests/RevisionStoreTests.cs`, then run the focused test to confirm the expected failure before implementing persistence.
+Start Task 6 only: write the failing deterministic offline-simulator tests in `tests/Scada.Simulator.Tests/OfflineSimulatorTests.cs`, then run the focused test to confirm the expected failure before implementing simulation.
 
-Tasks 1 through 4 are complete, but the Phase 1 gate is not complete. Do not start Task 6 until Task 5 persistence tests are complete and verified.
+Tasks 1 through 5 are complete, but the Phase 1 gate is not complete. Do not start Task 7 until Task 6 simulator tests are complete and verified.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 1, Task 5 - draft, publish, restore and import/export storage.
-- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 20 tests passed).
+- Active unit: Phase 1, Task 6 - deterministic offline simulator.
+- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 25 tests passed).
 - Intentionally uncommitted files: `AGENTS.md`, `Directory.Build.props`, `Directory.Packages.props`, `IndustrialScadaPlatform.sln`, `docs/MASTER_ROADMAP.md`, `docs/PROJECT_CONTROL.md`, `docs/handoff-current.md`, `src/`, and `tests/`.
-- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 5 failing revision-store tests.
+- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 6 failing simulator tests.
 - Current exclusions: WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
 
 ## Verification Status
 
-- Tasks 1 through 4 checkpoints have passed; no Phase 1 functional gate has passed.
+- Tasks 1 through 5 checkpoints have passed; no Phase 1 functional gate has passed.
 - Do not claim the platform or Task 1 is complete.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
