@@ -245,11 +245,11 @@ git commit -m "feat: add retained scene model and project schema"
 - Create: `src/Scada.Storage/SchemaMigrations.cs`
 - Create: `tests/Scada.Storage.Tests/JsonProjectSerializerTests.cs`
 
-- [ ] **Step 1: Write failing serializer tests**
+- [x] **Step 1: Write failing serializer tests**
 
 Test that serialization is deterministic, round-trips polymorphic objects, rejects an unsupported schema version, and migrates a version-0 fixture to version 1. The deterministic test must serialize the same document twice and compare the exact UTF-8 strings.
 
-- [ ] **Step 2: Implement serializer and migration pipeline**
+- [x] **Step 2: Implement serializer and migration pipeline**
 
 `JsonProjectSerializer` must expose:
 
@@ -263,7 +263,7 @@ Use `System.Text.Json` with camelCase, indented output, stable property ordering
 
 `SchemaMigrations` must expose `const int CurrentVersion = 1` and `string UpgradeToCurrent(string json, int sourceVersion)`. Version 0 migration must add `status: "draft"`, `screens: []`, and `variables: []`; it must not invent PLC addresses or control bindings.
 
-- [ ] **Step 3: Run storage tests**
+- [x] **Step 3: Run storage tests**
 
 Run:
 
@@ -273,7 +273,7 @@ dotnet test tests/Scada.Storage.Tests/Scada.Storage.Tests.csproj --no-restore
 
 Expected: serializer, schema validation and migration tests pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```powershell
 git add src/Scada.Storage tests/Scada.Storage.Tests
