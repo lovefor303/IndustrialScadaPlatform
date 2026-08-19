@@ -20,6 +20,8 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 - Task 1 solution skeleton is verified: `IndustrialScadaPlatform.sln` contains exactly seven projects.
 - `dotnet restore IndustrialScadaPlatform.sln` passed after pinning the vulnerable SQLitePCLRaw transitive packages to `2.1.13`.
 - `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` passed with 0 warnings and 0 errors.
+- Task 2 core contracts are implemented and verified by 10 passing tests.
+- The full Release solution build passes with 0 warnings and 0 errors.
 
 ## Current Incomplete State
 
@@ -28,22 +30,22 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 
 ## Next Action
 
-Start Task 2 only: write the failing core contract tests in `tests/Scada.Core.Tests/ContractTests.cs`, then run the focused test to confirm the expected compile failure before implementing contracts.
+Start Task 3 only: write the failing retained-scene tests in `tests/Scada.Core.Tests/ContractTests.cs`, then run the focused test to confirm the expected failure before implementing scene objects and the project schema.
 
-Task 1 is complete, but the Phase 1 gate is not complete. Do not start Task 3 until Task 2 tests and implementation are complete and verified.
+Tasks 1 and 2 are complete, but the Phase 1 gate is not complete. Do not start Task 4 until Task 3 tests, schema fixtures and implementation are complete and verified.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 1, Task 2 - core project and variable contracts.
-- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (7 projects, 0 warnings, 0 errors).
+- Active unit: Phase 1, Task 3 - retained scene model and JSON Schema.
+- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 10 tests passed).
 - Intentionally uncommitted files: `AGENTS.md`, `Directory.Build.props`, `Directory.Packages.props`, `IndustrialScadaPlatform.sln`, `docs/MASTER_ROADMAP.md`, `docs/PROJECT_CONTROL.md`, `docs/handoff-current.md`, `src/`, and `tests/`.
-- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 2 failing tests.
+- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 3 failing scene tests.
 - Current exclusions: WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
 
 ## Verification Status
 
-- Task 1 build/restore checkpoint has passed; no Phase 1 functional or test gate has passed.
+- Tasks 1 and 2 checkpoints have passed; no Phase 1 functional gate has passed.
 - Do not claim the platform or Task 1 is complete.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 

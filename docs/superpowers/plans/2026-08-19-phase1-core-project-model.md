@@ -95,7 +95,7 @@ git commit -m "build: create phase one scada sdk solution"
 - Create: `src/Scada.Core/VariableContracts.cs`
 - Test: `tests/Scada.Core.Tests/ContractTests.cs`
 
-- [ ] **Step 1: Write failing contract tests**
+- [x] **Step 1: Write failing contract tests**
 
 `ContractTests.cs` must include tests for stable IDs, invalid names, variable quality, and command separation. The test project references both `Scada.Core` and `Scada.Scene` because `ProjectDocument` is a scene-level aggregate:
 
@@ -138,7 +138,7 @@ public void Bad_quality_is_explicit_and_not_a_confirmed_value()
 
 Run `dotnet test tests/Scada.Core.Tests/Scada.Core.Tests.csproj --no-restore`. Expected: compile failure because the contracts do not exist yet.
 
-- [ ] **Step 2: Implement minimal contracts**
+- [x] **Step 2: Implement minimal contracts**
 
 `ProjectContracts.cs` must define `ProjectIdentity`, `ProjectRevision`, `ProjectStatus`, `ProjectValidationError`, and the shared revision/validation records. `ProjectDocument` is defined in `Scada.Scene` because it owns screens and scene objects. Initialize collections to empty arrays and use UTC timestamps.
 
@@ -157,7 +157,7 @@ public sealed record VariableValue(VariableDataType DataType, object? Value, Var
 
 Validate keys with `^[A-Za-z0-9_.-]+$`; reject empty keys, duplicate project variable keys, and minimum values greater than maximum values. `VariableDefinition.Bool` must create a feedback/command definition from an explicit direction rather than guessing it.
 
-- [ ] **Step 3: Run the contract tests**
+- [x] **Step 3: Run the contract tests**
 
 Run:
 
@@ -167,7 +167,7 @@ dotnet test tests/Scada.Core.Tests/Scada.Core.Tests.csproj --no-restore
 
 Expected: all tests pass and no warnings are emitted.
 
-- [ ] **Step 4: Commit the contracts**
+- [x] **Step 4: Commit the contracts**
 
 ```powershell
 git add src/Scada.Core tests/Scada.Core.Tests
