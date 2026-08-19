@@ -1,0 +1,7 @@
+.worktrees/
+bin/
+obj/
+TestResults/
+artifacts/
+*.user
+*.suo
