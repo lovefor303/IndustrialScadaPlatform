@@ -22,6 +22,8 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 - `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` passed with 0 warnings and 0 errors.
 - Task 2 core contracts are implemented and verified by 10 passing tests.
 - The full Release solution build passes with 0 warnings and 0 errors.
+- Task 3 retained scene model and project-v1 Schema are implemented and verified by 15 passing tests.
+- Valid and invalid Schema fixtures are checked automatically; independent pipe geometry is covered.
 
 ## Current Incomplete State
 
@@ -30,22 +32,22 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 
 ## Next Action
 
-Start Task 3 only: write the failing retained-scene tests in `tests/Scada.Core.Tests/ContractTests.cs`, then run the focused test to confirm the expected failure before implementing scene objects and the project schema.
+Start Task 4 only: write the failing deterministic JSON serializer and migration tests in `tests/Scada.Storage.Tests/JsonProjectSerializerTests.cs`, then run the focused test to confirm the expected failure before implementing serialization.
 
-Tasks 1 and 2 are complete, but the Phase 1 gate is not complete. Do not start Task 4 until Task 3 tests, schema fixtures and implementation are complete and verified.
+Tasks 1, 2 and 3 are complete, but the Phase 1 gate is not complete. Do not start Task 5 until Task 4 serialization and migration tests are complete and verified.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 1, Task 3 - retained scene model and JSON Schema.
-- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 10 tests passed).
+- Active unit: Phase 1, Task 4 - deterministic JSON serialization and schema migrations.
+- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 15 tests passed).
 - Intentionally uncommitted files: `AGENTS.md`, `Directory.Build.props`, `Directory.Packages.props`, `IndustrialScadaPlatform.sln`, `docs/MASTER_ROADMAP.md`, `docs/PROJECT_CONTROL.md`, `docs/handoff-current.md`, `src/`, and `tests/`.
-- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 3 failing scene tests.
+- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 4 failing serializer tests.
 - Current exclusions: WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
 
 ## Verification Status
 
-- Tasks 1 and 2 checkpoints have passed; no Phase 1 functional gate has passed.
+- Tasks 1, 2 and 3 checkpoints have passed; no Phase 1 functional gate has passed.
 - Do not claim the platform or Task 1 is complete.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 

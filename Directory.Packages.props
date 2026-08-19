@@ -10,6 +10,7 @@
     <PackageVersion Include="SQLitePCLRaw.core" Version="2.1.13" />
     <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
     <PackageVersion Include="SQLitePCLRaw.provider.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="xunit" Version="2.9.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />

@@ -11,7 +11,8 @@ public sealed record ProjectDocument
         DateTimeOffset createdAt,
         DateTimeOffset updatedAt,
         ProjectStatus status,
-        IReadOnlyList<VariableDefinition> variables)
+        IReadOnlyList<VariableDefinition> variables,
+        IReadOnlyList<ScreenDocument> screens)
     {
         ProjectId = projectId;
         SchemaVersion = schemaVersion;
@@ -20,6 +21,7 @@ public sealed record ProjectDocument
         UpdatedAt = updatedAt;
         Status = status;
         Variables = variables;
+        Screens = screens;
     }
 
     public Guid ProjectId { get; }
@@ -36,9 +38,12 @@ public sealed record ProjectDocument
 
     public IReadOnlyList<VariableDefinition> Variables { get; }
 
+    public IReadOnlyList<ScreenDocument> Screens { get; }
+
     public static ProjectDocument Create(
         string name,
-        IEnumerable<VariableDefinition>? variables = null)
+        IEnumerable<VariableDefinition>? variables = null,
+        IEnumerable<ScreenDocument>? screens = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
@@ -63,6 +68,7 @@ public sealed record ProjectDocument
             now,
             now,
             ProjectStatus.Draft,
-            variableList);
+            variableList,
+            screens?.ToArray() ?? []);
     }
 }
