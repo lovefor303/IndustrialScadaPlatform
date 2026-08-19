@@ -1,16 +1,18 @@
 # Current Handoff
 
-Updated: 2026-08-19
+Updated: 2026-08-20
 
 ## Authoritative Scope
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 1 complete; Phase 2 planning not started**
+Current phase: **Phase 1 complete; Phase 2 design written and awaiting final user review**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
 Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-project-model.md`
+
+Phase 2 draft design: `docs/superpowers/specs/2026-08-20-phase2-industrial-control-sdk-design.md`
 
 ## Completed In This Repository
 
@@ -35,22 +37,24 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 ## Current Incomplete State
 
 - No WPF canvas, Web Runtime, PLC communication, WinCC adapter or legacy migration has started.
+- No Phase 2 implementation code or implementation plan has started.
+- The Phase 2 design was approved section by section and written on 2026-08-20; final review of the written specification is pending.
 
 ## Next Action
 
-Write and approve a separate Phase 2 Industrial Control SDK implementation plan. Do not implement Phase 2 code until that plan is approved.
+Obtain the user's final review of `docs/superpowers/specs/2026-08-20-phase2-industrial-control-sdk-design.md`. After approval, write and review a separate Phase 2 implementation plan. Do not implement Phase 2 code until that plan is approved.
 
 Tasks 1 through 7 and the Phase 1 gate are complete. Phase 2 implementation has not started.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 2 planning only; no Phase 2 implementation task is active.
+- Active unit: Phase 2 written-design review; no Phase 2 implementation task is active.
 - Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build`; `git diff --check` (8 projects, 0 warnings, 0 errors, 33 tests passed).
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
-- Intentionally uncommitted files: `IndustrialScadaPlatform.sln`, `tests/Scada.Acceptance.Tests/`, `docs/phase1-acceptance.md`, `docs/handoff-2026-08-19-phase1.md`, and this handoff update.
+- Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
 - Resume action after any side task: re-read the five controlling documents and the Phase 1 handoff, then continue only with Phase 2 planning.
-- Current exclusions: WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
+- Current exclusions: Phase 2 implementation, WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
 
 ## Verification Status
 
