@@ -338,11 +338,11 @@ git commit -m "feat: add draft publish restore and project import"
 - Create: `src/Scada.Simulator/OfflineSimulator.cs`
 - Create: `tests/Scada.Simulator.Tests/OfflineSimulatorTests.cs`
 
-- [ ] **Step 1: Write failing simulator tests**
+- [x] **Step 1: Write failing simulator tests**
 
 Test that a seeded simulator returns repeatable values, unknown variables return `Bad` quality, and simulated values never become confirmed commands. Test a numeric range and a bool feedback separately.
 
-- [ ] **Step 2: Implement simulator**
+- [x] **Step 2: Implement simulator**
 
 `OfflineSimulator` must accept an `IReadOnlyList<VariableDefinition>` and a `uint seed`. Expose:
 
@@ -354,7 +354,7 @@ IReadOnlyDictionary<string, VariableValue> Snapshot(DateTimeOffset now);
 
 Use a deterministic PRNG seeded by the constructor. Numeric values must stay within the definition range; bool feedback defaults to `false`; missing keys return `VariableValue.Unknown`. Reject writes to variables whose direction is `Command` or whose data type/range does not match. Do not add PLC communication dependencies.
 
-- [ ] **Step 3: Run simulator tests and commit**
+- [x] **Step 3: Run simulator tests and commit**
 
 Run:
 

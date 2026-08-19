@@ -28,6 +28,8 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 - Full Release build remains at 0 warnings and 0 errors.
 - Task 5 SQLite draft, publish, revision, restore and import/export storage is implemented.
 - Storage is verified by 10 passing tests using isolated temporary database files.
+- Task 6 deterministic offline simulator is implemented and verified by 7 passing tests.
+- Commands remain unconfirmed/Bad in simulation; feedback type and range checks are enforced.
 
 ## Current Incomplete State
 
@@ -36,22 +38,22 @@ Approved implementation plan: `docs/superpowers/plans/2026-08-19-phase1-core-pro
 
 ## Next Action
 
-Start Task 6 only: write the failing deterministic offline-simulator tests in `tests/Scada.Simulator.Tests/OfflineSimulatorTests.cs`, then run the focused test to confirm the expected failure before implementing simulation.
+Start Task 7 only: add the end-to-end Phase 1 acceptance test project, run it through create/save/export/import/publish/list/restore/simulate, then document and execute the complete Release gate.
 
-Tasks 1 through 5 are complete, but the Phase 1 gate is not complete. Do not start Task 7 until Task 6 simulator tests are complete and verified.
+Tasks 1 through 6 are complete, but the Phase 1 gate is not complete. Do not begin Phase 2 until Task 7 passes and the Phase 1 handoff is recorded.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 1, Task 6 - deterministic offline simulator.
-- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 25 tests passed).
+- Active unit: Phase 1, Task 7 - acceptance harness and Phase 1 gate.
+- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (7 projects, 0 warnings, 0 errors; 32 tests passed).
 - Intentionally uncommitted files: `AGENTS.md`, `Directory.Build.props`, `Directory.Packages.props`, `IndustrialScadaPlatform.sln`, `docs/MASTER_ROADMAP.md`, `docs/PROJECT_CONTROL.md`, `docs/handoff-current.md`, `src/`, and `tests/`.
-- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then write the Task 6 failing simulator tests.
+- Resume action after any side task: re-read the five controlling documents, compare `git status --short` with this list, then add the Task 7 acceptance project and failing end-to-end test.
 - Current exclusions: WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
 
 ## Verification Status
 
-- Tasks 1 through 5 checkpoints have passed; no Phase 1 functional gate has passed.
+- Tasks 1 through 6 checkpoints have passed; the Phase 1 end-to-end gate has not passed.
 - Do not claim the platform or Task 1 is complete.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
