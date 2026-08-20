@@ -34,6 +34,8 @@ public static class VesselAgitatorFilterGeometry
 
         var primitives = new RenderPrimitive[]
         {
+            new RenderRectangle("vessel.top-inlet", new(82, 0, 16, 31), VisualTokens.EquipmentDepth),
+            new RenderLine("vessel.top-flange", new(78, 4), new(102, 4), VisualTokens.Outline),
             new RenderPath(
                 "vessel.jacket",
                 [new MoveTo(new(25, 48)), new CubicTo(new(25, 36), new(32, 27), new(42, 24)),
@@ -97,13 +99,6 @@ public static class VesselAgitatorFilterGeometry
         var stateToken = StateToken(context);
         var primitives = new RenderPrimitive[]
         {
-            new RenderPath(
-                "agitator.vessel",
-                [new MoveTo(new(16, 45)), new CubicTo(new(16, 36), new(23, 31), new(50, 31)),
-                 new CubicTo(new(77, 31), new(84, 36), new(84, 45)), new LineTo(new(84, 137)),
-                 new CubicTo(new(84, 148), new(74, 153), new(50, 153)),
-                 new CubicTo(new(26, 153), new(16, 148), new(16, 137)), new ClosePath()],
-                VisualTokens.EquipmentBody),
             new RenderRectangle("agitator.motor", new(35, 8, 30, 22), VisualTokens.EquipmentBody),
             new RenderRectangle("agitator.motor-end", new(31, 12, 5, 14), VisualTokens.EquipmentDepth),
             new RenderRectangle("agitator.motor-foot", new(42, 29, 16, 6), VisualTokens.EquipmentDepth),
@@ -114,8 +109,7 @@ public static class VesselAgitatorFilterGeometry
                  new LineTo(new(54, 135)), new LineTo(new(50, 145)), new LineTo(new(46, 135)),
                  new LineTo(new(37, 139)), new ClosePath()],
                 stateToken,
-                activeAnimation),
-            new RenderLine("agitator.liquid-line", new(25, 112), new(75, 112), VisualTokens.EquipmentDepth)
+                activeAnimation)
         };
 
         return new ControlRenderPlan(

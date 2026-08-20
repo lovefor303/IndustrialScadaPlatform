@@ -22,6 +22,8 @@ public sealed class VesselAgitatorFilterGeometryTests
         Assert.Contains(plan.Primitives, primitive => primitive.PartId == "vessel.jacket");
         Assert.Contains(plan.Primitives, primitive => primitive.PartId == "vessel.liquid");
         Assert.Contains(plan.Primitives, primitive => primitive.PartId == "vessel.bottom-outlet");
+        Assert.Contains(plan.Primitives, primitive => primitive.PartId == "vessel.top-inlet");
+        Assert.Equal(0, plan.Anchors["top-inlet"].Y);
         Assert.Equal(plan.DesignSize.Height, plan.Anchors["bottom-outlet"].Y);
         Assert.Equal("62", plan.Diagnostics["vessel.level"]);
     }
@@ -65,7 +67,8 @@ public sealed class VesselAgitatorFilterGeometryTests
         Assert.Equal("agitator.rotate", plan.Primitives.Single(primitive => primitive.PartId == "agitator.shaft").AnimationName);
         Assert.Equal("agitator.rotate", plan.Primitives.Single(primitive => primitive.PartId == "agitator.impeller").AnimationName);
         Assert.Null(plan.Primitives.Single(primitive => primitive.PartId == "agitator.motor").AnimationName);
-        Assert.Null(plan.Primitives.Single(primitive => primitive.PartId == "agitator.vessel").AnimationName);
+        Assert.DoesNotContain(plan.Primitives, primitive => primitive.PartId.StartsWith("vessel.", StringComparison.Ordinal)
+            || primitive.PartId == "agitator.vessel");
         Assert.Equal(["agitator.rotate"], plan.ActiveAnimations);
     }
 
