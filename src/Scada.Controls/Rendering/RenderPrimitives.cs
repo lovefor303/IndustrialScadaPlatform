@@ -78,6 +78,26 @@ public sealed record RenderEllipse : RenderPrimitive
     public RenderRect Bounds { get; }
 }
 
+public sealed record RenderText : RenderPrimitive
+{
+    public RenderText(
+        string partId,
+        RenderPoint position,
+        string text,
+        string token,
+        string? animationName = null)
+        : base(partId, token, animationName)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        Position = position;
+        Text = text;
+    }
+
+    public RenderPoint Position { get; }
+
+    public string Text { get; }
+}
+
 public abstract record PathCommand;
 
 public sealed record MoveTo(RenderPoint Point) : PathCommand;

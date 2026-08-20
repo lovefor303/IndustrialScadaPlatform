@@ -213,6 +213,31 @@ public sealed record PipeObject : SceneObject
             new Dictionary<string, BindingDefinition>(),
             new Dictionary<string, InteractionDefinition>());
     }
+
+    public PipeObject WithStart(PointD start) => CopyWithEndpoints(start, End);
+
+    public PipeObject WithEnd(PointD end) => CopyWithEndpoints(Start, end);
+
+    private PipeObject CopyWithEndpoints(PointD start, PointD end)
+    {
+        var bounds = RectD.FromPoints(new[] { start }.Concat(Bends).Append(end));
+        return new PipeObject(
+            Id,
+            Type,
+            start,
+            end,
+            Bends,
+            bounds,
+            Rotation,
+            ZIndex,
+            IsVisible,
+            Properties,
+            Bindings,
+            Interactions)
+        {
+            ControlVersion = ControlVersion
+        };
+    }
 }
 
 public sealed record ScreenDocument

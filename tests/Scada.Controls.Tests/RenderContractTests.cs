@@ -61,4 +61,15 @@ public sealed class RenderContractTests
         Assert.Equal(Scada.Core.VariableQuality.Bad, context.Quality);
         Assert.True(context.ReducedMotion);
     }
+
+    [Fact]
+    public void RenderTextRequiresStableTextAndKeepsPositionAndToken()
+    {
+        var text = new RenderText("label", new(4, 8), "温度", VisualTokens.EquipmentBody, "label.fade");
+
+        Assert.Equal("label", text.PartId);
+        Assert.Equal(new RenderPoint(4, 8), text.Position);
+        Assert.Equal("温度", text.Text);
+        Assert.Equal("label.fade", text.AnimationName);
+    }
 }
