@@ -20,6 +20,7 @@ public enum ControlOrientation
 public sealed class IndustrialControl : Control
 {
     private Canvas? _root;
+    private Canvas? _geometry;
 
     static IndustrialControl()
     {
@@ -80,9 +81,12 @@ public sealed class IndustrialControl : Control
 
     public double GeometryScaleY { get; private set; } = 1;
 
+    public Rect RenderedGeometryBounds { get; private set; } = Rect.Empty;
+
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
+        EnsureApplicationThemeResources();
         _root = GetTemplateChild("PART_Root") as Canvas;
         RefreshVisual();
     }
@@ -105,27 +109,43 @@ public sealed class IndustrialControl : Control
         }
 
         _root.Children.Clear();
+        _geometry = null;
         if (RenderPlan is not null)
         {
-            _root.Children.Add(WpfControlRenderer.Render(RenderPlan));
+            _geometry = WpfControlRenderer.Render(RenderPlan, EffectiveStateOverride(), ReducedMotion);
+            _root.Children.Add(_geometry);
         }
 
         UpdateTransform(RenderSize);
-        VisualStateManager.GoToState(this, StateName(State), useTransitions: !ReducedMotion && State != ControlState.Unknown);
-        VisualStateManager.GoToState(this, RenderPlan?.State == ControlState.Unknown ? "UnknownQuality" : "GoodQuality", useTransitions: false);
+        var effectiveState = EffectiveState;
+        VisualStateManager.GoToState(this, StateName(effectiveState), useTransitions: !ReducedMotion && effectiveState != ControlState.Unknown);
+        VisualStateManager.GoToState(this, effectiveState == ControlState.Unknown || PlanHasBadQuality(RenderPlan) ? "UnknownQuality" : "GoodQuality", useTransitions: false);
     }
 
     private void UpdateTransform(Size bounds)
     {
+        if ((!double.IsFinite(bounds.Width) || !double.IsFinite(bounds.Height))
+            && double.IsFinite(Width) && double.IsFinite(Height)
+            && Width > 0 && Height > 0)
+        {
+            bounds = new Size(Width, Height);
+        }
+
         if (RenderPlan is null || bounds.Width <= 0 || bounds.Height <= 0)
         {
+            RenderedGeometryBounds = Rect.Empty;
             return;
         }
 
+        var designWidth = RenderPlan.DesignSize.Width;
+        var designHeight = RenderPlan.DesignSize.Height;
+        var quarterTurn = Orientation is ControlOrientation.Right or ControlOrientation.Left;
+        var orientedWidth = quarterTurn ? designHeight : designWidth;
+        var orientedHeight = quarterTurn ? designWidth : designHeight;
         var policy = GetResizePolicy(RenderPlan);
-        var scaleX = bounds.Width / RenderPlan.DesignSize.Width;
-        var scaleY = bounds.Height / RenderPlan.DesignSize.Height;
-        if (policy == ResizePolicy.PreserveAspectRatio)
+        var scaleX = bounds.Width / orientedWidth;
+        var scaleY = bounds.Height / orientedHeight;
+        if (policy == ResizePolicy.PreserveAspectRatio || quarterTurn)
         {
             var uniform = Math.Min(scaleX, scaleY);
             scaleX = uniform;
@@ -134,19 +154,26 @@ public sealed class IndustrialControl : Control
 
         GeometryScaleX = scaleX;
         GeometryScaleY = scaleY;
-        if (_root is null)
+        var renderedWidth = orientedWidth * scaleX;
+        var renderedHeight = orientedHeight * scaleY;
+        RenderedGeometryBounds = new Rect(
+            Math.Max(0, (bounds.Width - renderedWidth) / 2),
+            Math.Max(0, (bounds.Height - renderedHeight) / 2),
+            renderedWidth,
+            renderedHeight);
+
+        if (_geometry is null)
         {
             return;
         }
 
-        _root.RenderTransform = new TransformGroup
-        {
-            Children = new TransformCollection
-            {
-                new ScaleTransform(scaleX, scaleY),
-                new RotateTransform(OrientationDegrees(Orientation), 0, 0)
-            }
-        };
+        var centerX = (designWidth * scaleX) / 2;
+        var centerY = (designHeight * scaleY) / 2;
+        var transform = Matrix.Identity;
+        transform.Scale(scaleX, scaleY);
+        transform.RotateAt(OrientationDegrees(Orientation), centerX, centerY);
+        transform.Translate((bounds.Width / 2) - centerX, (bounds.Height / 2) - centerY);
+        _geometry.RenderTransform = new MatrixTransform(transform);
     }
 
     private static ResizePolicy GetResizePolicy(ControlRenderPlan plan)
@@ -178,4 +205,37 @@ public sealed class IndustrialControl : Control
         ControlOrientation.Left => 270,
         _ => 0
     };
+
+    private ControlState EffectiveState => EffectiveStateOverride() ?? RenderPlan?.State ?? ControlState.Neutral;
+
+    private ControlState? EffectiveStateOverride() =>
+        ReadLocalValue(StateProperty) == DependencyProperty.UnsetValue ? null : State;
+
+    private static bool PlanHasBadQuality(ControlRenderPlan? plan) => plan is not null &&
+        (plan.State == ControlState.Unknown || ContainsUnknownQualityMarker(plan.Primitives));
+
+    private static bool ContainsUnknownQualityMarker(IEnumerable<RenderPrimitive> primitives) => primitives.Any(primitive =>
+        primitive.PartId == "quality.unknown"
+        || primitive is RenderGroup group && ContainsUnknownQualityMarker(group.Children));
+
+    private static void EnsureApplicationThemeResources()
+    {
+        var application = Application.Current;
+        if (application is null)
+        {
+            return;
+        }
+
+        var source = new ResourceDictionary
+        {
+            Source = new Uri("/Scada.Controls.Wpf;component/Themes/Generic.xaml", UriKind.Relative)
+        };
+        foreach (var key in source.Keys.OfType<string>().Where(key => key.StartsWith("ScadaBrush.", StringComparison.Ordinal)))
+        {
+            if (!application.Resources.Contains(key))
+            {
+                application.Resources[key] = source[key];
+            }
+        }
+    }
 }

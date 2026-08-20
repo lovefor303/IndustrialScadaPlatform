@@ -63,9 +63,13 @@ public static class WpfControlRenderer
     public static void SetAnchors(DependencyObject element, IReadOnlyDictionary<string, RenderPoint> value) =>
         element.SetValue(AnchorsProperty, value);
 
-    public static Canvas Render(ControlRenderPlan plan)
+    public static Canvas Render(
+        ControlRenderPlan plan,
+        ControlState? stateOverride = null,
+        bool reducedMotion = false)
     {
         ArgumentNullException.ThrowIfNull(plan);
+        plan = CreateEffectivePlan(plan, stateOverride, reducedMotion);
 
         var root = new Canvas
         {
@@ -86,16 +90,16 @@ public static class WpfControlRenderer
             root.Children.Add(CreateElement(primitive, plan));
         }
 
-        if (plan.State == ControlState.Unknown)
+        if (QualityFor(plan) != VariableQuality.Good)
         {
             var marker = new Ellipse
             {
                 Width = 8,
                 Height = 8,
-                Fill = BrushFor(VisualTokens.Unknown),
-                Stroke = BrushFor(VisualTokens.Outline),
                 StrokeThickness = 1
             };
+            ApplyToken(marker, Shape.FillProperty, VisualTokens.Unknown);
+            ApplyToken(marker, Shape.StrokeProperty, VisualTokens.Outline);
             SetPartId(marker, "control.quality-unknown");
             Canvas.SetLeft(marker, Math.Max(0, plan.DesignSize.Width - 10));
             Canvas.SetTop(marker, 2);
@@ -103,6 +107,28 @@ public static class WpfControlRenderer
         }
 
         return root;
+    }
+
+    private static ControlRenderPlan CreateEffectivePlan(
+        ControlRenderPlan plan,
+        ControlState? stateOverride,
+        bool reducedMotion)
+    {
+        var effectiveState = stateOverride ?? plan.State;
+        var badQuality = effectiveState == ControlState.Unknown || QualityFor(plan) != VariableQuality.Good;
+        var activeAnimations = reducedMotion || badQuality
+            ? new HashSet<string>(StringComparer.Ordinal)
+            : plan.ActiveAnimations;
+
+        return new ControlRenderPlan(
+            plan.TypeId,
+            plan.Version,
+            plan.DesignSize,
+            plan.Primitives,
+            plan.Anchors,
+            effectiveState,
+            activeAnimations,
+            plan.Diagnostics);
     }
 
     private static ReadOnlyDictionary<string, RenderPoint> SnapshotAnchors(
@@ -137,15 +163,19 @@ public static class WpfControlRenderer
         return element;
     }
 
-    private static Line CreateLine(RenderLine line) => new()
+    private static Line CreateLine(RenderLine line)
     {
-        X1 = line.Start.X,
-        Y1 = line.Start.Y,
-        X2 = line.End.X,
-        Y2 = line.End.Y,
-        Stroke = BrushFor(line.Token),
-        StrokeThickness = StrokeFor(line.PartId)
-    };
+        var shape = new Line
+        {
+            X1 = line.Start.X,
+            Y1 = line.Start.Y,
+            X2 = line.End.X,
+            Y2 = line.End.Y,
+            StrokeThickness = StrokeFor(line.PartId)
+        };
+        ApplyToken(shape, Shape.StrokeProperty, line.Token);
+        return shape;
+    }
 
     private static Rectangle CreateRectangle(RenderRectangle rectangle)
     {
@@ -153,10 +183,10 @@ public static class WpfControlRenderer
         {
             Width = rectangle.Bounds.Width,
             Height = rectangle.Bounds.Height,
-            Fill = BrushFor(rectangle.Token),
-            Stroke = BrushFor(VisualTokens.Outline),
             StrokeThickness = VisualTokens.EquipmentStroke
         };
+        ApplyToken(shape, Shape.FillProperty, rectangle.Token);
+        ApplyToken(shape, Shape.StrokeProperty, VisualTokens.Outline);
         Canvas.SetLeft(shape, rectangle.Bounds.X);
         Canvas.SetTop(shape, rectangle.Bounds.Y);
         return shape;
@@ -168,10 +198,10 @@ public static class WpfControlRenderer
         {
             Width = ellipse.Bounds.Width,
             Height = ellipse.Bounds.Height,
-            Fill = BrushFor(ellipse.Token),
-            Stroke = BrushFor(VisualTokens.Outline),
             StrokeThickness = VisualTokens.EquipmentStroke
         };
+        ApplyToken(shape, Shape.FillProperty, ellipse.Token);
+        ApplyToken(shape, Shape.StrokeProperty, VisualTokens.Outline);
         Canvas.SetLeft(shape, ellipse.Bounds.X);
         Canvas.SetTop(shape, ellipse.Bounds.Y);
         return shape;
@@ -182,26 +212,30 @@ public static class WpfControlRenderer
         var block = new TextBlock
         {
             Text = text.Text,
-            Foreground = BrushFor(text.Token),
             FontSize = 12,
             FontFamily = new FontFamily("Segoe UI"),
             IsHitTestVisible = false
         };
+        ApplyToken(block, TextBlock.ForegroundProperty, text.Token);
         Canvas.SetLeft(block, text.Position.X);
         Canvas.SetTop(block, text.Position.Y);
         return block;
     }
 
-    private static Path CreatePath(RenderPath path) => new()
+    private static Path CreatePath(RenderPath path)
     {
-        Data = CreateGeometry(path.Commands),
-        Fill = BrushFor(path.Token),
-        Stroke = BrushFor(path.Token),
-        StrokeThickness = StrokeFor(path.PartId),
-        StrokeLineJoin = PenLineJoin.Round,
-        StrokeStartLineCap = PenLineCap.Round,
-        StrokeEndLineCap = PenLineCap.Round
-    };
+        var shape = new Path
+        {
+            Data = CreateGeometry(path.Commands),
+            StrokeThickness = StrokeFor(path.PartId),
+            StrokeLineJoin = PenLineJoin.Round,
+            StrokeStartLineCap = PenLineCap.Round,
+            StrokeEndLineCap = PenLineCap.Round
+        };
+        ApplyToken(shape, Shape.FillProperty, path.Token);
+        ApplyToken(shape, Shape.StrokeProperty, path.Token);
+        return shape;
+    }
 
     private static Canvas CreateGroup(RenderGroup group, ControlRenderPlan plan)
     {
@@ -254,7 +288,7 @@ public static class WpfControlRenderer
     {
         if (primitive.AnimationName is null
             || !plan.ActiveAnimations.Contains(primitive.AnimationName)
-            || plan.State == ControlState.Unknown)
+            || QualityFor(plan) != VariableQuality.Good)
         {
             return;
         }
@@ -271,15 +305,8 @@ public static class WpfControlRenderer
         });
     }
 
-    private static Brush BrushFor(string token)
-    {
-        if (Application.Current?.TryFindResource(TokenKey(token)) is Brush resourceBrush)
-        {
-            return resourceBrush;
-        }
-
-        return new SolidColorBrush((Color)ColorConverter.ConvertFromString(token));
-    }
+    private static void ApplyToken(FrameworkElement element, DependencyProperty property, string token) =>
+        element.SetResourceReference(property, TokenKey(token));
 
     private static string TokenKey(string token) => $"ScadaBrush.{token}";
 
