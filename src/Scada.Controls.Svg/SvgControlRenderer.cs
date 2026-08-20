@@ -38,14 +38,46 @@ public sealed class SvgControlRenderer
         writer.WriteAttributeString("data-quality", QualityName(plan));
 
         WriteStyles(writer);
+        WriteAnchors(writer, plan.Anchors);
         foreach (var primitive in plan.Primitives)
         {
             WritePrimitive(writer, primitive, plan);
+        }
+        if (plan.State == ControlState.Unknown)
+        {
+            WriteUnknownQualityMarker(writer, plan);
         }
 
         writer.WriteEndElement();
         writer.Flush();
         return output.ToString();
+    }
+
+    private static void WriteAnchors(XmlWriter writer, IReadOnlyDictionary<string, RenderPoint> anchors)
+    {
+        writer.WriteStartElement("metadata");
+        foreach (var anchor in anchors.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+        {
+            writer.WriteStartElement("anchor");
+            writer.WriteAttributeString("data-anchor", anchor.Key);
+            writer.WriteAttributeString("x", Number(anchor.Value.X));
+            writer.WriteAttributeString("y", Number(anchor.Value.Y));
+            writer.WriteEndElement();
+        }
+
+        writer.WriteEndElement();
+    }
+
+    private static void WriteUnknownQualityMarker(XmlWriter writer, ControlRenderPlan plan)
+    {
+        writer.WriteStartElement("ellipse");
+        writer.WriteAttributeString("data-part", "control.quality-unknown");
+        writer.WriteAttributeString("class", "scada-shape token-unknown");
+        writer.WriteAttributeString("cx", Number(Math.Max(0, plan.DesignSize.Width - 6)));
+        writer.WriteAttributeString("cy", "6");
+        writer.WriteAttributeString("rx", "4");
+        writer.WriteAttributeString("ry", "4");
+        writer.WriteEndElement();
     }
 
     private static void WriteStyles(XmlWriter writer)

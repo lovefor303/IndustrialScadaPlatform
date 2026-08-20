@@ -1,0 +1,139 @@
+using Scada.Controls;
+using Scada.Scene;
+using Scada.Storage;
+using Xunit;
+
+namespace Scada.Controls.Tests;
+
+public sealed class SceneGeometryOperationTests
+{
+    private static readonly ControlCatalog Catalog = ControlCatalog.CreateDefault();
+
+    [Fact]
+    public void MovingValveDoesNotMoveUnselectedPipe()
+    {
+        var valveId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var pipeId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(40, 30, 40, 40), valveId);
+        var pipe = PipeObject.Create(new PointD(0, 50), new PointD(120, 50), id: pipeId);
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { valve, pipe });
+
+        var moved = SceneGeometryOperations.Move(screen, new[] { valveId }, dx: 1, dy: 0);
+
+        Assert.Equal(pipe, Assert.IsType<PipeObject>(moved.Objects.Single(item => item.Id == pipeId)));
+        Assert.Equal(41, Assert.IsType<ControlObject>(moved.Objects.Single(item => item.Id == valveId)).Bounds.X);
+    }
+
+    [Fact]
+    public void GroupMoveChangesOnlyExplicitIds()
+    {
+        var pump = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(10, 20, 120, 72));
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(160, 30, 80, 64));
+        var pipe = PipeObject.Create(new PointD(130, 56), new PointD(160, 56));
+        var label = TextObject.Create("P-101", new RectD(10, 96, 80, 24));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { pump, valve, pipe, label });
+
+        var moved = SceneGeometryOperations.Move(screen, new[] { pump.Id, label.Id }, dx: 4, dy: -2);
+
+        Assert.Equal(pipe, moved.Objects.Single(item => item.Id == pipe.Id));
+        Assert.Equal(valve, moved.Objects.Single(item => item.Id == valve.Id));
+        Assert.Equal(new RectD(14, 18, 120, 72), moved.Objects.Single(item => item.Id == pump.Id).Bounds);
+        Assert.Equal(new RectD(14, 94, 80, 24), moved.Objects.Single(item => item.Id == label.Id).Bounds);
+    }
+
+    [Fact]
+    public void NudgeMovesSelectedObjectsByExactlyOneSceneUnit()
+    {
+        var label = TextObject.Create("XV-102", new RectD(10, 20, 80, 24));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { label });
+
+        var nudged = SceneGeometryOperations.Nudge(screen, new[] { label.Id }, GeometryNudgeDirection.Right);
+
+        Assert.Equal(new RectD(11, 20, 80, 24), nudged.Objects.Single().Bounds);
+    }
+
+    [Fact]
+    public void RotationKeepsControlBoundsAndRotatesAboutObjectCenter()
+    {
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(40, 30, 100, 80));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { valve });
+
+        var rotated = SceneGeometryOperations.Rotate(screen, new[] { valve.Id }, degrees: 90);
+        var result = Assert.IsType<ControlObject>(rotated.Objects.Single());
+
+        Assert.Equal(new RectD(40, 30, 100, 80), result.Bounds);
+        Assert.Equal(90, result.Rotation);
+    }
+
+    [Fact]
+    public void AspectPreservingResizeUsesCatalogShapeInsteadOfSelectionRectangle()
+    {
+        var pump = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(10, 20, 120, 72));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { pump });
+
+        var resized = SceneGeometryOperations.Resize(
+            screen,
+            Catalog,
+            pump.Id,
+            new RectD(10, 20, 240, 72));
+
+        Assert.Equal(new RectD(10, 20, 240, 144), resized.Objects.Single().Bounds);
+    }
+
+    [Fact]
+    public void StraightPipeResizeUsesFreeEndpointWithoutChangingUnselectedObject()
+    {
+        var pipe = PipeObject.Create(new PointD(10, 20), new PointD(100, 20), [new PointD(50, 20)]);
+        var label = TextObject.Create("P-101", new RectD(0, 40, 80, 24));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { pipe, label });
+
+        var resized = SceneGeometryOperations.ResizePipeEndpoint(
+            screen,
+            pipe.Id,
+            PipeEndpoint.End,
+            new PointD(160, 50));
+        var updatedPipe = Assert.IsType<PipeObject>(resized.Objects.Single(item => item.Id == pipe.Id));
+
+        Assert.Equal(new PointD(10, 20), updatedPipe.Start);
+        Assert.Equal(new PointD(160, 50), updatedPipe.End);
+        Assert.Equal(RectD.FromPoints([new PointD(10, 20), new PointD(50, 20), new PointD(160, 50)]), updatedPipe.Bounds);
+        Assert.Equal(label, resized.Objects.Single(item => item.Id == label.Id));
+    }
+
+    [Fact]
+    public void GeometryOperationsRejectNonFiniteCoordinatesNegativeSizesAndMissingObjects()
+    {
+        var pump = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(10, 20, 120, 72));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { pump });
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            SceneGeometryOperations.Move(screen, new[] { pump.Id }, double.NaN, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            SceneGeometryOperations.Resize(screen, Catalog, pump.Id, new RectD(0, 0, -1, 10)));
+        Assert.Throws<KeyNotFoundException>(() =>
+            SceneGeometryOperations.Move(screen, new[] { Guid.Parse("33333333-3333-3333-3333-333333333333") }, 1, 0));
+    }
+
+    [Fact]
+    public void GeometrySurvivesProjectSerializationWithoutDrift()
+    {
+        var pipe = PipeObject.Create(new PointD(10.25, 20.5), new PointD(100.75, 30.125), [new PointD(50.5, 22.25)]);
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { pipe });
+        var edited = SceneGeometryOperations.ResizePipeEndpoint(
+            SceneGeometryOperations.Move(screen, new[] { pipe.Id }, 0.125, -0.25),
+            pipe.Id,
+            PipeEndpoint.End,
+            new PointD(160.875, 40.625));
+        var project = ProjectDocument.Create("Geometry", screens: new[] { edited });
+
+        var restored = new JsonProjectSerializer().Deserialize(new JsonProjectSerializer().Serialize(project));
+        var restoredPipe = Assert.IsType<PipeObject>(restored.Screens.Single().Objects.Single());
+        var expected = Assert.IsType<PipeObject>(edited.Objects.Single());
+
+        Assert.Equal(expected.Id, restoredPipe.Id);
+        Assert.Equal(expected.Start, restoredPipe.Start);
+        Assert.Equal(expected.End, restoredPipe.End);
+        Assert.Equal(expected.Bends, restoredPipe.Bends);
+        Assert.Equal(expected.Bounds, restoredPipe.Bounds);
+    }
+}
