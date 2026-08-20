@@ -2,7 +2,7 @@
 
 Date: 2026-08-20
 
-Status: Design approved in sections by the user; written specification awaiting final user review
+Status: Approved by the user on 2026-08-20
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
