@@ -7,6 +7,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Scada.Storage\Scada.Storage.csproj" />
     <ProjectReference Include="..\..\src\Scada.Controls.Wpf\Scada.Controls.Wpf.csproj" />
     <ProjectReference Include="..\..\src\Scada.Controls.Svg\Scada.Controls.Svg.csproj" />
     <ProjectReference Include="..\..\samples\Scada.Controls.SampleProject\Scada.Controls.SampleProject.csproj" />

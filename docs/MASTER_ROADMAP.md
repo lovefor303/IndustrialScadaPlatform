@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
-Updated: 2026-08-19  
-Status: Long-term direction approved; Phase 1 is complete; Phase 2 planning is the next authorized activity.
+Updated: 2026-08-20
+Status: Long-term direction approved; Phase 1 and Phase 2 are complete; Phase 3 planning is the next authorized activity.
 
 ## Product Outcome
 
@@ -38,13 +38,13 @@ Excluded: WPF, Web, PLC, WinCC, alarms, trends, recipes, batches and legacy migr
 
 Detailed plan: `docs/superpowers/plans/2026-08-19-phase1-core-project-model.md`.
 
-### Phase 2 - Industrial control SDK
+### Phase 2 - Industrial control SDK (complete)
 
 Deliverables: semantic and versioned definitions for pumps, valves, vessels, agitators, filters, pipes, numeric displays, level bars and temperature/pressure instruments; state precedence; animations; WPF and SVG/Web render profiles.
 
-Gate: one sample project renders equivalent equipment states in WPF and Web, with exact-size visual review evidence and command/feedback separation tests.
+Gate: one sample project renders equivalent equipment states in WPF and Web, with exact-size visual review evidence and command/feedback separation tests. Passed; see `docs/phase2-acceptance.md`.
 
-Before implementation: write and approve a separate detailed Phase 2 plan.
+Implementation plan and acceptance record: `docs/superpowers/plans/2026-08-20-phase2-industrial-control-sdk.md` and `docs/phase2-acceptance.md`.
 
 ### Phase 3 - WPF engineering editor
 
@@ -96,8 +96,8 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 2 planning.
-Current task: write and approve the Industrial Control SDK plan.
+Current phase: Phase 3 planning.
+Current task: write and approve the WPF engineering-editor plan.
 Single operational checkpoint: `docs/handoff-current.md`.
 
-Phase 1 is complete; no Phase 2 implementation, WPF editor, Web Runtime, PLC adapter or WinCC adapter has started.
+Phase 1 and Phase 2 are complete; the WPF editor, Web Runtime, PLC adapter and WinCC adapter have not started.

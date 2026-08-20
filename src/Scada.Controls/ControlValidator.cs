@@ -47,7 +47,7 @@ public sealed class ControlValidator
             }
 
             if (role.UnitFamily is not null && variable.Unit is not null
-                && !string.Equals(variable.Unit, role.UnitFamily, StringComparison.OrdinalIgnoreCase))
+                && !IsCompatibleUnit(role.UnitFamily, variable.Unit))
             {
                 result.Add(Error($"bindings.{role.Name}", "control.binding.unit", $"Variable '{variable.Key}' unit '{variable.Unit}' does not match '{role.UnitFamily}'."));
             }
@@ -82,4 +82,13 @@ public sealed class ControlValidator
     }
 
     private static ProjectValidationError Error(string path, string code, string message) => new(path, code, message);
+
+    private static bool IsCompatibleUnit(string unitFamily, string unit) => unitFamily switch
+    {
+        "level" => unit == "%",
+        "temperature" => unit is "°C" or "C" or "K",
+        "pressure" => unit is "bar" or "kPa" or "MPa",
+        "flow" => unit is "L/min" or "L/h" or "m3/h" or "m³/h",
+        _ => string.Equals(unitFamily, unit, StringComparison.OrdinalIgnoreCase)
+    };
 }
