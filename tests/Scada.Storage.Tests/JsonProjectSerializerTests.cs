@@ -63,7 +63,7 @@ public sealed class JsonProjectSerializerTests
 
         var restored = _serializer.Deserialize(versionZero);
 
-        Assert.Equal(1, restored.SchemaVersion);
+        Assert.Equal(ProjectFormat.CurrentVersion, restored.SchemaVersion);
         Assert.Equal(ProjectStatus.Draft, restored.Status);
         Assert.Empty(restored.Screens);
         Assert.Empty(restored.Variables);

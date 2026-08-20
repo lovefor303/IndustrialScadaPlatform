@@ -156,6 +156,11 @@ public sealed class JsonProjectSerializer
             ["interactions"] = SerializeInteractions(sceneObject.Interactions)
         };
 
+        if (sceneObject is ControlObject control)
+        {
+            result["controlVersion"] = control.ControlVersion;
+        }
+
         switch (sceneObject)
         {
             case PipeObject pipe:
@@ -219,7 +224,8 @@ public sealed class JsonProjectSerializer
             result[pair.Key] = new JsonObject
             {
                 ["eventName"] = pair.Value.EventName,
-                ["actionName"] = pair.Value.ActionName
+                ["actionName"] = pair.Value.ActionName,
+                ["parameters"] = SerializeStringMap(pair.Value.Parameters)
             };
         }
 
@@ -278,7 +284,10 @@ public sealed class JsonProjectSerializer
             IsVisible = element.GetProperty("isVisible").GetBoolean(),
             Properties = properties,
             Bindings = bindings,
-            Interactions = interactions
+            Interactions = interactions,
+            ControlVersion = element.TryGetProperty("controlVersion", out var controlVersion)
+                ? controlVersion.GetInt32()
+                : 1
         };
     }
 
@@ -316,7 +325,10 @@ public sealed class JsonProjectSerializer
             property => property.Name,
             property => new InteractionDefinition(
                 property.Value.GetProperty("eventName").GetString()!,
-                property.Value.GetProperty("actionName").GetString()!),
+                property.Value.GetProperty("actionName").GetString()!,
+                property.Value.TryGetProperty("parameters", out var parameters)
+                    ? DeserializeStringMap(parameters)
+                    : new Dictionary<string, string>(StringComparer.Ordinal)),
             StringComparer.Ordinal);
 
     private static double? ReadNullableDouble(JsonElement element, string name) =>
@@ -328,7 +340,7 @@ public sealed class JsonProjectSerializer
     {
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = assembly.GetManifestResourceNames()
-            .Single(name => name.EndsWith("project-v1.schema.json", StringComparison.Ordinal));
+            .Single(name => name.EndsWith("project-v2.schema.json", StringComparison.Ordinal));
         using var stream = assembly.GetManifestResourceStream(resourceName)
             ?? throw new InvalidOperationException("Embedded project schema resource was not found.");
         using var reader = new StreamReader(stream);

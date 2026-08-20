@@ -63,7 +63,7 @@ public sealed record ProjectDocument
         var now = DateTimeOffset.UtcNow;
         return new ProjectDocument(
             Guid.NewGuid(),
-            schemaVersion: 1,
+            schemaVersion: ProjectFormat.CurrentVersion,
             name.Trim(),
             now,
             now,

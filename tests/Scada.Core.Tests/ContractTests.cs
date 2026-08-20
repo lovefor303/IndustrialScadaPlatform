@@ -16,7 +16,7 @@ public sealed class ContractTests
         var project = ProjectDocument.Create("Demo");
 
         Assert.NotEqual(Guid.Empty, project.ProjectId);
-        Assert.Equal(1, project.SchemaVersion);
+        Assert.Equal(ProjectFormat.CurrentVersion, project.SchemaVersion);
         Assert.Equal("Demo", project.Name);
         Assert.Equal(ProjectStatus.Draft, project.Status);
     }

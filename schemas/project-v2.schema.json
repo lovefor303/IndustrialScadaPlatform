@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://industrial-scada.local/schemas/project-v2.schema.json",
+  "title": "Industrial SCADA Project Version 2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectId",
+    "name",
+    "createdAt",
+    "updatedAt",
+    "status",
+    "screens",
+    "variables"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "projectId": {
+      "$ref": "#/$defs/guid"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": ["draft", "published", "archived"]
+    },
+    "screens": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/screen"
+      }
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variable"
+      }
+    }
+  },
+  "$defs": {
+    "guid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variableKey", "targetProperty"],
+      "properties": {
+        "variableKey": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "targetProperty": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "interaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventName", "actionName", "parameters"],
+      "properties": {
+        "eventName": { "type": "string", "minLength": 1 },
+        "actionName": { "type": "string", "minLength": 1 },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "sceneBase": {
+      "type": "object",
+      "required": [
+        "$type",
+        "id",
+        "type",
+        "bounds",
+        "rotation",
+        "zIndex",
+        "isVisible",
+        "properties",
+        "bindings",
+        "interactions"
+      ],
+      "properties": {
+        "$type": {
+          "enum": ["control", "pipe", "text"]
+        },
+        "id": {
+          "$ref": "#/$defs/guid"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bounds": {
+          "$ref": "#/$defs/bounds"
+        },
+        "rotation": {
+          "type": "number"
+        },
+        "zIndex": {
+          "type": "integer"
+        },
+        "isVisible": {
+          "type": "boolean"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/binding"
+          }
+        },
+        "interactions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/interaction"
+          }
+        }
+      }
+    },
+    "control": {
+      "allOf": [
+        { "$ref": "#/$defs/sceneBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["controlVersion"],
+          "properties": {
+            "$type": { "const": "control" },
+            "id": true,
+            "type": true,
+            "bounds": true,
+            "rotation": true,
+            "zIndex": true,
+            "isVisible": true,
+            "properties": true,
+            "bindings": true,
+            "interactions": true,
+            "controlVersion": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "pipe": {
+      "allOf": [
+        { "$ref": "#/$defs/sceneBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end", "bends"],
+          "properties": {
+            "$type": { "const": "pipe" },
+            "id": true,
+            "type": true,
+            "bounds": true,
+            "rotation": true,
+            "zIndex": true,
+            "isVisible": true,
+            "properties": true,
+            "bindings": true,
+            "interactions": true,
+            "start": { "$ref": "#/$defs/point" },
+            "end": { "$ref": "#/$defs/point" },
+            "bends": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      ]
+    },
+    "text": {
+      "allOf": [
+        { "$ref": "#/$defs/sceneBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text"],
+          "properties": {
+            "$type": { "const": "text" },
+            "id": true,
+            "type": true,
+            "bounds": true,
+            "rotation": true,
+            "zIndex": true,
+            "isVisible": true,
+            "properties": true,
+            "bindings": true,
+            "interactions": true,
+            "text": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "sceneObject": {
+      "oneOf": [
+        { "$ref": "#/$defs/control" },
+        { "$ref": "#/$defs/pipe" },
+        { "$ref": "#/$defs/text" }
+      ]
+    },
+    "screen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "objects"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sceneObject"
+          }
+        }
+      }
+    },
+    "variable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "dataType", "direction"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "dataType": {
+          "enum": ["bool", "int32", "uint32", "float64", "string"]
+        },
+        "direction": {
+          "enum": ["feedback", "command", "parameter"]
+        },
+        "unit": {
+          "type": ["string", "null"]
+        },
+        "minimum": {
+          "type": ["number", "null"]
+        },
+        "maximum": {
+          "type": ["number", "null"]
+        }
+      }
+    }
+  }
+}
