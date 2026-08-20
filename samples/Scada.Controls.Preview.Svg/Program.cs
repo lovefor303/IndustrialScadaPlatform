@@ -1,22 +1,12 @@
 using System.Text;
-using Scada.Controls;
-using Scada.Controls.Geometry;
-using Scada.Controls.Rendering;
+using Scada.Controls.SampleProject;
 using Scada.Controls.Svg;
-using Scada.Core;
 
 return await SvgPreviewProgram.RunAsync(args);
 
 internal static class SvgPreviewProgram
 {
-    private static readonly ControlState[] States =
-    [
-        ControlState.Stopped,
-        ControlState.Active,
-        ControlState.Transition,
-        ControlState.Fault,
-        ControlState.Unknown
-    ];
+    private static readonly string[] ScenarioNames = ["stopped", "active", "transition", "fault", "unknown"];
 
     public static Task<int> RunAsync(string[] args)
     {
@@ -36,14 +26,17 @@ internal static class SvgPreviewProgram
         Directory.CreateDirectory(directory);
         var renderer = new SvgControlRenderer();
         var documents = new List<SvgPreviewDocument>();
-        foreach (var typeId in ControlTypeIds.All.OrderBy(type => type, StringComparer.Ordinal))
+        foreach (var scenarioName in ScenarioNames)
         {
-            foreach (var state in States)
+            foreach (var renderable in SampleProjectFactory.BuildRenderables(scenarioName))
             {
-                var fileName = $"{typeId}-{StateName(state)}.svg";
-                var plan = ControlGeometryFactory.Build(typeId, CreateContext(state));
-                File.WriteAllText(Path.Combine(directory, fileName), renderer.Render(plan), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-                documents.Add(new SvgPreviewDocument(fileName, $"{typeId} / {StateName(state)}"));
+                var fileName = $"{renderable.Control.Type}-{renderable.Control.Id:N}-{scenarioName}.svg";
+                File.WriteAllText(
+                    Path.Combine(directory, fileName),
+                    renderer.Render(renderable.Plan),
+                    new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                var label = renderable.Control.Properties.TryGetValue("Label", out var value) ? value : renderable.Control.Type;
+                documents.Add(new SvgPreviewDocument(fileName, $"{label} / {scenarioName}"));
             }
         }
 
@@ -53,34 +46,4 @@ internal static class SvgPreviewProgram
         return Task.FromResult(0);
     }
 
-    private static ControlRenderContext CreateContext(ControlState state) =>
-        ControlRenderContext.ForState(state) with
-        {
-            Quality = state == ControlState.Unknown ? VariableQuality.Bad : VariableQuality.Good,
-            NumericValues = new Dictionary<string, double>(StringComparer.Ordinal)
-            {
-                ["ProcessValue"] = 58.2,
-                ["LevelValue"] = 62,
-                ["ValvePosition"] = 45,
-                ["Minimum"] = 0,
-                ["Maximum"] = 100
-            },
-            TextValues = new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                ["Unit"] = "°C",
-                ["Label"] = "执行",
-                ["ActionKind"] = "write-command",
-                ["ActionTarget"] = "Preview.Command"
-            }
-        };
-
-    private static string StateName(ControlState state) => state switch
-    {
-        ControlState.Stopped => "stopped",
-        ControlState.Active => "active",
-        ControlState.Transition => "transition",
-        ControlState.Fault => "fault",
-        ControlState.Unknown => "unknown",
-        _ => throw new ArgumentOutOfRangeException(nameof(state))
-    };
 }

@@ -3,8 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.IO;
-using Scada.Controls;
-using Scada.Controls.Geometry;
+using Scada.Controls.SampleProject;
 using Scada.Controls.Wpf;
 
 namespace Scada.Controls.Preview.Wpf;
@@ -20,12 +19,12 @@ internal static class ReviewArtifactWriter
         }
 
         Directory.CreateDirectory(absoluteDirectory);
-        WriteSheet(Path.Combine(absoluteDirectory, "magnified-active.png"), 1440, 960, ControlState.Active, scale: 2.4);
-        WriteSheet(Path.Combine(absoluteDirectory, "magnified-fault.png"), 1440, 960, ControlState.Fault, scale: 2.4);
-        WriteSheet(Path.Combine(absoluteDirectory, "exact-size-1920x1080.png"), 1920, 1080, ControlState.Stopped, scale: 1);
+        WriteSheet(Path.Combine(absoluteDirectory, "magnified-active.png"), 1440, 960, "active", scale: 1.6);
+        WriteSheet(Path.Combine(absoluteDirectory, "magnified-fault.png"), 1440, 960, "fault", scale: 1.6);
+        WriteSheet(Path.Combine(absoluteDirectory, "exact-size-1920x1080.png"), 1920, 1080, "stopped", scale: 1);
     }
 
-    private static void WriteSheet(string path, int width, int height, ControlState state, double scale)
+    private static void WriteSheet(string path, int width, int height, string scenarioName, double scale)
     {
         var surface = new Canvas
         {
@@ -33,37 +32,19 @@ internal static class ReviewArtifactWriter
             Height = height,
             Background = new SolidColorBrush(Color.FromRgb(32, 36, 40))
         };
-        var context = PreviewPlans.CreateContext(state, reducedMotion: true);
-        var x = 60d;
-        var y = 55d;
-        foreach (var typeId in ControlTypeIds.All)
+        foreach (var renderable in SampleProjectFactory.BuildRenderables(scenarioName, reducedMotion: true))
         {
-            var plan = ControlGeometryFactory.Build(typeId, context);
             var control = new IndustrialControl
             {
-                RenderPlan = plan,
-                State = state,
+                RenderPlan = renderable.Plan,
+                State = renderable.Plan.State,
                 ReducedMotion = true,
-                Width = Math.Min(360, Math.Max(120, plan.DesignSize.Width * scale)),
-                Height = Math.Min(420, Math.Max(70, plan.DesignSize.Height * scale))
+                Width = renderable.Control.Bounds.Width * scale,
+                Height = renderable.Control.Bounds.Height * scale
             };
-            Canvas.SetLeft(control, x);
-            Canvas.SetTop(control, y + 24);
-            surface.Children.Add(new TextBlock
-            {
-                Text = typeId,
-                Foreground = Brushes.White,
-                FontSize = 13
-            });
-            Canvas.SetLeft(surface.Children[^1], x);
-            Canvas.SetTop(surface.Children[^1], y);
+            Canvas.SetLeft(control, renderable.Control.Bounds.X * scale);
+            Canvas.SetTop(control, renderable.Control.Bounds.Y * scale);
             surface.Children.Add(control);
-            x += 400;
-            if (x > width - 380)
-            {
-                x = 60;
-                y += 250;
-            }
         }
 
         surface.Measure(new Size(width, height));

@@ -2,8 +2,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Scada.Controls;
-using Scada.Controls.Geometry;
 using Scada.Controls.Rendering;
+using Scada.Controls.SampleProject;
 using Scada.Controls.Wpf;
 
 namespace Scada.Controls.Preview.Wpf;
@@ -11,7 +11,7 @@ namespace Scada.Controls.Preview.Wpf;
 internal sealed class MainWindow : Window
 {
     private readonly Canvas _sheet;
-    private readonly ComboBox _stateSelector;
+    private readonly ComboBox _scenarioSelector;
     private readonly CheckBox _reducedMotion;
 
     public MainWindow()
@@ -23,14 +23,14 @@ internal sealed class MainWindow : Window
         MinHeight = 620;
         Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(VisualTokens.Canvas));
 
-        _stateSelector = new ComboBox
+        _scenarioSelector = new ComboBox
         {
             Width = 150,
             Margin = new Thickness(8),
-            ItemsSource = Enum.GetValues<ControlState>(),
-            SelectedItem = ControlState.Stopped
+            ItemsSource = new[] { "stopped", "active", "transition", "fault", "unknown" },
+            SelectedItem = "stopped"
         };
-        _stateSelector.SelectionChanged += (_, _) => RefreshSheet();
+        _scenarioSelector.SelectionChanged += (_, _) => RefreshSheet();
         _reducedMotion = new CheckBox
         {
             Content = "减弱动画",
@@ -42,17 +42,18 @@ internal sealed class MainWindow : Window
         _reducedMotion.Unchecked += (_, _) => RefreshSheet();
 
         var toolbar = new StackPanel { Orientation = Orientation.Horizontal, Background = new SolidColorBrush(Color.FromRgb(45, 51, 56)) };
-        toolbar.Children.Add(new TextBlock { Text = "状态", Foreground = Brushes.White, Margin = new Thickness(12, 8, 0, 8), VerticalAlignment = VerticalAlignment.Center });
-        toolbar.Children.Add(_stateSelector);
+        toolbar.Children.Add(new TextBlock { Text = "离线场景", Foreground = Brushes.White, Margin = new Thickness(12, 8, 0, 8), VerticalAlignment = VerticalAlignment.Center });
+        toolbar.Children.Add(_scenarioSelector);
         toolbar.Children.Add(_reducedMotion);
 
-        _sheet = new Canvas { Background = Background, ClipToBounds = true };
+        _sheet = new Canvas { Width = 1920, Height = 1080, Background = Background, ClipToBounds = true };
+        var scrollViewer = new ScrollViewer { Content = _sheet, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
         Content = new DockPanel
         {
             Children =
             {
                 toolbar,
-                _sheet
+                scrollViewer
             }
         };
         DockPanel.SetDock(toolbar, Dock.Top);
@@ -62,30 +63,20 @@ internal sealed class MainWindow : Window
     private void RefreshSheet()
     {
         _sheet.Children.Clear();
-        var state = _stateSelector.SelectedItem is ControlState selected ? selected : ControlState.Stopped;
-        var context = PreviewPlans.CreateContext(state, _reducedMotion.IsChecked == true);
-        var x = 40d;
-        var y = 50d;
-        foreach (var typeId in ControlTypeIds.All)
+        var scenarioName = _scenarioSelector.SelectedItem as string ?? "stopped";
+        foreach (var renderable in SampleProjectFactory.BuildRenderables(scenarioName, reducedMotion: _reducedMotion.IsChecked == true))
         {
-            var plan = ControlGeometryFactory.Build(typeId, context);
             var control = new IndustrialControl
             {
-                RenderPlan = plan,
-                State = state,
-                ReducedMotion = context.ReducedMotion,
-                Width = Math.Min(210, Math.Max(120, plan.DesignSize.Width * 1.35)),
-                Height = Math.Min(240, Math.Max(70, plan.DesignSize.Height * 1.1))
+                RenderPlan = renderable.Plan,
+                State = renderable.Plan.State,
+                ReducedMotion = _reducedMotion.IsChecked == true,
+                Width = renderable.Control.Bounds.Width,
+                Height = renderable.Control.Bounds.Height
             };
-            Canvas.SetLeft(control, x);
-            Canvas.SetTop(control, y);
+            Canvas.SetLeft(control, renderable.Control.Bounds.X);
+            Canvas.SetTop(control, renderable.Control.Bounds.Y);
             _sheet.Children.Add(control);
-            x += 230;
-            if (x > 980)
-            {
-                x = 40;
-                y += 260;
-            }
         }
     }
 }
