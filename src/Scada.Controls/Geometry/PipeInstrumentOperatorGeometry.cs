@@ -188,7 +188,7 @@ public static class PipeInstrumentOperatorGeometry
             primitives.Add(new RenderLine("instrument.needle", new(23, 24), new(needleX, 13), StateToken(context)));
         }
 
-        primitives.Add(new RenderText("instrument.value", new(includeDial ? 48 : 10, 28), FormatNumber(display), VisualTokens.Outline));
+        primitives.Add(new RenderText("instrument.value", new(includeDial ? 48 : 10, 28), FormatNumber(raw), VisualTokens.Outline));
         primitives.Add(new RenderText("instrument.unit", new(92, 28), unit, VisualTokens.EquipmentDepth));
         AddQualityMarker(primitives, context, new(108, 6));
 
@@ -202,7 +202,8 @@ public static class PipeInstrumentOperatorGeometry
             {
                 ["instrument.family"] = family,
                 ["raw.value"] = FormatNumber(raw),
-                ["display.value"] = FormatNumber(display),
+                ["display.value"] = FormatNumber(raw),
+                ["visual.value"] = FormatNumber(display),
                 ["display.unit"] = unit
             });
     }

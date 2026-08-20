@@ -79,7 +79,7 @@ public sealed class PipeInstrumentOperatorGeometryTests
     }
 
     [Fact]
-    public void NumericDisplayClampsVisibleValueAndKeepsRawDiagnostic()
+    public void NumericDisplayKeepsActualValueWhileClampingOnlyVisualRange()
     {
         var plan = PipeInstrumentOperatorGeometry.BuildNumericDisplay(ControlRenderContext.ForState(ControlState.Active) with
         {
@@ -92,9 +92,10 @@ public sealed class PipeInstrumentOperatorGeometryTests
         });
 
         var value = Assert.IsType<RenderText>(plan.Primitives.Single(primitive => primitive.PartId == "instrument.value"));
-        Assert.Equal("100", value.Text);
+        Assert.Equal("125", value.Text);
         Assert.Equal("125", plan.Diagnostics["raw.value"]);
-        Assert.Equal("100", plan.Diagnostics["display.value"]);
+        Assert.Equal("125", plan.Diagnostics["display.value"]);
+        Assert.Equal("100", plan.Diagnostics["visual.value"]);
     }
 
     [Theory]
