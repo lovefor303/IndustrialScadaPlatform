@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <OutputType>WinExe</OutputType>
     <AssemblyName>Scada.Controls.Preview.Wpf</AssemblyName>
     <RootNamespace>Scada.Controls.Preview.Wpf</RootNamespace>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -7,6 +8,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Scada.Controls\Scada.Controls.csproj" />
     <ProjectReference Include="..\..\src\Scada.Controls.Wpf\Scada.Controls.Wpf.csproj" />
     <ProjectReference Include="..\Scada.Controls.SampleProject\Scada.Controls.SampleProject.csproj" />
   </ItemGroup>
