@@ -1,6 +1,7 @@
 <Window x:Class="Scada.Editor.Wpf.EditorShellWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Scada.Editor.Wpf"
         Title="工业组态编辑器"
         Width="1440"
         Height="900"
@@ -101,13 +102,7 @@
                     Background="#171B1F"
                     BorderBrush="#3B4650"
                     BorderThickness="1">
-                <Grid x:Name="CanvasHost">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Foreground="#6F7D89"
-                               FontSize="18"
-                               Text="画布" />
-                </Grid>
+                <local:EditorCanvas x:Name="ProcessCanvas" />
             </Border>
 
             <Border Grid.Column="2"

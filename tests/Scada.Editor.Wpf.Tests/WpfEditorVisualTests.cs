@@ -1,12 +1,44 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using Scada.Editor.Wpf;
+using Scada.Controls;
+using Scada.Scene;
 using Xunit;
 
 namespace Scada.Editor.Wpf.Tests;
 
 public sealed class WpfEditorVisualTests
 {
+    [Fact]
+    public void CanvasRendersIndependentValveAndPipeObjects()
+    {
+        StaThread.Run(() =>
+        {
+            var valve = ControlObject.Create(
+                ControlTypeIds.AutomatedValve,
+                new RectD(100, 100, 80, 60));
+            var pipe = PipeObject.Create(
+                new PointD(20, 130),
+                new PointD(100, 130),
+                new[] { new PointD(60, 130) });
+            var project = ProjectDocument.Create(
+                "Canvas test",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve, pipe }) });
+            var session = new EditorSession(project, "Main");
+            session.SelectOnly(valve.Id);
+            var canvas = new EditorCanvas { Session = session };
+
+            canvas.Refresh();
+
+            Assert.Equal(2, canvas.Children.Count);
+            Assert.Contains(canvas.Children.OfType<Border>(), border =>
+                border.Tag is Guid id && id == valve.Id);
+            Assert.Contains(canvas.Children.OfType<Polyline>(), polyline => polyline.Points.Count == 3);
+            return true;
+        });
+    }
+
     [Fact]
     public void DeveloperShellLoadsTheWinccStylePanels()
     {

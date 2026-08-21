@@ -8,6 +8,20 @@ namespace Scada.Editor.Wpf.Tests;
 public sealed class EditorSessionTests
 {
     [Fact]
+    public void ToolboxContainsEveryPhase2ControlAndIndependentPipeEntry()
+    {
+        var entries = ToolboxCatalog.CreateDefault().Entries;
+
+        Assert.Contains(entries, entry => entry.TypeId == ControlTypeIds.CentrifugalPump);
+        Assert.Contains(entries, entry => entry.TypeId == ControlTypeIds.AutomatedValve);
+        Assert.Contains(entries, entry => entry.TypeId == ControlTypeIds.Vessel);
+        Assert.Contains(entries, entry => entry.TypeId == ControlTypeIds.StraightPipe);
+        Assert.Contains(entries, entry => entry.TypeId == "text");
+        Assert.Equal(ControlTypeIds.All.Count + 1, entries.Count);
+        Assert.Contains(entries, entry => entry.TypeId == ControlTypeIds.StraightPipe && entry.IsPipe);
+    }
+
+    [Fact]
     public void AddingObjectPreservesExistingIdsAndMarksDraftDirty()
     {
         var existing = ControlObject.Create(
