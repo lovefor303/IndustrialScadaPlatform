@@ -74,4 +74,21 @@ public sealed class WpfEditorVisualTests
             return true;
         });
     }
+
+    [Fact]
+    public void DeveloperShellExposesEditableInspectorSurfaces()
+    {
+        StaThread.Run(() =>
+        {
+            var window = new EditorShellWindow(EditorRole.Developer);
+
+            Assert.IsAssignableFrom<FrameworkElement>(window.FindName("PropertyPanel"));
+            Assert.IsAssignableFrom<FrameworkElement>(window.FindName("BindingPanel"));
+            Assert.IsAssignableFrom<FrameworkElement>(window.FindName("DynamicsPanel"));
+            Assert.IsAssignableFrom<FrameworkElement>(window.FindName("EventsPanel"));
+
+            window.Close();
+            return true;
+        });
+    }
 }

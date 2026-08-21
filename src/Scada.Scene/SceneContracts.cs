@@ -25,6 +25,43 @@ public readonly record struct RectD(double X, double Y, double Width, double Hei
 
 public sealed record BindingDefinition(string VariableKey, string TargetProperty);
 
+/// <summary>
+/// Declarative editor-time dynamic rule. It describes how a variable may drive
+/// a visual property; runtime evaluation belongs to a later runtime module.
+/// </summary>
+public sealed record DynamicDefinition
+{
+    public DynamicDefinition(
+        string targetProperty,
+        string variableKey,
+        VariableDataType expectedDataType,
+        VariableDirection expectedDirection,
+        string? condition = null,
+        IReadOnlyDictionary<string, string>? mapping = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetProperty);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variableKey);
+        TargetProperty = targetProperty;
+        VariableKey = variableKey;
+        ExpectedDataType = expectedDataType;
+        ExpectedDirection = expectedDirection;
+        Condition = condition;
+        Mapping = mapping ?? new Dictionary<string, string>(StringComparer.Ordinal);
+    }
+
+    public string TargetProperty { get; }
+
+    public string VariableKey { get; init; }
+
+    public VariableDataType ExpectedDataType { get; init; }
+
+    public VariableDirection ExpectedDirection { get; init; }
+
+    public string? Condition { get; init; }
+
+    public IReadOnlyDictionary<string, string> Mapping { get; init; }
+}
+
 public sealed record InteractionDefinition
 {
     public InteractionDefinition(string eventName, string actionName, IReadOnlyDictionary<string, string>? parameters = null)
@@ -94,6 +131,9 @@ public abstract record SceneObject
     public IReadOnlyDictionary<string, BindingDefinition> Bindings { get; init; }
 
     public IReadOnlyDictionary<string, InteractionDefinition> Interactions { get; init; }
+
+    public IReadOnlyDictionary<string, DynamicDefinition> Dynamics { get; init; } =
+        new Dictionary<string, DynamicDefinition>(StringComparer.Ordinal);
 
     public int ControlVersion { get; init; } = 1;
 

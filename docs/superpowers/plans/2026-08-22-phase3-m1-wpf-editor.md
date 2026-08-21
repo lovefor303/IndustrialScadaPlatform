@@ -81,8 +81,8 @@
 - [ ] Render each `ControlObject` through `IndustrialControl`/`WpfControlRenderer`, render `PipeObject` with its own path, and render `TextObject` with its stored text.
 - [ ] Add selection adorners, multi-select, click-empty-to-clear, direction-key nudging, delete and explicit pipe endpoint handles. Do not infer or enforce connections.
 - [ ] Add Ctrl-click alignment/distribution commands that operate only on the current selection.
-- [ ] Run focused model and STA tests.
-- [ ] Commit `feat: add toolbox and independent scene editing`.
+- [x] Run focused model and STA tests.
+- [x] Commit `feat: add toolbox and independent scene editing`.
 
 ### Task 4: Add properties, variables, dynamics and events panels
 
@@ -91,12 +91,12 @@
 - Modify: `src/Scada.Scene/SceneContracts.cs` only if a typed dynamic definition is missing; add a schema migration when persisted shape changes.
 - Test: `tests/Scada.Editor.Wpf.Tests/EditorSessionTests.cs`, `WpfEditorVisualTests.cs`.
 
-- [ ] Write tests for editing bounds/rotation/visibility, selecting a valid binding role and rejecting an unknown variable or wrong data direction.
-- [ ] Implement property editing against immutable `SceneObject` copies; equipment uses the Phase 2 resize policy, while pipes use endpoint/bend operations.
-- [ ] Implement dynamics as declarative records `{TargetProperty, VariableKey, Condition/Mapping}` with validation and no runtime side effect.
-- [ ] Implement events using `InteractionCatalog` stable IDs and Chinese labels; action parameters are selected from known schemas rather than free-form English names.
-- [ ] Display validation errors with object ID and field path; preserve invalid drafts only in the view model and block publish until validation passes.
-- [ ] Run focused tests and verify serialized metadata survives a round-trip.
+- [x] Write tests for editing bounds/rotation/visibility, selecting a valid binding role and rejecting an unknown variable or wrong data direction.
+- [x] Implement property editing against immutable `SceneObject` copies; equipment uses the Phase 2 resize policy, while pipes use endpoint/bend operations.
+- [x] Implement dynamics as declarative records `{TargetProperty, VariableKey, Condition/Mapping}` with validation and no runtime side effect.
+- [x] Implement events using `InteractionCatalog` stable IDs and Chinese labels; action parameters are selected from known schemas rather than free-form English names.
+- [x] Display validation errors with object ID and field path; preserve invalid drafts only in the view model and block publish until validation passes.
+- [x] Run focused tests and verify serialized metadata survives a round-trip.
 - [ ] Commit `feat: add editor property binding dynamics and event panels`.
 
 ### Task 5: Add project/new-open/save/publish/restore workflow

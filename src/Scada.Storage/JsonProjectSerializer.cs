@@ -153,7 +153,8 @@ public sealed class JsonProjectSerializer
             ["isVisible"] = sceneObject.IsVisible,
             ["properties"] = SerializeStringMap(sceneObject.Properties),
             ["bindings"] = SerializeBindings(sceneObject.Bindings),
-            ["interactions"] = SerializeInteractions(sceneObject.Interactions)
+            ["interactions"] = SerializeInteractions(sceneObject.Interactions),
+            ["dynamics"] = SerializeDynamics(sceneObject.Dynamics)
         };
 
         if (sceneObject is ControlObject control)
@@ -232,6 +233,31 @@ public sealed class JsonProjectSerializer
         return result;
     }
 
+    private static JsonObject SerializeDynamics(IReadOnlyDictionary<string, DynamicDefinition> values)
+    {
+        var result = new JsonObject();
+        foreach (var pair in values.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+        {
+            var definition = pair.Value;
+            var item = new JsonObject
+            {
+                ["targetProperty"] = definition.TargetProperty,
+                ["variableKey"] = definition.VariableKey,
+                ["expectedDataType"] = ToWire(definition.ExpectedDataType),
+                ["expectedDirection"] = ToWire(definition.ExpectedDirection),
+                ["mapping"] = SerializeStringMap(definition.Mapping)
+            };
+            if (definition.Condition is not null)
+            {
+                item["condition"] = definition.Condition;
+            }
+
+            result[pair.Key] = item;
+        }
+
+        return result;
+    }
+
     private static ProjectDocument DeserializeProject(JsonElement root)
     {
         var variables = root.GetProperty("variables").EnumerateArray().Select(DeserializeVariable).ToArray();
@@ -268,6 +294,9 @@ public sealed class JsonProjectSerializer
         var properties = DeserializeStringMap(element.GetProperty("properties"));
         var bindings = DeserializeBindings(element.GetProperty("bindings"));
         var interactions = DeserializeInteractions(element.GetProperty("interactions"));
+        var dynamics = element.TryGetProperty("dynamics", out var dynamicElement)
+            ? DeserializeDynamics(dynamicElement)
+            : new Dictionary<string, DynamicDefinition>(StringComparer.Ordinal);
         var type = element.GetProperty("type").GetString()!;
         var common = element.GetProperty("$type").GetString() switch
         {
@@ -285,6 +314,7 @@ public sealed class JsonProjectSerializer
             Properties = properties,
             Bindings = bindings,
             Interactions = interactions,
+            Dynamics = dynamics,
             ControlVersion = element.TryGetProperty("controlVersion", out var controlVersion)
                 ? controlVersion.GetInt32()
                 : 1
@@ -328,6 +358,22 @@ public sealed class JsonProjectSerializer
                 property.Value.GetProperty("actionName").GetString()!,
                 property.Value.TryGetProperty("parameters", out var parameters)
                     ? DeserializeStringMap(parameters)
+                    : new Dictionary<string, string>(StringComparer.Ordinal)),
+            StringComparer.Ordinal);
+
+    private static Dictionary<string, DynamicDefinition> DeserializeDynamics(JsonElement element) =>
+        element.EnumerateObject().ToDictionary(
+            property => property.Name,
+            property => new DynamicDefinition(
+                property.Value.GetProperty("targetProperty").GetString()!,
+                property.Value.GetProperty("variableKey").GetString()!,
+                FromWireDataType(property.Value.GetProperty("expectedDataType").GetString()!),
+                FromWireDirection(property.Value.GetProperty("expectedDirection").GetString()!),
+                property.Value.TryGetProperty("condition", out var condition)
+                    ? condition.GetString()
+                    : null,
+                property.Value.TryGetProperty("mapping", out var mapping)
+                    ? DeserializeStringMap(mapping)
                     : new Dictionary<string, string>(StringComparer.Ordinal)),
             StringComparer.Ordinal);
 

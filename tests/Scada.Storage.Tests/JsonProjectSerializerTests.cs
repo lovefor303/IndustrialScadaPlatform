@@ -37,6 +37,23 @@ public sealed class JsonProjectSerializerTests
         Assert.Equal(new PointD(10, 20), pipe.Start);
         Assert.Equal(new PointD(100, 20), pipe.End);
         Assert.Equal("Main title", Assert.IsType<TextObject>(objects[2]).Text);
+        var restoredControl = Assert.IsType<ControlObject>(objects[0]);
+        var originalControl = Assert.IsType<ControlObject>(project.Screens.Single().Objects[0]);
+        Assert.Equal(originalControl.Dynamics.Keys, restoredControl.Dynamics.Keys);
+        var originalDynamic = originalControl.Dynamics["Visibility"];
+        var restoredDynamic = restoredControl.Dynamics["Visibility"];
+        Assert.Equal(originalDynamic.TargetProperty, restoredDynamic.TargetProperty);
+        Assert.Equal(originalDynamic.VariableKey, restoredDynamic.VariableKey);
+        Assert.Equal(originalDynamic.ExpectedDataType, restoredDynamic.ExpectedDataType);
+        Assert.Equal(originalDynamic.ExpectedDirection, restoredDynamic.ExpectedDirection);
+        Assert.Equal(originalDynamic.Condition, restoredDynamic.Condition);
+        Assert.Equal(originalDynamic.Mapping, restoredDynamic.Mapping);
+        Assert.Equal(originalControl.Interactions.Keys, restoredControl.Interactions.Keys);
+        var originalInteraction = originalControl.Interactions["pointer.left.press"];
+        var restoredInteraction = restoredControl.Interactions["pointer.left.press"];
+        Assert.Equal(originalInteraction.EventName, restoredInteraction.EventName);
+        Assert.Equal(originalInteraction.ActionName, restoredInteraction.ActionName);
+        Assert.Equal(originalInteraction.Parameters, restoredInteraction.Parameters);
     }
 
     [Fact]
@@ -86,6 +103,19 @@ public sealed class JsonProjectSerializerTests
             Bindings = new Dictionary<string, BindingDefinition>
             {
                 ["running"] = new("Valve.RunningFeedback", "fill")
+            },
+            Dynamics = new Dictionary<string, DynamicDefinition>
+            {
+                ["Visibility"] = new(
+                    "Visibility",
+                    "Valve.RunningFeedback",
+                    VariableDataType.Bool,
+                    VariableDirection.Feedback,
+                    condition: "== true")
+            },
+            Interactions = new Dictionary<string, InteractionDefinition>
+            {
+                ["pointer.left.press"] = new("pointer.left.press", "command.toggle-bool")
             }
         };
         var pipe = PipeObject.Create(new PointD(10, 20), new PointD(100, 20));

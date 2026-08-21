@@ -103,6 +103,29 @@
         }
       }
     },
+    "dynamic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetProperty", "variableKey", "expectedDataType", "expectedDirection", "mapping"],
+      "properties": {
+        "targetProperty": { "type": "string", "minLength": 1 },
+        "variableKey": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "expectedDataType": {
+          "enum": ["bool", "int32", "uint32", "float64", "string"]
+        },
+        "expectedDirection": {
+          "enum": ["feedback", "command", "parameter"]
+        },
+        "condition": { "type": ["string", "null"] },
+        "mapping": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
     "sceneBase": {
       "type": "object",
       "required": [
@@ -157,6 +180,12 @@
           "additionalProperties": {
             "$ref": "#/$defs/interaction"
           }
+        },
+        "dynamics": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/dynamic"
+          }
         }
       }
     },
@@ -178,6 +207,7 @@
             "properties": true,
             "bindings": true,
             "interactions": true,
+            "dynamics": true,
             "controlVersion": { "type": "integer", "minimum": 1 }
           }
         }
@@ -201,6 +231,7 @@
             "properties": true,
             "bindings": true,
             "interactions": true,
+            "dynamics": true,
             "start": { "$ref": "#/$defs/point" },
             "end": { "$ref": "#/$defs/point" },
             "bends": {
@@ -229,6 +260,7 @@
             "properties": true,
             "bindings": true,
             "interactions": true,
+            "dynamics": true,
             "text": { "type": "string" }
           }
         }

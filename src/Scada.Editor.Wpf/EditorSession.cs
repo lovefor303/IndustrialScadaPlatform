@@ -78,4 +78,27 @@ public sealed class EditorSession
             dx,
             dy));
     }
+
+    public void UpdateSelectedObject(Func<SceneObject, SceneObject> update)
+    {
+        ArgumentNullException.ThrowIfNull(update);
+        if (_selectedObjectIds.Count != 1)
+        {
+            throw new InvalidOperationException("Exactly one scene object must be selected for this edit.");
+        }
+
+        var selectedId = _selectedObjectIds.Single();
+        var selected = ActiveScreen.FindObject(selectedId)
+            ?? throw new KeyNotFoundException($"Scene object '{selectedId}' was not found.");
+        var replacement = update(selected)
+            ?? throw new InvalidOperationException("An object update must return a scene object.");
+        if (replacement.Id != selected.Id)
+        {
+            throw new InvalidOperationException("An object update must preserve the scene object ID.");
+        }
+
+        ReplaceActiveScreen(ActiveScreen.ReplaceObjects(
+            ActiveScreen.Objects.Select(sceneObject =>
+                sceneObject.Id == selectedId ? replacement : sceneObject)));
+    }
 }

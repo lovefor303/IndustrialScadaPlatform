@@ -34,6 +34,12 @@ public static class InteractionCatalog
 
     public static LocalizedCapability Action(string id) => Get(Actions, id, "action");
 
+    public static IReadOnlyList<LocalizedCapability> AllEvents { get; } =
+        Events.Values.OrderBy(item => item.ChineseLabel, StringComparer.Ordinal).ToArray();
+
+    public static IReadOnlyList<LocalizedCapability> AllActions { get; } =
+        Actions.Values.OrderBy(item => item.ChineseLabel, StringComparer.Ordinal).ToArray();
+
     private static LocalizedCapability Get(
         IReadOnlyDictionary<string, LocalizedCapability> values,
         string id,

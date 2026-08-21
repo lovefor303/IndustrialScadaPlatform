@@ -1,4 +1,5 @@
 using Scada.Controls;
+using Scada.Core;
 using Scada.Editor.Wpf;
 using Scada.Scene;
 using Xunit;
@@ -83,5 +84,93 @@ public sealed class EditorSessionTests
         Assert.Equal(Scada.Core.ProjectStatus.Draft, session.Project.Status);
         Assert.Equal(replacement, session.ActiveScreen);
         Assert.True(session.Project.UpdatedAt >= project.UpdatedAt);
+    }
+
+    [Fact]
+    public void DynamicsPanelAcceptsMatchingVariableAndRejectsMissingTypeOrDirection()
+    {
+        var feedback = VariableDefinition.Number("Tank.Level", VariableDataType.Float64, VariableDirection.Feedback, "%");
+        var command = VariableDefinition.Bool("Tank.Command", VariableDirection.Command);
+        var control = ControlObject.Create(ControlTypeIds.LevelBar, new RectD(0, 0, 120, 48));
+        var project = ProjectDocument.Create(
+            "Dynamic test",
+            new[] { feedback, command },
+            new[] { ScreenDocument.Create("Main", new SceneObject[] { control }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(control.Id);
+        var panel = new DynamicsPanelViewModel(session);
+
+        var valid = new DynamicDefinition(
+            "Visibility",
+            feedback.Key,
+            VariableDataType.Float64,
+            VariableDirection.Feedback,
+            condition: "> 0");
+        Assert.True(panel.TrySet(valid, out var validErrors), string.Join("; ", validErrors));
+        Assert.Equal(valid, Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(control.Id)).Dynamics["Visibility"]);
+
+        var missing = valid with { VariableKey = "Tank.Missing" };
+        Assert.False(panel.TrySet(missing, out var missingErrors));
+        Assert.Contains(missingErrors, error => error.Contains("变量", StringComparison.Ordinal));
+
+        var wrongType = valid with { VariableKey = command.Key };
+        Assert.False(panel.TrySet(wrongType, out var typeErrors));
+        Assert.Contains(typeErrors, error => error.Contains("类型", StringComparison.Ordinal));
+
+        var wrongDirection = valid with { VariableKey = command.Key, ExpectedDataType = VariableDataType.Bool };
+        Assert.False(panel.TrySet(wrongDirection, out var directionErrors));
+        Assert.Contains(directionErrors, error => error.Contains("方向", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void PropertyPanelUpdatesGeometryAndEventsUseChineseCatalogLabels()
+    {
+        var control = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 100, 80));
+        var project = ProjectDocument.Create(
+            "Panel test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { control }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(control.Id);
+
+        var properties = new PropertyPanelViewModel(session);
+        properties.SetGeometry(new RectD(20, 30, 140, 90), rotation: 15, isVisible: false);
+        var updated = Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(control.Id));
+        Assert.Equal(new RectD(20, 30, 140, 90), updated.Bounds);
+        Assert.Equal(15, updated.Rotation);
+        Assert.False(updated.IsVisible);
+
+        var events = new EventsPanelViewModel(session);
+        Assert.Contains(events.Events, item => item.Id == "pointer.left.press" && item.ChineseLabel == "左键按下");
+        Assert.True(events.TrySet(
+            "pointer.left.press",
+            "command.toggle-bool",
+            new Dictionary<string, string>(),
+            out var eventErrors), string.Join("; ", eventErrors));
+        updated = Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(control.Id));
+        Assert.Equal("左键按下", events.GetEventLabel("pointer.left.press"));
+        Assert.Equal("command.toggle-bool", updated.Interactions["pointer.left.press"].ActionName);
+    }
+
+    [Fact]
+    public void BindingPanelValidatesRoleTypeAndDirectionBeforeChangingTheObject()
+    {
+        var feedback = VariableDefinition.Bool("Valve.OpenFeedback", VariableDirection.Feedback);
+        var command = VariableDefinition.Bool("Valve.OpenCommand", VariableDirection.Command);
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 100, 80));
+        var project = ProjectDocument.Create(
+            "Binding test",
+            new[] { feedback, command },
+            new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(valve.Id);
+        var panel = new BindingPanelViewModel(session);
+
+        Assert.True(panel.TrySet("OpenFeedback", feedback.Key, out var validErrors), string.Join("; ", validErrors));
+        Assert.Equal(feedback.Key, Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(valve.Id)).Bindings["OpenFeedback"].VariableKey);
+
+        Assert.False(panel.TrySet("OpenFeedback", command.Key, out var directionErrors));
+        Assert.Contains(directionErrors, error => error.Contains("方向", StringComparison.Ordinal));
+        Assert.False(panel.TrySet("UnknownRole", feedback.Key, out var roleErrors));
+        Assert.Contains(roleErrors, error => error.Contains("角色", StringComparison.Ordinal));
     }
 }
