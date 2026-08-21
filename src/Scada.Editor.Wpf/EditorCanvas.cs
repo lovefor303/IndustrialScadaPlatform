@@ -14,6 +14,9 @@ namespace Scada.Editor.Wpf;
 public sealed class EditorCanvas : Canvas
 {
     private const string ToolboxDataFormat = "Scada.Editor.ToolboxType";
+    private bool _isPanning;
+    private Point _panStart;
+    private Vector _panOrigin;
 
     public EditorCanvas()
     {
@@ -24,11 +27,41 @@ public sealed class EditorCanvas : Canvas
         Drop += OnDrop;
         MouseLeftButtonDown += OnCanvasMouseLeftButtonDown;
         KeyDown += OnKeyDown;
+        MouseWheel += OnMouseWheel;
+        MouseDown += OnMouseDown;
+        MouseMove += OnMouseMove;
+        MouseUp += OnMouseUp;
     }
 
     public EditorSession? Session { get; set; }
 
     public EditorViewport Viewport { get; } = new();
+
+    protected override void OnRender(DrawingContext dc)
+    {
+        base.OnRender(dc);
+        if (!Viewport.GridEnabled || Viewport.GridSize <= 0 || !double.IsFinite(Viewport.GridSize))
+        {
+            return;
+        }
+
+        var spacing = Viewport.GridSize * Viewport.Zoom;
+        if (spacing < 4)
+        {
+            return;
+        }
+
+        var pen = new Pen(new SolidColorBrush(Color.FromRgb(42, 49, 56)), 1);
+        for (var x = Viewport.Pan.X % spacing; x < ActualWidth; x += spacing)
+        {
+            dc.DrawLine(pen, new Point(x, 0), new Point(x, ActualHeight));
+        }
+
+        for (var y = Viewport.Pan.Y % spacing; y < ActualHeight; y += spacing)
+        {
+            dc.DrawLine(pen, new Point(0, y), new Point(ActualWidth, y));
+        }
+    }
 
     public void Refresh()
     {
@@ -45,6 +78,8 @@ public sealed class EditorCanvas : Canvas
             SetLeft(visual, sceneObject.Bounds.X * Viewport.Zoom + Viewport.Pan.X);
             SetTop(visual, sceneObject.Bounds.Y * Viewport.Zoom + Viewport.Pan.Y);
         }
+
+        InvalidateVisual();
     }
 
     public static void BeginToolboxDrag(DependencyObject source, string typeId) =>
@@ -160,7 +195,7 @@ public sealed class EditorCanvas : Canvas
 
         var typeId = (string)e.Data.GetData(ToolboxDataFormat)!;
         var entry = ToolboxCatalog.CreateDefault().Get(typeId);
-        var modelPoint = Viewport.ScreenToModel(e.GetPosition(this));
+        var modelPoint = Viewport.SnapToGrid(Viewport.ScreenToModel(e.GetPosition(this)));
         var bounds = new RectD(
             modelPoint.X,
             modelPoint.Y,
@@ -231,6 +266,58 @@ public sealed class EditorCanvas : Canvas
         };
         Session.MoveSelection(offset.X, offset.Y);
         Refresh();
+        e.Handled = true;
+    }
+
+    private void OnMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            return;
+        }
+
+        var factor = e.Delta > 0 ? 1.1 : 1 / 1.1;
+        Viewport.SetZoomAt(Viewport.Zoom * factor, e.GetPosition(this));
+        Refresh();
+        e.Handled = true;
+    }
+
+    private void OnMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Middle)
+        {
+            return;
+        }
+
+        _isPanning = true;
+        _panStart = e.GetPosition(this);
+        _panOrigin = Viewport.Pan;
+        CaptureMouse();
+        e.Handled = true;
+    }
+
+    private void OnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_isPanning || e.MiddleButton != MouseButtonState.Pressed)
+        {
+            return;
+        }
+
+        var delta = e.GetPosition(this) - _panStart;
+        Viewport.SetPan(_panOrigin + delta);
+        Refresh();
+        e.Handled = true;
+    }
+
+    private void OnMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Middle || !_isPanning)
+        {
+            return;
+        }
+
+        _isPanning = false;
+        ReleaseMouseCapture();
         e.Handled = true;
     }
 }

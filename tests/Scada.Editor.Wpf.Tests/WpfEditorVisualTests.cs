@@ -105,4 +105,24 @@ public sealed class WpfEditorVisualTests
         var operatorView = new EditorShellViewModel(EditorRole.Operator);
         Assert.False(operatorView.SaveDraftCommand.CanExecute(null));
     }
+
+    [Fact]
+    public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
+    {
+        var viewport = new EditorViewport();
+        var anchor = new Point(240, 180);
+        var modelPoint = viewport.ScreenToModel(anchor);
+
+        viewport.SetZoomAt(2, anchor);
+
+        Assert.Equal(modelPoint.X, viewport.ScreenToModel(anchor).X, 6);
+        Assert.Equal(modelPoint.Y, viewport.ScreenToModel(anchor).Y, 6);
+        Assert.Equal(new Point(30, 20), viewport.SnapToGrid(new Point(27, 24)));
+
+        viewport.GridEnabled = false;
+        Assert.Equal(new Point(27, 24), viewport.SnapToGrid(new Point(27, 24)));
+        var panBefore = viewport.Pan;
+        viewport.PanBy(new Vector(10, -5));
+        Assert.Equal(panBefore + new Vector(10, -5), viewport.Pan);
+    }
 }
