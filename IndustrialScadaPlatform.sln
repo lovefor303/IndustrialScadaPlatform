@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scada.Editor.Wpf", "src\Sca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scada.Editor.Wpf.Tests", "tests\Scada.Editor.Wpf.Tests\Scada.Editor.Wpf.Tests.csproj", "{0C6606F2-A2F5-44A6-96FE-345673B780B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scada.Editor.Preview.Wpf", "samples\Scada.Editor.Preview.Wpf\Scada.Editor.Preview.Wpf.csproj", "{ED2D268B-6DCE-4838-931E-B6A1C4014D54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -299,6 +301,18 @@ Global
 		{0C6606F2-A2F5-44A6-96FE-345673B780B0}.Release|x64.Build.0 = Release|Any CPU
 		{0C6606F2-A2F5-44A6-96FE-345673B780B0}.Release|x86.ActiveCfg = Release|Any CPU
 		{0C6606F2-A2F5-44A6-96FE-345673B780B0}.Release|x86.Build.0 = Release|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Debug|x64.Build.0 = Debug|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Debug|x86.Build.0 = Debug|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Release|x64.ActiveCfg = Release|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Release|x64.Build.0 = Release|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -324,5 +338,6 @@ Global
 		{FE6F1D44-ECAE-4A77-8184-B755F5842B34} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{4B9CF847-19FC-4B63-B1EB-73E62EA5B29D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{0C6606F2-A2F5-44A6-96FE-345673B780B0} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{ED2D268B-6DCE-4838-931E-B6A1C4014D54} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
 	EndGlobalSection
 EndGlobal

@@ -133,14 +133,14 @@
 - Create: `samples/Scada.Editor.Preview.Wpf/*`, `docs/phase3/acceptance.md`, `docs/phase3/visual-review.md`.
 - Modify: `docs/handoff-current.md`, `docs/MASTER_ROADMAP.md` only after all evidence passes.
 
-- [ ] Add an offline sample screen containing a vessel, pump, valve, pipe, numeric display and text label with no customer PLC addresses.
-- [ ] Run `dotnet restore IndustrialScadaPlatform.sln`.
-- [ ] Run `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` and require 0 warnings and 0 errors.
-- [ ] Run `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` and record the exact pass/skip counts.
-- [ ] Run the Phase 3 editor acceptance test project and record project round-trip, permission, independent-editing and no-drift evidence separately from any future online evidence.
-- [ ] Review the editor at magnified morphology, exact 1920x1080 and full-screen density levels; reject clipping, stale selection handles, incorrect control scaling and any pipe mutation caused by moving an unselected object.
-- [ ] Update handoff with the branch, commit, commands, intentionally dirty files and the next approved Phase 3 task. Do not claim Phase 3 complete until the gate passes.
-- [ ] Commit `test: complete phase3 m1 editor acceptance gate`.
+- [x] Add an offline sample screen containing a vessel, pump, valve, pipe, numeric display and text label with no customer PLC addresses.
+- [x] Run `dotnet restore IndustrialScadaPlatform.sln`.
+- [x] Run `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` and require 0 warnings and 0 errors.
+- [x] Run `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` and record the exact pass/skip counts.
+- [x] Run the Phase 3 editor acceptance test project and record project round-trip, permission, independent-editing and no-drift evidence separately from any future online evidence.
+- [x] Review the editor at magnified morphology, exact 1920x1080 and full-screen density levels; reject clipping, stale selection handles, incorrect control scaling and any pipe mutation caused by moving an unselected object.
+- [x] Update handoff with the branch, commit, commands, intentionally dirty files and the next approved Phase 3 task. Do not claim Phase 3 complete until the gate passes.
+- [x] Commit `test: complete phase3 m1 editor acceptance gate`.
 
 ## Verification Matrix
 
