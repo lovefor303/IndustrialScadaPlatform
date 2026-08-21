@@ -252,6 +252,38 @@ public sealed record ScreenDocument
 
     public IReadOnlyList<SceneObject> Objects { get; }
 
+    public ScreenDocument AddObject(SceneObject sceneObject)
+    {
+        ArgumentNullException.ThrowIfNull(sceneObject);
+        if (Objects.Any(existing => existing.Id == sceneObject.Id))
+        {
+            throw new ArgumentException(
+                $"Scene object '{sceneObject.Id}' already exists on screen '{Name}'.",
+                nameof(sceneObject));
+        }
+
+        return Create(Name, Objects.Append(sceneObject));
+    }
+
+    public ScreenDocument RemoveObject(Guid objectId)
+    {
+        if (!Objects.Any(sceneObject => sceneObject.Id == objectId))
+        {
+            throw new KeyNotFoundException($"Scene object '{objectId}' was not found.");
+        }
+
+        return Create(Name, Objects.Where(sceneObject => sceneObject.Id != objectId));
+    }
+
+    public SceneObject? FindObject(Guid objectId) =>
+        Objects.SingleOrDefault(sceneObject => sceneObject.Id == objectId);
+
+    public ScreenDocument ReplaceObjects(IEnumerable<SceneObject> replacements)
+    {
+        ArgumentNullException.ThrowIfNull(replacements);
+        return Create(Name, replacements);
+    }
+
     public static ScreenDocument Create(string name, IEnumerable<SceneObject>? objects = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);

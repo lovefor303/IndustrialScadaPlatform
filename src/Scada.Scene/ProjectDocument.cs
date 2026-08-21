@@ -40,6 +40,54 @@ public sealed record ProjectDocument
 
     public IReadOnlyList<ScreenDocument> Screens { get; }
 
+    public ProjectDocument ReplaceScreen(ScreenDocument replacement)
+    {
+        ArgumentNullException.ThrowIfNull(replacement);
+        var index = Screens.ToList().FindIndex(screen =>
+            string.Equals(screen.Name, replacement.Name, StringComparison.Ordinal));
+        if (index < 0)
+        {
+            throw new KeyNotFoundException($"Screen '{replacement.Name}' was not found.");
+        }
+
+        var screens = Screens.ToArray();
+        screens[index] = replacement;
+        return FromStorage(
+            ProjectId,
+            SchemaVersion,
+            Name,
+            CreatedAt,
+            DateTimeOffset.UtcNow,
+            ProjectStatus.Draft,
+            Variables,
+            screens);
+    }
+
+    public ProjectDocument ReplaceVariables(IEnumerable<VariableDefinition> variables)
+    {
+        ArgumentNullException.ThrowIfNull(variables);
+        return FromStorage(
+            ProjectId,
+            SchemaVersion,
+            Name,
+            CreatedAt,
+            DateTimeOffset.UtcNow,
+            ProjectStatus.Draft,
+            variables,
+            Screens);
+    }
+
+    public ProjectDocument TouchDraft() =>
+        FromStorage(
+            ProjectId,
+            SchemaVersion,
+            Name,
+            CreatedAt,
+            DateTimeOffset.UtcNow,
+            ProjectStatus.Draft,
+            Variables,
+            Screens);
+
     public static ProjectDocument Create(
         string name,
         IEnumerable<VariableDefinition>? variables = null,
