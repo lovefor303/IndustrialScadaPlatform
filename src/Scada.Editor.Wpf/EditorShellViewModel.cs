@@ -59,7 +59,7 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    private Task NewProjectAsync()
+    private async Task NewProjectAsync()
     {
         if (_commands is null)
         {
@@ -67,11 +67,9 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         }
         else
         {
-            _commands.NewProject("未命名项目");
-            StatusText = "已新建项目草稿";
+            var changed = await _commands.TryNewProjectAsync("未命名项目");
+            StatusText = changed ? "已新建项目草稿" : "已取消新建项目";
         }
-
-        return Task.CompletedTask;
     }
 
     private async Task OpenProjectAsync()

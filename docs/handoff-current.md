@@ -49,19 +49,19 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Phase 3 Task 2 WPF shell and authorization gate are complete (`7162977`).
 - Phase 3 Task 3 toolbox drag-in and independent scene editing are complete (`a8e4dbe`).
 - Phase 3 Task 4 properties, variable bindings, dynamics and events are complete (`e4f19bb`).
-- Phase 3 Task 5 persistence core and WPF command binding are implemented (`2d01f16` plus current working change): `EditorCommands` covers new/open/export/save/publish/list/restore against an injected `RevisionStore`; menu/toolbar commands and status messages are bound; temporary SQLite round-trip test passes. Dirty-discard confirmation remains before Task 5 is closed.
+- Phase 3 Task 5 persistence core, dirty-discard confirmation and WPF command binding are implemented (`2d01f16`, `96b3a56` plus current working change): `EditorCommands` covers new/open/export/save/publish/list/restore against an injected `RevisionStore`; menu/toolbar commands and status messages are bound; dirty sessions require an injected confirmation before new/open; temporary SQLite round-trip test passes.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
 ## Next Action
 
-Finish Phase 3 Task 5 safety interaction: add an injected dirty-discard confirmation before new/open and then close Task 5. Keep file access isolated to the new platform store and do not touch legacy databases or PLC projects.
+Close Phase 3 Task 5 with a fresh full verification, then start Task 6 viewport ergonomics. Keep file access isolated to the new platform store and do not touch legacy databases or PLC projects.
 
 Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M1 Task 5 command binding complete; dirty-discard confirmation is next.
+- Active unit: Phase 3-M1 Task 5 complete in source; final verification before Task 6.
 - Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (145 tests passed); editor focused tests (15 passed); storage focused tests (10 passed); `git diff --check` clean.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.

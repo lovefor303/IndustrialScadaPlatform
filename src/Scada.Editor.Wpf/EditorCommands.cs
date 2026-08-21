@@ -12,6 +12,11 @@ public interface IProjectFileDialog
     Task<string?> PickSavePathAsync(CancellationToken cancellationToken = default);
 }
 
+public interface IUnsavedChangesPrompt
+{
+    Task<bool> ConfirmDiscardAsync(CancellationToken cancellationToken = default);
+}
+
 /// <summary>
 /// Persistence command adapter for the editor shell. It deliberately depends
 /// only on RevisionStore and never owns PLC/runtime side effects.
@@ -21,13 +26,19 @@ public sealed class EditorCommands
     private readonly EditorSession _session;
     private readonly RevisionStore _store;
     private readonly string _author;
+    private readonly IUnsavedChangesPrompt? _discardPrompt;
 
-    public EditorCommands(EditorSession session, RevisionStore store, string author)
+    public EditorCommands(
+        EditorSession session,
+        RevisionStore store,
+        string author,
+        IUnsavedChangesPrompt? discardPrompt = null)
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _store = store ?? throw new ArgumentNullException(nameof(store));
         ArgumentException.ThrowIfNullOrWhiteSpace(author);
         _author = author.Trim();
+        _discardPrompt = discardPrompt;
     }
 
     public static ProjectDocument CreateProject(string name, string screenName = "Main") =>
@@ -39,8 +50,27 @@ public sealed class EditorCommands
         _session.LoadProject(project, screenName);
     }
 
+    public async Task<bool> TryNewProjectAsync(
+        string name,
+        string screenName = "Main",
+        CancellationToken cancellationToken = default)
+    {
+        if (!await CanDiscardAsync(cancellationToken))
+        {
+            return false;
+        }
+
+        NewProject(name, screenName);
+        return true;
+    }
+
     public async Task OpenAsync(string filePath, CancellationToken cancellationToken = default)
     {
+        if (!await CanDiscardAsync(cancellationToken))
+        {
+            return;
+        }
+
         var projectId = await _store.ImportAsync(filePath, cancellationToken);
         var project = await _store.LoadDraftAsync(projectId, cancellationToken)
             ?? throw new InvalidOperationException("打开项目后未找到草稿。");
@@ -51,6 +81,25 @@ public sealed class EditorCommands
 
         var screenName = project.Screens[0].Name;
         _session.LoadProject(project, screenName);
+    }
+
+    public async Task<bool> TryOpenAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        if (!await CanDiscardAsync(cancellationToken))
+        {
+            return false;
+        }
+
+        var projectId = await _store.ImportAsync(filePath, cancellationToken);
+        var project = await _store.LoadDraftAsync(projectId, cancellationToken)
+            ?? throw new InvalidOperationException("打开项目后未找到草稿。");
+        if (project.Screens.Count == 0)
+        {
+            throw new InvalidDataException("项目至少需要包含一个画面。");
+        }
+
+        _session.LoadProject(project, project.Screens[0].Name);
+        return true;
     }
 
     public Task ExportAsync(string filePath, CancellationToken cancellationToken = default) =>
@@ -81,5 +130,16 @@ public sealed class EditorCommands
         var restored = await _store.LoadDraftAsync(_session.Project.ProjectId, cancellationToken)
             ?? throw new InvalidOperationException("恢复版本后未找到草稿。");
         _session.LoadProject(restored, _session.ActiveScreenName);
+    }
+
+    private async Task<bool> CanDiscardAsync(CancellationToken cancellationToken)
+    {
+        if (!_session.IsDirty)
+        {
+            return true;
+        }
+
+        return _discardPrompt is not null
+            && await _discardPrompt.ConfirmDiscardAsync(cancellationToken);
     }
 }

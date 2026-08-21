@@ -107,7 +107,7 @@
 
 - [x] Write a failing temporary-SQLite test for create project, add screen/object metadata, save draft, dispose session, load draft, publish, list revision, restore and load again.
 - [x] Implement `RevisionStore` adapter calls with cancellation tokens and file dialogs abstracted behind `IProjectFileDialog` so tests never use the real user database.
-- [ ] Require confirmation before discarding dirty changes; save draft updates only the new platform temporary store.
+- [x] Require confirmation before discarding dirty changes; save draft updates only the new platform temporary store.
 - [x] Add toolbar commands `新建`, `打开`, `保存草稿`, `发布`, `恢复版本` and status messages; show revision number after publish.
 - [x] Verify loaded project status is draft after restore and all stable IDs/metadata are identical.
 - [x] Run focused persistence tests.
