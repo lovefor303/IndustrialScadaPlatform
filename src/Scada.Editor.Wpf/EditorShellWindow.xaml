@@ -1,0 +1,138 @@
+<Window x:Class="Scada.Editor.Wpf.EditorShellWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="工业组态编辑器"
+        Width="1440"
+        Height="900"
+        MinWidth="1100"
+        MinHeight="700"
+        Background="#1F2429"
+        Foreground="#E6EDF3"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#252B31" Foreground="#E6EDF3">
+            <MenuItem Header="文件">
+                <MenuItem Header="新建项目" />
+                <MenuItem Header="打开项目" />
+                <Separator />
+                <MenuItem Header="保存草稿" />
+                <MenuItem Header="发布版本" />
+                <MenuItem Header="恢复版本" />
+            </MenuItem>
+            <MenuItem Header="编辑">
+                <MenuItem Header="撤销" />
+                <MenuItem Header="重做" />
+                <MenuItem Header="对齐" />
+                <MenuItem Header="分布" />
+            </MenuItem>
+            <MenuItem Header="视图">
+                <MenuItem Header="网格" />
+                <MenuItem Header="标尺" />
+            </MenuItem>
+        </Menu>
+
+        <ToolBar DockPanel.Dock="Top" Background="#2B3239">
+            <Button Content="新建" Margin="2" Padding="10,4" />
+            <Button Content="打开" Margin="2" Padding="10,4" />
+            <Button Content="保存草稿" Margin="2" Padding="10,4" />
+            <Separator />
+            <Button Content="撤销" Margin="2" Padding="10,4" />
+            <Button Content="重做" Margin="2" Padding="10,4" />
+            <Separator />
+            <Button Content="缩小" Margin="2" Padding="10,4" />
+            <Button Content="放大" Margin="2" Padding="10,4" />
+        </ToolBar>
+
+        <StatusBar DockPanel.Dock="Bottom" Background="#252B31" Foreground="#B9C3CC">
+            <StatusBarItem Content="绑定状态：离线编辑" />
+            <Separator />
+            <StatusBarItem Content="{Binding StatusText}" />
+        </StatusBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="360" />
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="ToolboxPanel"
+                    Grid.Column="0"
+                    Margin="8"
+                    Padding="8"
+                    Background="#252B31"
+                    BorderBrush="#3B4650"
+                    BorderThickness="1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top"
+                               Margin="4,2,4,10"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Text="工具箱" />
+                    <TreeView x:Name="ToolboxTree"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              Foreground="#E6EDF3">
+                        <TreeViewItem Header="设备">
+                            <TreeViewItem Header="离心泵" />
+                            <TreeViewItem Header="自动阀" />
+                            <TreeViewItem Header="容器" />
+                            <TreeViewItem Header="搅拌器" />
+                            <TreeViewItem Header="过滤器" />
+                        </TreeViewItem>
+                        <TreeViewItem Header="管道与仪表">
+                            <TreeViewItem Header="直管" />
+                            <TreeViewItem Header="弯头" />
+                            <TreeViewItem Header="数值显示" />
+                            <TreeViewItem Header="液位柱" />
+                            <TreeViewItem Header="温度仪表" />
+                            <TreeViewItem Header="压力仪表" />
+                        </TreeViewItem>
+                        <TreeViewItem Header="文本与操作">
+                            <TreeViewItem Header="文本标签" />
+                            <TreeViewItem Header="操作按钮" />
+                        </TreeViewItem>
+                    </TreeView>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Margin="0,8,8,8"
+                    Background="#171B1F"
+                    BorderBrush="#3B4650"
+                    BorderThickness="1">
+                <Grid x:Name="CanvasHost">
+                    <TextBlock HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="#6F7D89"
+                               FontSize="18"
+                               Text="画布" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Margin="0,8,8,8"
+                    Background="#252B31"
+                    BorderBrush="#3B4650"
+                    BorderThickness="1">
+                <TabControl x:Name="InspectorTabs"
+                            Background="#252B31"
+                            BorderThickness="0"
+                            Foreground="#E6EDF3">
+                    <TabItem Header="属性">
+                        <TextBlock Margin="12" Text="请选择画面对象" />
+                    </TabItem>
+                    <TabItem Header="变量">
+                        <TextBlock Margin="12" Text="变量绑定" />
+                    </TabItem>
+                    <TabItem Header="动态">
+                        <TextBlock Margin="12" Text="动态设置" />
+                    </TabItem>
+                    <TabItem Header="事件">
+                        <TextBlock Margin="12" Text="事件与动作" />
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
