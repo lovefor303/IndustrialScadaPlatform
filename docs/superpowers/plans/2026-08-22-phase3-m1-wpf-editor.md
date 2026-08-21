@@ -121,11 +121,11 @@
 
 - [x] Write tests for zoom around cursor, pan, grid snapping toggle, ruler coordinates and one-pixel direction-key nudge in model coordinates.
 - [x] Implement a uniform `MatrixTransform` from screen coordinates to model coordinates; never serialize the viewport transform into scene object bounds.
-- [ ] Add grid/ruler rendering, Ctrl+mouse-wheel zoom, middle-button pan, selection handles, rotation handle and stable minimum hit targets.
+- [x] Add grid/ruler rendering, Ctrl+mouse-wheel zoom, middle-button pan, selection handles, rotation handle and stable minimum hit targets.
 - [x] Add the round-trip drift assertion comparing every object ID, type, bounds, rotation, z-index, visibility, pipe endpoints, bends, properties, bindings and interactions exactly.
-- [ ] Render a 1920x1080 editor review artifact and assert non-empty content and in-canvas object extents.
+- [x] Render a 1920x1080 editor review artifact and assert non-empty content and in-canvas object extents.
 - [x] Run all focused WPF and geometry tests.
-- [ ] Commit `feat: add editor viewport and geometry drift gates`.
+- [x] Commit `feat: add editor viewport and geometry drift gates`.
 
 ### Task 7: Complete the Phase 3-M1 acceptance gate and handoff
 

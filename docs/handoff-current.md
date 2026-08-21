@@ -50,23 +50,23 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Phase 3 Task 3 toolbox drag-in and independent scene editing are complete (`a8e4dbe`).
 - Phase 3 Task 4 properties, variable bindings, dynamics and events are complete (`e4f19bb`).
 - Phase 3 Task 5 persistence core, dirty-discard confirmation and WPF command binding are implemented (`2d01f16`, `96b3a56`, `92c44f3`): `EditorCommands` covers new/open/export/save/publish/list/restore against an injected `RevisionStore`; menu/toolbar commands and status messages are bound; dirty sessions require an injected confirmation before new/open; temporary SQLite round-trip test passes.
-- Phase 3 Task 6 viewport core is implemented in the working tree: cursor-anchored zoom, pan, optional grid snapping/grid rendering, Ctrl+wheel zoom and middle-button pan, plus a byte-for-byte scene JSON drift gate. Selection resize/rotation handles and the 1920x1080 visual artifact remain.
+- Phase 3 Task 6 viewport and selection ergonomics are implemented (`2fedf35` plus current working change): cursor-anchored zoom, pan, optional grid snapping/grid rendering, Ctrl+wheel zoom, middle-button pan, eight resize handles, a rotation handle, byte-for-byte scene JSON drift gate, and a non-empty 1920x1080 render assertion.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
 ## Next Action
 
-Finish Phase 3 Task 6: add selection resize/rotation handles and produce the 1920x1080 visual review artifact. Keep viewport transforms out of persisted scene geometry.
+Start Phase 3 Task 7 acceptance gate: add the offline preview sample, acceptance/visual-review documents, and run the final Phase 3-M1 verification. Keep viewport transforms out of persisted scene geometry.
 
 Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M1 Task 6 viewport core complete; selection handles/artifact are next.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (151 tests passed); editor focused tests (20 passed); storage focused tests (10 passed); `git diff --check` clean.
+- Active unit: Phase 3-M1 Task 6 complete; Task 7 acceptance gate is next.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (153 tests passed); editor focused tests (22 passed); storage focused tests (10 passed); `git diff --check` clean.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from Task 6 handle/artifact work.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from Task 7 acceptance work.
 - Current exclusions: production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status

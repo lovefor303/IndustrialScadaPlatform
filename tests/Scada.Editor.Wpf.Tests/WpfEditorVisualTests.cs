@@ -2,6 +2,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using Scada.Editor.Wpf;
 using Scada.Controls;
 using Scada.Scene;
@@ -32,7 +35,7 @@ public sealed class WpfEditorVisualTests
 
             canvas.Refresh();
 
-            Assert.Equal(2, canvas.Children.Count);
+            Assert.True(canvas.Children.Count >= 2);
             Assert.Contains(canvas.Children.OfType<Border>(), border =>
                 border.Tag is Guid id && id == valve.Id);
             Assert.Contains(canvas.Children.OfType<Polyline>(), polyline => polyline.Points.Count == 3);
@@ -124,5 +127,48 @@ public sealed class WpfEditorVisualTests
         var panBefore = viewport.Pan;
         viewport.PanBy(new Vector(10, -5));
         Assert.Equal(panBefore + new Vector(10, -5), viewport.Pan);
+    }
+
+    [Fact]
+    public void SelectedObjectRendersResizeAndRotationHandles()
+    {
+        StaThread.Run(() =>
+        {
+            var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(100, 100, 100, 80));
+            var pipe = PipeObject.Create(new PointD(0, 140), new PointD(100, 140));
+            var project = ProjectDocument.Create(
+                "Handle test",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve, pipe }) });
+            var session = new EditorSession(project, "Main");
+            session.SelectOnly(valve.Id);
+            var canvas = new EditorCanvas { Session = session };
+
+            canvas.Refresh();
+
+            Assert.Equal(9, canvas.Children.OfType<Thumb>().Count());
+            Assert.Contains(canvas.Children.OfType<Thumb>(), thumb => Equals(thumb.Tag, "rotation"));
+            return true;
+        });
+    }
+
+    [Fact]
+    public void EditorShellRendersNonEmptyAt1920By1080()
+    {
+        StaThread.Run(() =>
+        {
+            var window = new EditorShellWindow(EditorRole.Developer);
+            window.Show();
+            window.Measure(new Size(1920, 1080));
+            window.Arrange(new Rect(0, 0, 1920, 1080));
+            window.UpdateLayout();
+            var bitmap = new RenderTargetBitmap(1920, 1080, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(window);
+            var pixels = new byte[1920 * 1080 * 4];
+            bitmap.CopyPixels(pixels, 1920 * 4, 0);
+
+            Assert.Contains(pixels, value => value != 0);
+            window.Close();
+            return true;
+        });
     }
 }

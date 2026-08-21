@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -17,6 +18,20 @@ public sealed class EditorCanvas : Canvas
     private bool _isPanning;
     private Point _panStart;
     private Vector _panOrigin;
+
+    private enum HandlePosition
+    {
+        TopLeft,
+        Top,
+        TopRight,
+        Right,
+        BottomRight,
+        Bottom,
+        BottomLeft,
+        Left
+    }
+
+    private sealed record ResizeHandleTag(Guid ObjectId, HandlePosition Position);
 
     public EditorCanvas()
     {
@@ -77,6 +92,13 @@ public sealed class EditorCanvas : Canvas
             Children.Add(visual);
             SetLeft(visual, sceneObject.Bounds.X * Viewport.Zoom + Viewport.Pan.X);
             SetTop(visual, sceneObject.Bounds.Y * Viewport.Zoom + Viewport.Pan.Y);
+        }
+
+        foreach (var sceneObject in Session.ActiveScreen.Objects.Where(item =>
+                     Session.SelectedObjectIds.Contains(item.Id)
+                     && item is not PipeObject))
+        {
+            AddSelectionHandles(sceneObject);
         }
 
         InvalidateVisual();
@@ -177,6 +199,116 @@ public sealed class EditorCanvas : Canvas
             Tag = objectId,
             Child = content
         };
+
+    private void AddSelectionHandles(SceneObject sceneObject)
+    {
+        var bounds = sceneObject.Bounds;
+        foreach (var position in Enum.GetValues<HandlePosition>())
+        {
+            var handle = new Thumb
+            {
+                Width = 8,
+                Height = 8,
+                Background = Brushes.White,
+                BorderBrush = Brushes.DeepSkyBlue,
+                BorderThickness = new Thickness(1),
+                Cursor = Cursors.SizeAll,
+                Tag = new ResizeHandleTag(sceneObject.Id, position)
+            };
+            handle.DragDelta += OnResizeHandleDragDelta;
+            Children.Add(handle);
+            SetHandlePosition(handle, bounds, position);
+        }
+
+        var rotationHandle = new Thumb
+        {
+            Width = 8,
+            Height = 8,
+            Background = Brushes.Orange,
+            BorderBrush = Brushes.White,
+            BorderThickness = new Thickness(1),
+            Cursor = Cursors.Hand,
+            Tag = "rotation"
+        };
+        rotationHandle.DragDelta += (_, args) =>
+        {
+            if (Session is null)
+            {
+                return;
+            }
+
+            Session.UpdateSelectedObject(selected => selected with
+            {
+                Rotation = selected.Rotation + args.HorizontalChange
+            });
+            Refresh();
+        };
+        Children.Add(rotationHandle);
+        SetLeft(rotationHandle, (bounds.X + bounds.Width / 2) * Viewport.Zoom + Viewport.Pan.X - 4);
+        SetTop(rotationHandle, (bounds.Y - 20) * Viewport.Zoom + Viewport.Pan.Y);
+    }
+
+    private void SetHandlePosition(Thumb handle, RectD bounds, HandlePosition position)
+    {
+        var x = position switch
+        {
+            HandlePosition.TopLeft or HandlePosition.Left or HandlePosition.BottomLeft => bounds.X,
+            HandlePosition.Top or HandlePosition.Bottom => bounds.X + bounds.Width / 2,
+            _ => bounds.X + bounds.Width
+        };
+        var y = position switch
+        {
+            HandlePosition.TopLeft or HandlePosition.Top or HandlePosition.TopRight => bounds.Y,
+            HandlePosition.Left or HandlePosition.Right => bounds.Y + bounds.Height / 2,
+            _ => bounds.Y + bounds.Height
+        };
+        SetLeft(handle, x * Viewport.Zoom + Viewport.Pan.X - 4);
+        SetTop(handle, y * Viewport.Zoom + Viewport.Pan.Y - 4);
+    }
+
+    private void OnResizeHandleDragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (Session is null || sender is not Thumb { Tag: ResizeHandleTag tag })
+        {
+            return;
+        }
+
+        var dx = e.HorizontalChange / Viewport.Zoom;
+        var dy = e.VerticalChange / Viewport.Zoom;
+        Session.SelectOnly(tag.ObjectId);
+        Session.UpdateSelectedObject(sceneObject => sceneObject with
+        {
+            Bounds = ResizeBounds(sceneObject.Bounds, tag.Position, dx, dy)
+        });
+        Refresh();
+    }
+
+    private static RectD ResizeBounds(RectD bounds, HandlePosition position, double dx, double dy)
+    {
+        const double minimum = 16;
+        var left = bounds.X;
+        var top = bounds.Y;
+        var right = bounds.X + bounds.Width;
+        var bottom = bounds.Y + bounds.Height;
+        if (position is HandlePosition.TopLeft or HandlePosition.Left or HandlePosition.BottomLeft)
+        {
+            left = Math.Min(left + dx, right - minimum);
+        }
+        if (position is HandlePosition.TopRight or HandlePosition.Right or HandlePosition.BottomRight)
+        {
+            right = Math.Max(right + dx, left + minimum);
+        }
+        if (position is HandlePosition.TopLeft or HandlePosition.Top or HandlePosition.TopRight)
+        {
+            top = Math.Min(top + dy, bottom - minimum);
+        }
+        if (position is HandlePosition.BottomLeft or HandlePosition.Bottom or HandlePosition.BottomRight)
+        {
+            bottom = Math.Max(bottom + dy, top + minimum);
+        }
+
+        return new RectD(left, top, right - left, bottom - top);
+    }
 
     private void OnDragOver(object sender, DragEventArgs e)
     {
