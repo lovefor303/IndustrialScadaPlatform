@@ -70,6 +70,26 @@ public sealed class EditorSession
         IsDirty = true;
     }
 
+    public void MarkSaved()
+    {
+        IsDirty = false;
+    }
+
+    public void LoadProject(ProjectDocument project, string activeScreenName)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        ArgumentException.ThrowIfNullOrWhiteSpace(activeScreenName);
+        if (project.Screens.All(screen => !string.Equals(screen.Name, activeScreenName, StringComparison.Ordinal)))
+        {
+            throw new KeyNotFoundException($"Screen '{activeScreenName}' was not found.");
+        }
+
+        Project = project;
+        ActiveScreenName = activeScreenName;
+        _selectedObjectIds.Clear();
+        IsDirty = false;
+    }
+
     public void MoveSelection(double dx, double dy)
     {
         ReplaceActiveScreen(SceneGeometryOperations.Move(

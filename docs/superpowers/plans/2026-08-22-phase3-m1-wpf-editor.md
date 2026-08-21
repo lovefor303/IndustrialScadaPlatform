@@ -105,12 +105,12 @@
 - Modify: `EditorCommands.cs`, `EditorShellViewModel.cs`.
 - Test: `EditorPersistenceTests.cs`.
 
-- [ ] Write a failing temporary-SQLite test for create project, add screen/object metadata, save draft, dispose session, load draft, publish, list revision, restore and load again.
-- [ ] Implement `RevisionStore` adapter calls with cancellation tokens and file dialogs abstracted behind `IProjectFileDialog` so tests never use the real user database.
+- [x] Write a failing temporary-SQLite test for create project, add screen/object metadata, save draft, dispose session, load draft, publish, list revision, restore and load again.
+- [x] Implement `RevisionStore` adapter calls with cancellation tokens and file dialogs abstracted behind `IProjectFileDialog` so tests never use the real user database.
 - [ ] Require confirmation before discarding dirty changes; save draft updates only the new platform temporary store.
 - [ ] Add toolbar commands `新建`, `打开`, `保存草稿`, `发布`, `恢复版本` and status messages; show revision number after publish.
-- [ ] Verify loaded project status is draft after restore and all stable IDs/metadata are identical.
-- [ ] Run focused persistence tests.
+- [x] Verify loaded project status is draft after restore and all stable IDs/metadata are identical.
+- [x] Run focused persistence tests.
 - [ ] Commit `feat: add editor project persistence workflow`.
 
 ### Task 6: Add viewport ergonomics and geometry drift gates

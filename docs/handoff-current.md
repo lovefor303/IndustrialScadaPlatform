@@ -1,12 +1,12 @@
 # Current Handoff
 
-Updated: 2026-08-20
+Updated: 2026-08-22
 
 ## Authoritative Scope
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 2 complete; Phase 3 planning is the next authorized activity**
+Current phase: **Phase 3-M1 editor implementation in progress**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -44,28 +44,33 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 
 ## Current Incomplete State
 
-- No WPF engineering canvas/editor, production Web Runtime, PLC communication, WinCC adapter or legacy migration has started.
-- Phase 2 SDK implementation is complete and gated; Phase 3 editor implementation has not started.
+- Phase 2 SDK implementation is complete and gated.
+- Phase 3 Task 1 editor session contracts are complete (`a4a859b`).
+- Phase 3 Task 2 WPF shell and authorization gate are complete (`7162977`).
+- Phase 3 Task 3 toolbox drag-in and independent scene editing are complete (`a8e4dbe`).
+- Phase 3 Task 4 properties, variable bindings, dynamics and events are complete (`e4f19bb`).
+- Phase 3 Task 5 persistence core is implemented in the working tree: `EditorCommands` covers new/open/export/save/publish/list/restore against an injected `RevisionStore`; temporary SQLite round-trip test passes. WPF menu/button binding remains to be completed before Task 5 is closed.
+- The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
 ## Next Action
 
-Write and obtain approval for a separate Phase 3 WPF engineering-editor plan. Do not start editor code until that plan is approved.
+Finish Phase 3 Task 5 shell integration: bind the existing `EditorCommands` to the WPF file/menu/toolbar commands and status messages, with an injected `IProjectFileDialog`. Keep file access isolated to the new platform store and do not touch legacy databases or PLC projects.
 
-Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 implementation has not started.
+Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 2 gate complete; Phase 3 planning.
-- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build`; `git diff --check` (0 warnings, 0 errors, 128 tests passed).
+- Active unit: Phase 3-M1 Task 5 persistence core complete; WPF command binding is next.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (145 tests passed); editor focused tests (15 passed); storage focused tests (10 passed); `git diff --check` clean.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 2 acceptance and the Phase 3 plan once written; continue only from the recorded next action.
-- Current exclusions: WPF editor implementation until Phase 3 plan approval; production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from Task 5.
+- Current exclusions: production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
 
-- Phase 1 and Phase 2 final gates passed. Phase 3 requires its own approved plan.
+- Phase 1 and Phase 2 final gates passed. Phase 3-M1 Tasks 1-4 passed focused verification; the milestone gate is not complete until Tasks 5-7 pass.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks
