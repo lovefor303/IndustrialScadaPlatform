@@ -97,7 +97,7 @@
 - [x] Implement events using `InteractionCatalog` stable IDs and Chinese labels; action parameters are selected from known schemas rather than free-form English names.
 - [x] Display validation errors with object ID and field path; preserve invalid drafts only in the view model and block publish until validation passes.
 - [x] Run focused tests and verify serialized metadata survives a round-trip.
-- [ ] Commit `feat: add editor property binding dynamics and event panels`.
+- [x] Commit `feat: add editor property binding dynamics and event panels`.
 
 ### Task 5: Add project/new-open/save/publish/restore workflow
 
@@ -108,10 +108,10 @@
 - [x] Write a failing temporary-SQLite test for create project, add screen/object metadata, save draft, dispose session, load draft, publish, list revision, restore and load again.
 - [x] Implement `RevisionStore` adapter calls with cancellation tokens and file dialogs abstracted behind `IProjectFileDialog` so tests never use the real user database.
 - [ ] Require confirmation before discarding dirty changes; save draft updates only the new platform temporary store.
-- [ ] Add toolbar commands `新建`, `打开`, `保存草稿`, `发布`, `恢复版本` and status messages; show revision number after publish.
+- [x] Add toolbar commands `新建`, `打开`, `保存草稿`, `发布`, `恢复版本` and status messages; show revision number after publish.
 - [x] Verify loaded project status is draft after restore and all stable IDs/metadata are identical.
 - [x] Run focused persistence tests.
-- [ ] Commit `feat: add editor project persistence workflow`.
+- [x] Commit `feat: add editor project persistence workflow`.
 
 ### Task 6: Add viewport ergonomics and geometry drift gates
 

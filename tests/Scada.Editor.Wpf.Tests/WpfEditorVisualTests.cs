@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using System.Windows.Input;
 using Scada.Editor.Wpf;
 using Scada.Controls;
 using Scada.Scene;
@@ -90,5 +91,18 @@ public sealed class WpfEditorVisualTests
             window.Close();
             return true;
         });
+    }
+
+    [Fact]
+    public void ShellViewModelExposesEngineeringProjectCommandsOnlyToEditors()
+    {
+        var developer = new EditorShellViewModel(EditorRole.Developer);
+        Assert.IsAssignableFrom<ICommand>(developer.NewProjectCommand);
+        Assert.IsAssignableFrom<ICommand>(developer.OpenProjectCommand);
+        Assert.IsAssignableFrom<ICommand>(developer.SaveDraftCommand);
+        Assert.True(developer.SaveDraftCommand.CanExecute(null));
+
+        var operatorView = new EditorShellViewModel(EditorRole.Operator);
+        Assert.False(operatorView.SaveDraftCommand.CanExecute(null));
     }
 }

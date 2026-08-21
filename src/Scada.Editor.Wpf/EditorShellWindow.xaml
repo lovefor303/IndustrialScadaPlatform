@@ -13,12 +13,12 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#252B31" Foreground="#E6EDF3">
             <MenuItem Header="文件">
-                <MenuItem Header="新建项目" />
-                <MenuItem Header="打开项目" />
+                <MenuItem Header="新建项目" Command="{Binding NewProjectCommand}" />
+                <MenuItem Header="打开项目" Command="{Binding OpenProjectCommand}" />
                 <Separator />
-                <MenuItem Header="保存草稿" />
-                <MenuItem Header="发布版本" />
-                <MenuItem Header="恢复版本" />
+                <MenuItem Header="保存草稿" Command="{Binding SaveDraftCommand}" />
+                <MenuItem Header="发布版本" Command="{Binding PublishCommand}" />
+                <MenuItem Header="恢复版本" Command="{Binding RestoreCommand}" />
             </MenuItem>
             <MenuItem Header="编辑">
                 <MenuItem Header="撤销" />
@@ -33,9 +33,9 @@
         </Menu>
 
         <ToolBar DockPanel.Dock="Top" Background="#2B3239">
-            <Button Content="新建" Margin="2" Padding="10,4" />
-            <Button Content="打开" Margin="2" Padding="10,4" />
-            <Button Content="保存草稿" Margin="2" Padding="10,4" />
+            <Button Content="新建" Command="{Binding NewProjectCommand}" Margin="2" Padding="10,4" />
+            <Button Content="打开" Command="{Binding OpenProjectCommand}" Margin="2" Padding="10,4" />
+            <Button Content="保存草稿" Command="{Binding SaveDraftCommand}" Margin="2" Padding="10,4" />
             <Separator />
             <Button Content="撤销" Margin="2" Padding="10,4" />
             <Button Content="重做" Margin="2" Padding="10,4" />
