@@ -54,23 +54,23 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 
 ## Next Action
 
-Close Phase 3 Task 5 with a fresh full verification, then start Task 6 viewport ergonomics. Keep file access isolated to the new platform store and do not touch legacy databases or PLC projects.
+Start Phase 3 Task 6: add viewport ergonomics and geometry-drift gates (zoom/pan/grid/ruler/direction-key model coordinates). Keep viewport transforms out of persisted scene geometry.
 
 Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M1 Task 5 complete in source; final verification before Task 6.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (145 tests passed); editor focused tests (15 passed); storage focused tests (10 passed); `git diff --check` clean.
+- Active unit: Phase 3-M1 Task 5 complete; Task 6 is next.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (147 tests passed); editor focused tests (18 passed); storage focused tests (10 passed); `git diff --check` clean.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from Task 5.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from Task 6.
 - Current exclusions: production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
 
-- Phase 1 and Phase 2 final gates passed. Phase 3-M1 Tasks 1-4 passed focused verification; the milestone gate is not complete until Tasks 5-7 pass.
+- Phase 1 and Phase 2 final gates passed. Phase 3-M1 Tasks 1-5 passed focused verification; the milestone gate is not complete until Tasks 6-7 pass.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks
