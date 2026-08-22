@@ -240,7 +240,7 @@ public sealed class WpfEditorVisualTests
             rotation.RaiseEvent(new DragDeltaEventArgs(-5, 0) { RoutedEvent = Thumb.DragDeltaEvent });
 
             var result = session.ActiveScreen.FindObject(valve.Id)!;
-            Assert.Equal(0.75, result.Rotation, 6);
+            Assert.Equal(0.15, result.Rotation, 6);
             Assert.True(canvas.Children.Contains(rotation));
 
             rotation.RaiseEvent(new DragCompletedEventArgs(0, 0, false) { RoutedEvent = Thumb.DragCompletedEvent });
