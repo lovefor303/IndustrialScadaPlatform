@@ -7,7 +7,7 @@ public partial class EditorShellWindow : Window
     public EditorShellWindow(EditorRole role = EditorRole.Developer, EditorSession? session = null)
     {
         InitializeComponent();
-        DataContext = new EditorShellViewModel(role);
+        DataContext = new EditorShellViewModel(role, session: session);
         if (session is not null)
         {
             ProcessCanvas.Session = session;

@@ -110,6 +110,33 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void ShellViewModelExposesProductivityCommandsWithEngineeringEnablement()
+    {
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 40, 40));
+        var project = ProjectDocument.Create(
+            "Command test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(valve.Id);
+        session.MoveSelection(1, 0);
+
+        var developer = new EditorShellViewModel(EditorRole.Developer, session: session);
+        Assert.Equal("撤销", developer.UndoCommandLabel);
+        Assert.Equal("重做", developer.RedoCommandLabel);
+        Assert.Equal("左对齐", developer.AlignLeftCommandLabel);
+        Assert.Equal("水平等距", developer.DistributeHorizontalCommandLabel);
+        Assert.True(developer.UndoCommand.CanExecute(null));
+        Assert.False(developer.RedoCommand.CanExecute(null));
+        Assert.False(developer.AlignLeftCommand.CanExecute(null));
+        Assert.False(developer.GroupCommand.CanExecute(null));
+
+        var operatorView = new EditorShellViewModel(EditorRole.Operator, session: session);
+        Assert.False(operatorView.UndoCommand.CanExecute(null));
+        Assert.False(operatorView.AlignLeftCommand.CanExecute(null));
+        Assert.False(operatorView.GroupCommand.CanExecute(null));
+    }
+
+    [Fact]
     public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
     {
         var viewport = new EditorViewport();

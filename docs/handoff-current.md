@@ -56,21 +56,22 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Phase 3-M2 Task 1 is implemented in the working tree: immutable 100-step project history, undo/redo session APIs, redo invalidation after new edits, and independent-pipe history regression tests.
 - Phase 3-M2 Task 2 is implemented in the working tree: selection-scoped left/center/right/top/middle/bottom alignment, horizontal/vertical equal-gap distribution, non-pipe validation and one-step session undo integration.
 - Phase 3-M2 Task 3 is implemented in the working tree: editor-session-only groups, group selection/ungrouping, and explicit layer-order operations that modify only selected `ZIndex` values.
+- Phase 3-M2 Task 4 is implemented in the working tree: Chinese productivity commands, WPF menu/toolbar bindings, engineering-role enablement and Ctrl+Z/Ctrl+Y/Ctrl+G/Ctrl+Shift+G shortcuts.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
 ## Next Action
 
-Phase 3-M2 Tasks 1 through 3 are implemented. Commit after the full Release
-build/test gate, then proceed to Task 4 WPF command bindings and shortcuts. Do
-not start PLC/Web/WinCC deployment work from this gate.
+Phase 3-M2 Tasks 1 through 4 are implemented. Commit after the full Release
+build/test gate, then run the M2 acceptance review and update the gate record.
+Do not start PLC/Web/WinCC deployment work from this gate.
 
 Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M2 Tasks 1-3; commit after full verification, then Task 4 WPF commands.
+- Active unit: Phase 3-M2 Tasks 1-4; commit after full verification, then M2 acceptance review.
 - Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (156 tests passed); editor focused tests (25 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.

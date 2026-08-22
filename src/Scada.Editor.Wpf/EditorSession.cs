@@ -45,6 +45,8 @@ public sealed class EditorSession
 
     public bool CanRedo => _history.CanRedo;
 
+    public bool HasSelectedGroup => _groups.Any(pair => pair.Value.SetEquals(_selectedObjectIds));
+
     public void SelectOnly(Guid objectId)
     {
         if (ActiveScreen.FindObject(objectId) is null)

@@ -62,11 +62,11 @@
 
 **Files:** `EditorShellViewModel.cs`, `EditorShellWindow.xaml`, `EditorCanvas.cs`, `WpfEditorVisualTests.cs`
 
-- [ ] Write failing STA tests for command enablement and Chinese labels: `撤销`, `重做`, `左对齐`, `水平等距`, `组合`, `取消组合`, `置于顶层`, `置于底层`.
-- [ ] Bind commands to the shell and use `Ctrl+Z`, `Ctrl+Y`, `Ctrl+G`, `Ctrl+Shift+G`; arrow keys remain one-pixel nudges.
-- [ ] Add disabled states when selection/history does not satisfy the operation requirements.
-- [ ] Ensure clicking empty canvas clears selection and command state updates without rebuilding unrelated visuals.
-- [ ] Run WPF tests and commit `feat: expose engineering productivity commands`.
+- [x] Write failing STA tests for command enablement and Chinese labels: `撤销`, `重做`, `左对齐`, `水平等距`, `组合`, `取消组合`, `置于顶层`, `置于底层`.
+- [x] Bind commands to the shell and use `Ctrl+Z`, `Ctrl+Y`, `Ctrl+G`, `Ctrl+Shift+G`; arrow keys remain one-pixel nudges.
+- [x] Add disabled states when selection/history does not satisfy the operation requirements.
+- [x] Ensure clicking empty canvas clears selection and command state updates without rebuilding unrelated visuals.
+- [x] Run WPF tests; full verification and commit are the Task 4 checkpoint below.
 
 ## Task 5: M2 acceptance gate
 

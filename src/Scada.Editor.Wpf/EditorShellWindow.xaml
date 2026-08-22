@@ -10,6 +10,12 @@
         Background="#1F2429"
         Foreground="#E6EDF3"
         WindowStartupLocation="CenterScreen">
+    <Window.InputBindings>
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}" />
+        <KeyBinding Key="G" Modifiers="Control" Command="{Binding GroupCommand}" />
+        <KeyBinding Key="G" Modifiers="Control+Shift" Command="{Binding UngroupCommand}" />
+    </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#252B31" Foreground="#E6EDF3">
             <MenuItem Header="文件">
@@ -21,10 +27,22 @@
                 <MenuItem Header="恢复版本" Command="{Binding RestoreCommand}" />
             </MenuItem>
             <MenuItem Header="编辑">
-                <MenuItem Header="撤销" />
-                <MenuItem Header="重做" />
-                <MenuItem Header="对齐" />
-                <MenuItem Header="分布" />
+                <MenuItem Header="撤销" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z" />
+                <MenuItem Header="重做" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y" />
+                <Separator />
+                <MenuItem Header="左对齐" Command="{Binding AlignLeftCommand}" />
+                <MenuItem Header="水平居中" Command="{Binding AlignCenterCommand}" />
+                <MenuItem Header="右对齐" Command="{Binding AlignRightCommand}" />
+                <MenuItem Header="顶端对齐" Command="{Binding AlignTopCommand}" />
+                <MenuItem Header="垂直居中" Command="{Binding AlignMiddleCommand}" />
+                <MenuItem Header="底端对齐" Command="{Binding AlignBottomCommand}" />
+                <MenuItem Header="水平等距" Command="{Binding DistributeHorizontalCommand}" />
+                <MenuItem Header="垂直等距" Command="{Binding DistributeVerticalCommand}" />
+                <Separator />
+                <MenuItem Header="组合" Command="{Binding GroupCommand}" InputGestureText="Ctrl+G" />
+                <MenuItem Header="取消组合" Command="{Binding UngroupCommand}" InputGestureText="Ctrl+Shift+G" />
+                <MenuItem Header="置于顶层" Command="{Binding BringToFrontCommand}" />
+                <MenuItem Header="置于底层" Command="{Binding SendToBackCommand}" />
             </MenuItem>
             <MenuItem Header="视图">
                 <MenuItem Header="网格" />
@@ -37,8 +55,12 @@
             <Button Content="打开" Command="{Binding OpenProjectCommand}" Margin="2" Padding="10,4" />
             <Button Content="保存草稿" Command="{Binding SaveDraftCommand}" Margin="2" Padding="10,4" />
             <Separator />
-            <Button Content="撤销" Margin="2" Padding="10,4" />
-            <Button Content="重做" Margin="2" Padding="10,4" />
+            <Button Content="撤销" Command="{Binding UndoCommand}" Margin="2" Padding="10,4" />
+            <Button Content="重做" Command="{Binding RedoCommand}" Margin="2" Padding="10,4" />
+            <Button Content="左对齐" Command="{Binding AlignLeftCommand}" Margin="2" Padding="10,4" />
+            <Button Content="水平等距" Command="{Binding DistributeHorizontalCommand}" Margin="2" Padding="10,4" />
+            <Button Content="组合" Command="{Binding GroupCommand}" Margin="2" Padding="10,4" />
+            <Button Content="取消组合" Command="{Binding UngroupCommand}" Margin="2" Padding="10,4" />
             <Separator />
             <Button Content="缩小" Margin="2" Padding="10,4" />
             <Button Content="放大" Margin="2" Padding="10,4" />
