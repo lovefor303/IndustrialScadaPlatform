@@ -222,6 +222,8 @@ public sealed class EditorSession
         Project = _history.Current;
         KeepExistingSelection();
         IsDirty = true;
+        ProjectChanged?.Invoke(this, EventArgs.Empty);
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }
 
@@ -235,6 +237,8 @@ public sealed class EditorSession
         Project = _history.Current;
         KeepExistingSelection();
         IsDirty = true;
+        ProjectChanged?.Invoke(this, EventArgs.Empty);
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }
 
