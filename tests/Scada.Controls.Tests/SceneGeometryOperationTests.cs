@@ -96,6 +96,32 @@ public sealed class SceneGeometryOperationTests
     }
 
     [Fact]
+    public void LayerOperationsChangeOnlySelectedZOrderAndPreserveObjectGeometry()
+    {
+        var back = ControlObject.Create(ControlTypeIds.Vessel, new RectD(0, 0, 100, 100)) with { ZIndex = 0 };
+        var middle = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(10, 10, 80, 60)) with { ZIndex = 1 };
+        var front = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(20, 20, 40, 40)) with { ZIndex = 2 };
+        var pipe = PipeObject.Create(new PointD(0, 50), new PointD(20, 50), id: Guid.NewGuid()) with { ZIndex = 3 };
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { back, middle, front, pipe });
+
+        var moved = SceneGeometryOperations.ChangeLayer(
+            screen,
+            new[] { middle.Id },
+            LayerOrderOperation.BringToFront);
+
+        Assert.Equal(4, moved.FindObject(middle.Id)!.ZIndex);
+        Assert.Equal(middle.Bounds, moved.FindObject(middle.Id)!.Bounds);
+        Assert.Equal(pipe, moved.FindObject(pipe.Id));
+
+        var sentBack = SceneGeometryOperations.ChangeLayer(
+            moved,
+            new[] { middle.Id },
+            LayerOrderOperation.SendToBack);
+        Assert.Equal(-1, sentBack.FindObject(middle.Id)!.ZIndex);
+        Assert.Equal(front.ZIndex, sentBack.FindObject(front.Id)!.ZIndex);
+    }
+
+    [Fact]
     public void NudgeMovesSelectedObjectsByExactlyOneSceneUnit()
     {
         var label = TextObject.Create("XV-102", new RectD(10, 20, 80, 24));

@@ -255,4 +255,28 @@ public sealed class EditorSessionTests
         session.Undo();
         Assert.Equal(60, session.ActiveScreen.FindObject(second.Id)!.Bounds.X);
     }
+
+    [Fact]
+    public void GroupingCanBeSelectedLaterWithoutChangingSceneObjects()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 40, 40));
+        var second = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(60, 0, 80, 60));
+        var pipe = PipeObject.Create(new PointD(0, 20), new PointD(60, 20));
+        var project = ProjectDocument.Create(
+            "Group test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second, pipe }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectMany(new[] { first.Id, second.Id });
+
+        var groupId = session.GroupSelection();
+        session.ClearSelection();
+        session.SelectGroup(groupId);
+        session.MoveSelection(10, 5);
+
+        Assert.Equal(new RectD(10, 5, 40, 40), session.ActiveScreen.FindObject(first.Id)!.Bounds);
+        Assert.Equal(new RectD(70, 5, 80, 60), session.ActiveScreen.FindObject(second.Id)!.Bounds);
+        Assert.Equal(pipe, session.ActiveScreen.FindObject(pipe.Id));
+        Assert.True(session.UngroupSelection());
+        Assert.False(session.UngroupSelection());
+    }
 }

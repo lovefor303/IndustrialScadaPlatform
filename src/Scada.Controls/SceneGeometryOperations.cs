@@ -148,6 +148,34 @@ public static class SceneGeometryOperations
         });
     }
 
+    public static ScreenDocument ChangeLayer(
+        ScreenDocument screen,
+        IEnumerable<Guid> selectedObjectIds,
+        LayerOrderOperation operation)
+    {
+        ArgumentNullException.ThrowIfNull(screen);
+        var selected = MaterializeSelection(screen, selectedObjectIds);
+        if (selected.Count == 0)
+        {
+            throw new InvalidOperationException("At least one object must be selected.");
+        }
+
+        var minimum = screen.Objects.Min(sceneObject => sceneObject.ZIndex);
+        var maximum = screen.Objects.Max(sceneObject => sceneObject.ZIndex);
+        return ReplaceSelected(screen, selected, sceneObject =>
+        {
+            var zIndex = operation switch
+            {
+                LayerOrderOperation.BringForward => sceneObject.ZIndex + 1,
+                LayerOrderOperation.SendBackward => sceneObject.ZIndex - 1,
+                LayerOrderOperation.BringToFront => maximum + 1,
+                LayerOrderOperation.SendToBack => minimum - 1,
+                _ => throw new ArgumentOutOfRangeException(nameof(operation))
+            };
+            return sceneObject with { ZIndex = zIndex };
+        });
+    }
+
     public static ScreenDocument Rotate(
         ScreenDocument screen,
         IEnumerable<Guid> selectedObjectIds,
@@ -376,6 +404,14 @@ public enum GeometryDistribution
 {
     Horizontal,
     Vertical
+}
+
+public enum LayerOrderOperation
+{
+    BringForward,
+    SendBackward,
+    BringToFront,
+    SendToBack
 }
 
 public enum PipeEndpoint

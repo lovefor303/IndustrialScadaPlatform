@@ -10,6 +10,7 @@ namespace Scada.Editor.Wpf;
 public sealed class EditorSession
 {
     private readonly HashSet<Guid> _selectedObjectIds = new();
+    private readonly Dictionary<Guid, HashSet<Guid>> _groups = new();
     private EditHistory _history;
 
     public EditorSession(ProjectDocument project, string activeScreenName)
@@ -69,6 +70,40 @@ public sealed class EditorSession
 
         _selectedObjectIds.Clear();
         _selectedObjectIds.UnionWith(ids);
+    }
+
+    public Guid GroupSelection()
+    {
+        if (_selectedObjectIds.Count < 2)
+        {
+            throw new InvalidOperationException("At least two objects must be selected to create a group.");
+        }
+
+        var groupId = Guid.NewGuid();
+        _groups[groupId] = new HashSet<Guid>(_selectedObjectIds);
+        return groupId;
+    }
+
+    public void SelectGroup(Guid groupId)
+    {
+        if (!_groups.TryGetValue(groupId, out var objectIds))
+        {
+            throw new KeyNotFoundException($"Group '{groupId}' was not found.");
+        }
+
+        SelectMany(objectIds);
+    }
+
+    public bool UngroupSelection()
+    {
+        var group = _groups.FirstOrDefault(pair => pair.Value.SetEquals(_selectedObjectIds));
+        if (group.Equals(default(KeyValuePair<Guid, HashSet<Guid>>)))
+        {
+            return false;
+        }
+
+        _groups.Remove(group.Key);
+        return true;
     }
 
     public void ClearSelection() => _selectedObjectIds.Clear();
@@ -164,6 +199,14 @@ public sealed class EditorSession
             ActiveScreen,
             _selectedObjectIds,
             distribution));
+    }
+
+    public void ChangeLayer(LayerOrderOperation operation)
+    {
+        ReplaceActiveScreen(SceneGeometryOperations.ChangeLayer(
+            ActiveScreen,
+            _selectedObjectIds,
+            operation));
     }
 
     public void UpdateSelectedObject(Func<SceneObject, SceneObject> update)

@@ -52,11 +52,11 @@
 
 **Files:** `SceneContracts.cs`, `SceneGeometryOperations.cs`, `EditorSession.cs`, serializer/schema tests if needed
 
-- [ ] First prefer an editor-only selection group map outside `ProjectDocument`; only persist group IDs if reopening a project must preserve groups, and then add a schema migration.
-- [ ] Write failing tests for group, ungroup, bring-forward, send-backward, bring-to-front and send-to-back while asserting stable object IDs and independent pipe geometry.
-- [ ] Implement layer operations by changing only `ZIndex`; group operations must not merge objects or change their bounds.
-- [ ] Add persistence coverage for the chosen group representation and reject malformed group references.
-- [ ] Run focused tests and commit `feat: add editor grouping and layer commands`.
+- [x] First prefer an editor-only selection group map outside `ProjectDocument`; only persist group IDs if reopening a project must preserve groups, and then add a schema migration.
+- [x] Write failing tests for group, ungroup, bring-forward, send-backward, bring-to-front and send-to-back while asserting stable object IDs and independent pipe geometry.
+- [x] Implement layer operations by changing only `ZIndex`; group operations must not merge objects or change their bounds.
+- [x] Add session coverage for the chosen group representation and reject malformed group references.
+- [x] Run focused tests; full verification and commit are the Task 3 checkpoint below.
 
 ## Task 4: WPF command surface and shortcuts
 
