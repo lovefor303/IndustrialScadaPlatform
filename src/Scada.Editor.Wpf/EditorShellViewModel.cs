@@ -183,6 +183,8 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
 
     private void OnSessionStateChanged(object? sender, EventArgs e)
     {
+        RefreshCommand(UndoCommand);
+        RefreshCommand(RedoCommand);
         RefreshCommand(AlignLeftCommand);
         RefreshCommand(AlignCenterCommand);
         RefreshCommand(AlignRightCommand);

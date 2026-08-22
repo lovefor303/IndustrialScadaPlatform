@@ -189,6 +189,34 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void AlignmentRefreshesUndoAndRedoCommands()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 40, 40));
+        var second = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(80, 20, 60, 60));
+        var project = ProjectDocument.Create(
+            "Undo command refresh test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectMany(new[] { first.Id, second.Id });
+        var viewModel = new EditorShellViewModel(EditorRole.Developer, session: session);
+
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+        Assert.False(viewModel.RedoCommand.CanExecute(null));
+        var undoStateChanged = false;
+        viewModel.UndoCommand.CanExecuteChanged += (_, _) => undoStateChanged = true;
+
+        viewModel.AlignTopCommand.Execute(null);
+
+        Assert.True(undoStateChanged);
+        Assert.True(viewModel.UndoCommand.CanExecute(null));
+        Assert.False(viewModel.RedoCommand.CanExecute(null));
+
+        viewModel.UndoCommand.Execute(null);
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+        Assert.True(viewModel.RedoCommand.CanExecute(null));
+    }
+
+    [Fact]
     public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
     {
         var viewport = new EditorViewport();
