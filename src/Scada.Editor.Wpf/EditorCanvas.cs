@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -15,6 +16,7 @@ namespace Scada.Editor.Wpf;
 public sealed class EditorCanvas : Canvas
 {
     private const string ToolboxDataFormat = "Scada.Editor.ToolboxType";
+    private static readonly Cursor RotationCursor = RotationCursorFactory.Create();
     private bool _isPanning;
     private Point _panStart;
     private Vector _panOrigin;
@@ -138,6 +140,7 @@ public sealed class EditorCanvas : Canvas
         if (visual is FrameworkElement element)
         {
             element.Tag = sceneObject.Id;
+            element.Cursor = Cursors.SizeAll;
             element.Width = sceneObject.Bounds.Width * Viewport.Zoom;
             element.Height = sceneObject.Bounds.Height * Viewport.Zoom;
             element.RenderTransform = new RotateTransform(sceneObject.Rotation);
@@ -196,6 +199,7 @@ public sealed class EditorCanvas : Canvas
             Height = height,
             BorderBrush = Brushes.DeepSkyBlue,
             BorderThickness = new Thickness(1),
+            Cursor = Cursors.SizeAll,
             Tag = objectId,
             Child = content
         };
@@ -212,10 +216,11 @@ public sealed class EditorCanvas : Canvas
                 Background = Brushes.White,
                 BorderBrush = Brushes.DeepSkyBlue,
                 BorderThickness = new Thickness(1),
-                Cursor = Cursors.SizeAll,
+                Cursor = ResizeCursor(position),
                 Tag = new ResizeHandleTag(sceneObject.Id, position)
             };
             handle.DragDelta += OnResizeHandleDragDelta;
+            handle.DragCompleted += OnGeometryHandleDragCompleted;
             Children.Add(handle);
             SetHandlePosition(handle, bounds, position);
         }
@@ -227,22 +232,11 @@ public sealed class EditorCanvas : Canvas
             Background = Brushes.Orange,
             BorderBrush = Brushes.White,
             BorderThickness = new Thickness(1),
-            Cursor = Cursors.Hand,
+            Cursor = RotationCursor,
             Tag = "rotation"
         };
-        rotationHandle.DragDelta += (_, args) =>
-        {
-            if (Session is null)
-            {
-                return;
-            }
-
-            Session.UpdateSelectedObject(selected => selected with
-            {
-                Rotation = selected.Rotation + args.HorizontalChange
-            });
-            Refresh();
-        };
+        rotationHandle.DragDelta += (_, args) => OnRotationHandleDragDelta(sceneObject.Id, args);
+        rotationHandle.DragCompleted += OnGeometryHandleDragCompleted;
         Children.Add(rotationHandle);
         SetLeft(rotationHandle, (bounds.X + bounds.Width / 2) * Viewport.Zoom + Viewport.Pan.X - 4);
         SetTop(rotationHandle, (bounds.Y - 20) * Viewport.Zoom + Viewport.Pan.Y);
@@ -280,8 +274,96 @@ public sealed class EditorCanvas : Canvas
         {
             Bounds = ResizeBounds(sceneObject.Bounds, tag.Position, dx, dy)
         });
+        UpdateObjectVisual(tag.ObjectId);
+    }
+
+    private void OnRotationHandleDragDelta(Guid objectId, DragDeltaEventArgs e)
+    {
+        if (Session is null)
+        {
+            return;
+        }
+
+        Session.SelectOnly(objectId);
+        Session.UpdateSelectedObject(selected => selected with
+        {
+            Rotation = selected.Rotation + e.HorizontalChange
+        });
+        UpdateObjectVisual(objectId);
+    }
+
+    private void OnGeometryHandleDragCompleted(object sender, DragCompletedEventArgs e)
+    {
         Refresh();
     }
+
+    private void UpdateObjectVisual(Guid objectId)
+    {
+        if (Session is null || Session.ActiveScreen.FindObject(objectId) is not { } sceneObject)
+        {
+            return;
+        }
+
+        var visual = Children.OfType<FrameworkElement>()
+            .FirstOrDefault(element => element.Tag is Guid id && id == objectId);
+        if (visual is not null)
+        {
+            ApplyVisualGeometry(visual, sceneObject);
+        }
+
+        foreach (var handle in Children.OfType<Thumb>())
+        {
+            if (handle.Tag is ResizeHandleTag resize && resize.ObjectId == objectId)
+            {
+                SetHandlePosition(handle, sceneObject.Bounds, resize.Position);
+            }
+            else if (Equals(handle.Tag, "rotation"))
+            {
+                SetRotationHandlePosition(handle, sceneObject.Bounds);
+            }
+        }
+
+        InvalidateVisual();
+    }
+
+    private void SetRotationHandlePosition(Thumb handle, RectD bounds)
+    {
+        SetLeft(handle, (bounds.X + bounds.Width / 2) * Viewport.Zoom + Viewport.Pan.X - 4);
+        SetTop(handle, (bounds.Y - 20) * Viewport.Zoom + Viewport.Pan.Y);
+    }
+
+    private void ApplyVisualGeometry(FrameworkElement visual, SceneObject sceneObject)
+    {
+        var width = sceneObject.Bounds.Width * Viewport.Zoom;
+        var height = sceneObject.Bounds.Height * Viewport.Zoom;
+        visual.Width = width;
+        visual.Height = height;
+        SetLeft(visual, sceneObject.Bounds.X * Viewport.Zoom + Viewport.Pan.X);
+        SetTop(visual, sceneObject.Bounds.Y * Viewport.Zoom + Viewport.Pan.Y);
+
+        if (visual is Border { Child: FrameworkElement child })
+        {
+            visual.RenderTransform = null;
+            child.Width = width;
+            child.Height = height;
+            child.RenderTransform = new RotateTransform(sceneObject.Rotation);
+            child.RenderTransformOrigin = new Point(0.5, 0.5);
+        }
+        else
+        {
+            visual.RenderTransform = new RotateTransform(sceneObject.Rotation);
+            visual.RenderTransformOrigin = new Point(0.5, 0.5);
+        }
+    }
+
+    private static Cursor ResizeCursor(HandlePosition position) => position switch
+    {
+        HandlePosition.TopLeft or HandlePosition.BottomRight => Cursors.SizeNWSE,
+        HandlePosition.TopRight or HandlePosition.BottomLeft => Cursors.SizeNESW,
+        HandlePosition.Top or HandlePosition.Bottom => Cursors.SizeNS,
+        HandlePosition.Left or HandlePosition.Right => Cursors.SizeWE,
+        _ => Cursors.SizeAll
+    };
 
     private static RectD ResizeBounds(RectD bounds, HandlePosition position, double dx, double dy)
     {
@@ -451,5 +533,121 @@ public sealed class EditorCanvas : Canvas
         _isPanning = false;
         ReleaseMouseCapture();
         e.Handled = true;
+    }
+}
+
+internal static class RotationCursorFactory
+{
+    public static Cursor Create()
+    {
+        try
+        {
+            const int size = 32;
+            const int pixelBytes = size * size * 4;
+            const int maskBytes = size * (size / 8);
+            const int imageOffset = 22;
+            const int imageSize = 40 + pixelBytes + maskBytes;
+
+            using var stream = new MemoryStream(imageOffset + imageSize);
+            using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true))
+            {
+                // CUR header and one 32-bit DIB image. For a cursor, planes/bitcount
+                // in the directory entry store the hotspot coordinates.
+                writer.Write((ushort)0);
+                writer.Write((ushort)2);
+                writer.Write((ushort)1);
+                writer.Write((byte)size);
+                writer.Write((byte)size);
+                writer.Write((byte)0);
+                writer.Write((byte)0);
+                writer.Write((ushort)(size / 2));
+                writer.Write((ushort)(size / 2));
+                writer.Write(imageSize);
+                writer.Write(imageOffset);
+
+                writer.Write(40);
+                writer.Write(size);
+                writer.Write(size * 2);
+                writer.Write((ushort)1);
+                writer.Write((ushort)32);
+                writer.Write(0);
+                writer.Write(pixelBytes);
+                writer.Write(0);
+                writer.Write(0);
+                writer.Write(0);
+                writer.Write(0);
+
+                var pixels = new bool[size, size];
+                DrawArc(pixels, 16, 16, 10.5, 35, 315);
+                DrawArrow(pixels, 24, 8, 22, 4, 25, 12);
+                DrawArrow(pixels, 8, 24, 4, 25, 12, 22);
+
+                for (var y = size - 1; y >= 0; y--)
+                {
+                    for (var x = 0; x < size; x++)
+                    {
+                        var on = pixels[x, y];
+                        writer.Write(on ? (byte)40 : (byte)0);
+                        writer.Write(on ? (byte)140 : (byte)0);
+                        writer.Write(on ? (byte)255 : (byte)0);
+                        writer.Write(on ? (byte)255 : (byte)0);
+                    }
+                }
+
+                for (var i = 0; i < maskBytes; i++)
+                {
+                    writer.Write((byte)0);
+                }
+            }
+
+            stream.Position = 0;
+            return new Cursor(stream);
+        }
+        catch (Exception)
+        {
+            // Keep the editor usable on WPF environments that reject custom DIB
+            // cursors; ScrollAll still communicates a rotation gesture better
+            // than a generic hand cursor.
+            return Cursors.ScrollAll;
+        }
+    }
+
+    private static void DrawArc(bool[,] pixels, double centerX, double centerY, double radius, double start, double end)
+    {
+        for (var angle = start; angle <= end; angle += 2)
+        {
+            var radians = angle * Math.PI / 180;
+            var x = (int)Math.Round(centerX + radius * Math.Cos(radians));
+            var y = (int)Math.Round(centerY + radius * Math.Sin(radians));
+            SetPixel(pixels, x, y);
+            SetPixel(pixels, x + 1, y);
+            SetPixel(pixels, x, y + 1);
+        }
+    }
+
+    private static void DrawArrow(bool[,] pixels, int tipX, int tipY, int leftX, int leftY, int rightX, int rightY)
+    {
+        DrawLine(pixels, tipX, tipY, leftX, leftY);
+        DrawLine(pixels, tipX, tipY, rightX, rightY);
+    }
+
+    private static void DrawLine(bool[,] pixels, int x1, int y1, int x2, int y2)
+    {
+        var steps = Math.Max(Math.Abs(x2 - x1), Math.Abs(y2 - y1));
+        for (var i = 0; i <= steps; i++)
+        {
+            var fraction = steps == 0 ? 0 : (double)i / steps;
+            SetPixel(pixels,
+                (int)Math.Round(x1 + (x2 - x1) * fraction),
+                (int)Math.Round(y1 + (y2 - y1) * fraction));
+        }
+    }
+
+    private static void SetPixel(bool[,] pixels, int x, int y)
+    {
+        if (x >= 0 && x < pixels.GetLength(0) && y >= 0 && y < pixels.GetLength(1))
+        {
+            pixels[x, y] = true;
+        }
     }
 }

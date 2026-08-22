@@ -152,6 +152,99 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void SelectionHandlesUseDirectionalResizeCursorsAndRotationCursor()
+    {
+        StaThread.Run(() =>
+        {
+            var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(100, 100, 100, 80));
+            var project = ProjectDocument.Create(
+                "Cursor test",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+            var session = new EditorSession(project, "Main");
+            session.SelectOnly(valve.Id);
+            var canvas = new EditorCanvas { Session = session };
+
+            canvas.Refresh();
+
+            var handles = canvas.Children.OfType<Thumb>().ToArray();
+            Assert.Equal(9, handles.Length);
+            Assert.Equal(Cursors.SizeAll, Assert.IsAssignableFrom<FrameworkElement>(Assert.IsType<Border>(canvas.Children[0]).Child).Cursor);
+            Assert.Equal(Cursors.SizeNWSE, handles[0].Cursor);
+            Assert.Equal(Cursors.SizeNS, handles[1].Cursor);
+            Assert.Equal(Cursors.SizeNESW, handles[2].Cursor);
+            Assert.Equal(Cursors.SizeWE, handles[3].Cursor);
+            Assert.Equal(Cursors.SizeNWSE, handles[4].Cursor);
+            Assert.Equal(Cursors.SizeNS, handles[5].Cursor);
+            Assert.Equal(Cursors.SizeNESW, handles[6].Cursor);
+            Assert.Equal(Cursors.SizeWE, handles[7].Cursor);
+            Assert.NotEqual(Cursors.Hand, handles[8].Cursor);
+            Assert.NotEqual(Cursors.ScrollAll, handles[8].Cursor);
+            return true;
+        });
+    }
+
+    [Fact]
+    public void ResizeDragSupportsGrowthAndShrinkWithoutRebuildingTheActiveHandle()
+    {
+        StaThread.Run(() =>
+        {
+            var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(100, 100, 100, 80));
+            var project = ProjectDocument.Create(
+                "Resize drag test",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+            var session = new EditorSession(project, "Main");
+            session.SelectOnly(valve.Id);
+            var canvas = new EditorCanvas { Session = session };
+            canvas.Refresh();
+
+            var bottomRight = canvas.Children.OfType<Thumb>().ElementAt(4);
+            bottomRight.RaiseEvent(new DragStartedEventArgs(0, 0) { RoutedEvent = Thumb.DragStartedEvent });
+            bottomRight.RaiseEvent(new DragDeltaEventArgs(20, 10) { RoutedEvent = Thumb.DragDeltaEvent });
+
+            var grown = session.ActiveScreen.FindObject(valve.Id)!;
+            Assert.Equal(120, grown.Bounds.Width);
+            Assert.Equal(90, grown.Bounds.Height);
+            Assert.True(canvas.Children.Contains(bottomRight));
+
+            bottomRight.RaiseEvent(new DragDeltaEventArgs(-30, -20) { RoutedEvent = Thumb.DragDeltaEvent });
+            var shrunk = session.ActiveScreen.FindObject(valve.Id)!;
+            Assert.Equal(90, shrunk.Bounds.Width);
+            Assert.Equal(70, shrunk.Bounds.Height);
+
+            bottomRight.RaiseEvent(new DragCompletedEventArgs(0, 0, false) { RoutedEvent = Thumb.DragCompletedEvent });
+            return true;
+        });
+    }
+
+    [Fact]
+    public void RotationDragSupportsBothDirectionsWithoutRebuildingTheActiveHandle()
+    {
+        StaThread.Run(() =>
+        {
+            var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(100, 100, 100, 80));
+            var project = ProjectDocument.Create(
+                "Rotation drag test",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+            var session = new EditorSession(project, "Main");
+            session.SelectOnly(valve.Id);
+            var canvas = new EditorCanvas { Session = session };
+            canvas.Refresh();
+
+            var rotation = canvas.Children.OfType<Thumb>().Single(thumb => Equals(thumb.Tag, "rotation"));
+            rotation.RaiseEvent(new DragStartedEventArgs(0, 0) { RoutedEvent = Thumb.DragStartedEvent });
+            rotation.RaiseEvent(new DragDeltaEventArgs(20, 0) { RoutedEvent = Thumb.DragDeltaEvent });
+            rotation.RaiseEvent(new DragDeltaEventArgs(-5, 0) { RoutedEvent = Thumb.DragDeltaEvent });
+
+            var result = session.ActiveScreen.FindObject(valve.Id)!;
+            Assert.Equal(15, result.Rotation);
+            Assert.True(canvas.Children.Contains(rotation));
+
+            rotation.RaiseEvent(new DragCompletedEventArgs(0, 0, false) { RoutedEvent = Thumb.DragCompletedEvent });
+            return true;
+        });
+    }
+
+    [Fact]
     public void EditorShellRendersNonEmptyAt1920By1080()
     {
         StaThread.Run(() =>
