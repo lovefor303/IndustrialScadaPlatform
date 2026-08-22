@@ -39,6 +39,8 @@ public sealed class EditorSession
 
     public IReadOnlyCollection<Guid> SelectedObjectIds => _selectedObjectIds;
 
+    public event EventHandler? SelectionChanged;
+
     public bool IsDirty { get; private set; }
 
     public bool CanUndo => _history.CanUndo;
@@ -56,6 +58,7 @@ public sealed class EditorSession
 
         _selectedObjectIds.Clear();
         _selectedObjectIds.Add(objectId);
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void SelectMany(IEnumerable<Guid> objectIds)
@@ -72,6 +75,7 @@ public sealed class EditorSession
 
         _selectedObjectIds.Clear();
         _selectedObjectIds.UnionWith(ids);
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public bool ToggleSelection(Guid objectId)
@@ -84,9 +88,11 @@ public sealed class EditorSession
         if (!_selectedObjectIds.Add(objectId))
         {
             _selectedObjectIds.Remove(objectId);
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
             return false;
         }
 
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }
 
@@ -109,6 +115,8 @@ public sealed class EditorSession
                 _selectedObjectIds.Add(sceneObject.Id);
             }
         }
+
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public Guid GroupSelection()
@@ -145,7 +153,16 @@ public sealed class EditorSession
         return true;
     }
 
-    public void ClearSelection() => _selectedObjectIds.Clear();
+    public void ClearSelection()
+    {
+        if (_selectedObjectIds.Count == 0)
+        {
+            return;
+        }
+
+        _selectedObjectIds.Clear();
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
+    }
 
     public void AddObject(SceneObject sceneObject)
     {
@@ -188,6 +205,7 @@ public sealed class EditorSession
         _groups.Clear();
         _selectedObjectIds.Clear();
         IsDirty = false;
+        SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public bool Undo()

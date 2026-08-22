@@ -58,7 +58,13 @@
             <Button Content="撤销" Command="{Binding UndoCommand}" Margin="2" Padding="10,4" />
             <Button Content="重做" Command="{Binding RedoCommand}" Margin="2" Padding="10,4" />
             <Button Content="左对齐" Command="{Binding AlignLeftCommand}" Margin="2" Padding="10,4" />
+            <Button Content="水平居中" Command="{Binding AlignCenterCommand}" Margin="2" Padding="10,4" />
+            <Button Content="右对齐" Command="{Binding AlignRightCommand}" Margin="2" Padding="10,4" />
+            <Button Content="顶端对齐" Command="{Binding AlignTopCommand}" Margin="2" Padding="10,4" />
+            <Button Content="垂直居中" Command="{Binding AlignMiddleCommand}" Margin="2" Padding="10,4" />
+            <Button Content="底端对齐" Command="{Binding AlignBottomCommand}" Margin="2" Padding="10,4" />
             <Button Content="水平等距" Command="{Binding DistributeHorizontalCommand}" Margin="2" Padding="10,4" />
+            <Button Content="垂直等距" Command="{Binding DistributeVerticalCommand}" Margin="2" Padding="10,4" />
             <Button Content="组合" Command="{Binding GroupCommand}" Margin="2" Padding="10,4" />
             <Button Content="取消组合" Command="{Binding UngroupCommand}" Margin="2" Padding="10,4" />
             <Separator />

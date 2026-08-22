@@ -21,6 +21,10 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         _commands = commands;
         _fileDialog = fileDialog;
         _session = session;
+        if (_session is not null)
+        {
+            _session.SelectionChanged += OnSelectionChanged;
+        }
         NewProjectCommand = new AsyncEditorCommand(NewProjectAsync, () => IsEngineeringEnabled);
         OpenProjectCommand = new AsyncEditorCommand(OpenProjectAsync, () => IsEngineeringEnabled);
         SaveDraftCommand = new AsyncEditorCommand(SaveDraftAsync, () => IsEngineeringEnabled);
@@ -175,6 +179,30 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         && _session.SelectedObjectIds.Any(id => _session.ActiveScreen.FindObject(id) is not Scada.Scene.PipeObject);
 
     private bool CanLayer() => IsEngineeringEnabled && _session?.SelectedObjectIds.Count > 0;
+
+    private void OnSelectionChanged(object? sender, EventArgs e)
+    {
+        RefreshCommand(AlignLeftCommand);
+        RefreshCommand(AlignCenterCommand);
+        RefreshCommand(AlignRightCommand);
+        RefreshCommand(AlignTopCommand);
+        RefreshCommand(AlignMiddleCommand);
+        RefreshCommand(AlignBottomCommand);
+        RefreshCommand(DistributeHorizontalCommand);
+        RefreshCommand(DistributeVerticalCommand);
+        RefreshCommand(GroupCommand);
+        RefreshCommand(UngroupCommand);
+        RefreshCommand(BringToFrontCommand);
+        RefreshCommand(SendToBackCommand);
+    }
+
+    private static void RefreshCommand(ICommand command)
+    {
+        if (command is EditorCommand editorCommand)
+        {
+            editorCommand.Refresh();
+        }
+    }
 
     private void Undo()
     {

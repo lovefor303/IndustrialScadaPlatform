@@ -58,6 +58,7 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Phase 3-M2 Task 3 is implemented in the working tree: editor-session-only groups, group selection/ungrouping, and explicit layer-order operations that modify only selected `ZIndex` values.
 - Phase 3-M2 Task 4 is implemented in the working tree: Chinese productivity commands, WPF menu/toolbar bindings, engineering-role enablement and Ctrl+Z/Ctrl+Y/Ctrl+G/Ctrl+Shift+G shortcuts.
 - Phase 3-M2 selection ergonomics are implemented and verified: normal left-click single-selects, Ctrl+left-click toggles selection, and dragging on blank canvas performs intersecting-object frame selection. Frame cleanup removes the owned rectangle by reference, preserving existing scene visuals and handles.
+- Selection-dependent WPF commands now refresh when the session selection changes, so alignment, distribution, grouping and layer commands no longer remain disabled after Ctrl-click or frame selection. The toolbar exposes all alignment and distribution directions.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
@@ -75,7 +76,7 @@ not been planned or started.
 
 - Active workstream: new industrial SCADA platform.
 - Active unit: Phase 3-M2 visual acceptance; M2 implementation and gate are complete.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (167 tests passed); editor focused tests (32 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (168 tests passed); editor focused tests (33 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
 - Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from user-facing Phase 3-M2 visual acceptance.

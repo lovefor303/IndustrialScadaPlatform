@@ -137,6 +137,34 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void SelectionChangesRefreshAlignmentAndDistributionCommandEnablement()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 40, 40));
+        var second = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(80, 20, 60, 60));
+        var project = ProjectDocument.Create(
+            "Selection command test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second }) });
+        var session = new EditorSession(project, "Main");
+        var developer = new EditorShellViewModel(EditorRole.Developer, session: session);
+
+        Assert.False(developer.AlignTopCommand.CanExecute(null));
+        Assert.False(developer.AlignBottomCommand.CanExecute(null));
+        Assert.False(developer.AlignLeftCommand.CanExecute(null));
+        Assert.False(developer.DistributeHorizontalCommand.CanExecute(null));
+
+        var canExecuteChanged = false;
+        developer.AlignTopCommand.CanExecuteChanged += (_, _) => canExecuteChanged = true;
+
+        session.SelectMany(new[] { first.Id, second.Id });
+
+        Assert.True(canExecuteChanged);
+        Assert.True(developer.AlignTopCommand.CanExecute(null));
+        Assert.True(developer.AlignBottomCommand.CanExecute(null));
+        Assert.True(developer.AlignLeftCommand.CanExecute(null));
+        Assert.True(developer.DistributeHorizontalCommand.CanExecute(null));
+    }
+
+    [Fact]
     public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
     {
         var viewport = new EditorViewport();
