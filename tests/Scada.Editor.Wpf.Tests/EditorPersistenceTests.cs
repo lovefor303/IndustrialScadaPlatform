@@ -48,14 +48,29 @@ public sealed class EditorPersistenceTests
             var databasePath = Path.Combine(directory, "editor.db");
             var store = new RevisionStore(databasePath);
             await store.InitializeAsync();
-            var project = EditorCommands.CreateProject("Editor project", "Main");
-            var session = new EditorSession(project, "Main");
             var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(10, 20, 100, 80)) with
             {
+                Rotation = 12,
                 Properties = new Dictionary<string, string> { ["label"] = "XV101" }
             };
-            session.AddObject(valve);
+            var pipe = PipeObject.Create(
+                new PointD(0, 60),
+                new PointD(260, 60),
+                new[] { new PointD(100, 60), new PointD(100, 120) });
+            var project = ProjectDocument.Create(
+                "Editor project",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { pipe, valve }) });
+            var session = new EditorSession(project, "Main");
             var commands = new EditorCommands(session, store, "developer");
+
+            session.SelectOnly(valve.Id);
+            session.UpdateSelectedObject(sceneObject => sceneObject with
+            {
+                Bounds = new RectD(200, 300, 120, 90),
+                Rotation = 27
+            });
+            var savedBounds = new RectD(200, 300, 120, 90);
+            const double savedRotation = 27;
 
             await commands.SaveDraftAsync();
             Assert.False(session.IsDirty);
@@ -63,9 +78,15 @@ public sealed class EditorPersistenceTests
             var reopened = await store.LoadDraftAsync(project.ProjectId);
             Assert.NotNull(reopened);
             var reopenedSession = new EditorSession(reopened, "Main");
-            var reopenedObject = Assert.IsType<ControlObject>(reopenedSession.ActiveScreen.Objects.Single());
+            var reopenedObject = Assert.IsType<ControlObject>(reopenedSession.ActiveScreen.FindObject(valve.Id));
+            var reopenedPipe = Assert.IsType<PipeObject>(reopenedSession.ActiveScreen.FindObject(pipe.Id));
             Assert.Equal(valve.Id, reopenedObject.Id);
             Assert.Equal(valve.Properties, reopenedObject.Properties);
+            Assert.Equal(savedBounds, reopenedObject.Bounds);
+            Assert.Equal(savedRotation, reopenedObject.Rotation);
+            Assert.Equal(pipe.Start, reopenedPipe.Start);
+            Assert.Equal(pipe.End, reopenedPipe.End);
+            Assert.Equal(pipe.Bends, reopenedPipe.Bends);
 
             var reopenedCommands = new EditorCommands(reopenedSession, store, "developer");
             var revision = await reopenedCommands.PublishAsync();
@@ -75,12 +96,14 @@ public sealed class EditorPersistenceTests
             reopenedSession.SelectOnly(reopenedObject.Id);
             reopenedSession.UpdateSelectedObject(sceneObject => sceneObject with
             {
-                Bounds = new RectD(200, 300, 100, 80)
+                Bounds = new RectD(500, 600, 100, 80),
+                Rotation = 4
             });
             await reopenedCommands.SaveDraftAsync();
             await reopenedCommands.RestoreAsync(revision.RevisionId);
-            var restoredObject = Assert.IsType<ControlObject>(reopenedSession.ActiveScreen.Objects.Single());
-            Assert.Equal(valve.Bounds, restoredObject.Bounds);
+            var restoredObject = Assert.IsType<ControlObject>(reopenedSession.ActiveScreen.FindObject(valve.Id));
+            Assert.Equal(savedBounds, restoredObject.Bounds);
+            Assert.Equal(savedRotation, restoredObject.Rotation);
             Assert.False(reopenedSession.IsDirty);
         }
         finally

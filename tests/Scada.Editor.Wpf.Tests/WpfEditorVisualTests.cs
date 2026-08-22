@@ -9,6 +9,8 @@ using Scada.Editor.Wpf;
 using Scada.Controls;
 using Scada.Core;
 using Scada.Scene;
+using Scada.Storage;
+using IOPath = System.IO.Path;
 using Xunit;
 
 namespace Scada.Editor.Wpf.Tests;
@@ -108,6 +110,52 @@ public sealed class WpfEditorVisualTests
 
         var operatorView = new EditorShellViewModel(EditorRole.Operator);
         Assert.False(operatorView.SaveDraftCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task WindowCanUseInjectedPersistenceCommands()
+    {
+        var directory = IOPath.Combine(IOPath.GetTempPath(), "IndustrialScadaPlatform.EditorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+
+        try
+        {
+            var projectId = Guid.Empty;
+            StaThread.Run(() =>
+            {
+                var project = EditorCommands.CreateProject("Injected window project", "Main");
+                projectId = project.ProjectId;
+                var session = new EditorSession(project, "Main");
+                var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(10, 20, 100, 80));
+                session.AddObject(valve);
+                var store = new RevisionStore(IOPath.Combine(directory, "editor.db"));
+                store.InitializeAsync().GetAwaiter().GetResult();
+                var commands = new EditorCommands(session, store, "developer");
+                var window = new EditorShellWindow(EditorRole.Developer, session, commands);
+                var viewModel = Assert.IsType<EditorShellViewModel>(window.DataContext);
+                Assert.True(viewModel.SaveDraftCommand.CanExecute(null));
+                viewModel.SaveDraftCommand.Execute(null);
+                window.Close();
+                return true;
+            });
+
+            ProjectDocument? saved = null;
+            for (var attempt = 0; attempt < 20 && saved is null; attempt++)
+            {
+                await Task.Delay(25);
+                var store = new RevisionStore(IOPath.Combine(directory, "editor.db"));
+                await store.InitializeAsync();
+                saved = await store.LoadDraftAsync(projectId);
+            }
+
+            Assert.NotNull(saved);
+            var savedValve = Assert.IsType<ControlObject>(saved!.Screens[0].Objects.Single());
+            Assert.Equal(ControlTypeIds.AutomatedValve, savedValve.Type);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
     }
 
     [Fact]

@@ -45,15 +45,15 @@ Excluded: PLC/S7 communication, Gateway, Web Runtime, WinCC deployment, alarms, 
 
 **Files:** `EditorShellWindow.xaml.cs`, `EditorShellViewModel.cs`, `EditorCommands.cs`, `tests/Scada.Editor.Wpf.Tests/WpfEditorVisualTests.cs`, `docs/phase3-m3-acceptance.md`
 
-- [ ] Inject a temporary `RevisionStore` and `EditorCommands` into the preview shell instead of leaving save/open commands detached.
-- [ ] Add a save/reopen test that edits geometry, saves draft, reloads, and compares object IDs, bounds, rotation and pipe endpoints.
-- [ ] Keep all files in a temporary test directory and never touch legacy databases.
+- [x] Inject a temporary `RevisionStore` and `EditorCommands` into the preview shell instead of leaving save/open commands detached.
+- [x] Add a save/reopen test that edits geometry, saves draft, reloads, and compares object IDs, bounds, rotation and pipe endpoints.
+- [x] Keep all files in a temporary test directory and never touch legacy databases.
 
 ### Task 5: M3 gate and handoff
 
-- [ ] Run Release build, full solution tests, editor focused tests and `git diff --check`.
-- [ ] Produce `docs/phase3-m3-acceptance.md` with the exact commands and results.
-- [ ] Update `docs/handoff-current.md` with the M3 checkpoint and remaining exclusions.
+- [x] Run Release build, full solution tests, editor focused tests and `git diff --check`.
+- [x] Produce `docs/phase3-m3-acceptance.md` with the exact commands and results.
+- [x] Update `docs/handoff-current.md` with the M3 checkpoint and remaining exclusions.
 - [ ] Commit each task separately with focused messages.
 
 ## Verification Commands

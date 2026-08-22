@@ -15,5 +15,6 @@
     <ProjectReference Include="..\..\src\Scada.Editor.Wpf\Scada.Editor.Wpf.csproj" />
     <ProjectReference Include="..\..\src\Scada.Scene\Scada.Scene.csproj" />
     <ProjectReference Include="..\..\src\Scada.Controls\Scada.Controls.csproj" />
+    <ProjectReference Include="..\..\src\Scada.Storage\Scada.Storage.csproj" />
   </ItemGroup>
 </Project>

@@ -1,14 +1,16 @@
+using System.IO;
 using System.Windows;
 using Scada.Controls;
 using Scada.Core;
 using Scada.Editor.Wpf;
 using Scada.Scene;
+using Scada.Storage;
 
 namespace Scada.Editor.Preview.Wpf;
 
 public partial class App : Application
 {
-    private void OnStartup(object sender, StartupEventArgs e)
+    private async void OnStartup(object sender, StartupEventArgs e)
     {
         var level = VariableDefinition.Number(
             "Tank.Level",
@@ -43,7 +45,14 @@ public partial class App : Application
             ProjectDocument.Create("离线编辑预览", new[] { level, running }, new[] { screen }),
             "Main");
 
-        var window = new EditorShellWindow(EditorRole.Developer, session);
+        var dataDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "IndustrialScadaPlatform",
+            "Preview");
+        var store = new RevisionStore(Path.Combine(dataDirectory, "editor.db"));
+        await store.InitializeAsync();
+        var commands = new EditorCommands(session, store, "preview-developer");
+        var window = new EditorShellWindow(EditorRole.Developer, session, commands);
         MainWindow = window;
         window.Show();
     }
