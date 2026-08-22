@@ -74,6 +74,43 @@ public sealed class EditorSession
         _selectedObjectIds.UnionWith(ids);
     }
 
+    public bool ToggleSelection(Guid objectId)
+    {
+        if (ActiveScreen.FindObject(objectId) is null)
+        {
+            throw new KeyNotFoundException($"Scene object '{objectId}' was not found.");
+        }
+
+        if (!_selectedObjectIds.Add(objectId))
+        {
+            _selectedObjectIds.Remove(objectId);
+            return false;
+        }
+
+        return true;
+    }
+
+    public void SelectIntersecting(RectD selectionBounds)
+    {
+        var left = Math.Min(selectionBounds.X, selectionBounds.X + selectionBounds.Width);
+        var top = Math.Min(selectionBounds.Y, selectionBounds.Y + selectionBounds.Height);
+        var right = Math.Max(selectionBounds.X, selectionBounds.X + selectionBounds.Width);
+        var bottom = Math.Max(selectionBounds.Y, selectionBounds.Y + selectionBounds.Height);
+        _selectedObjectIds.Clear();
+        foreach (var sceneObject in ActiveScreen.Objects)
+        {
+            var bounds = sceneObject.Bounds;
+            var intersects = bounds.X <= right
+                && bounds.X + bounds.Width >= left
+                && bounds.Y <= bottom
+                && bounds.Y + bounds.Height >= top;
+            if (intersects)
+            {
+                _selectedObjectIds.Add(sceneObject.Id);
+            }
+        }
+    }
+
     public Guid GroupSelection()
     {
         if (_selectedObjectIds.Count < 2)

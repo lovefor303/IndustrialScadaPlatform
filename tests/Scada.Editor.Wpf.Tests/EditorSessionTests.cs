@@ -279,4 +279,41 @@ public sealed class EditorSessionTests
         Assert.True(session.UngroupSelection());
         Assert.False(session.UngroupSelection());
     }
+
+    [Fact]
+    public void ToggleSelectionAddsAndRemovesObjectsWithoutChangingExistingSelection()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 40, 40));
+        var second = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(60, 0, 80, 60));
+        var project = ProjectDocument.Create(
+            "Selection test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second }) });
+        var session = new EditorSession(project, "Main");
+
+        session.SelectOnly(first.Id);
+        Assert.True(session.ToggleSelection(second.Id));
+        Assert.Equal(new[] { first.Id, second.Id }, session.SelectedObjectIds);
+        Assert.False(session.ToggleSelection(first.Id));
+        Assert.Equal(new[] { second.Id }, session.SelectedObjectIds);
+    }
+
+    [Fact]
+    public void FrameSelectionSelectsIntersectingObjectsAndClearsForEmptyFrame()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(10, 10, 40, 40));
+        var second = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(100, 100, 80, 60));
+        var pipe = PipeObject.Create(new PointD(0, 30), new PointD(20, 30));
+        var project = ProjectDocument.Create(
+            "Frame selection test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second, pipe }) });
+        var session = new EditorSession(project, "Main");
+
+        session.SelectIntersecting(new RectD(0, 0, 70, 70));
+        Assert.Contains(first.Id, session.SelectedObjectIds);
+        Assert.Contains(pipe.Id, session.SelectedObjectIds);
+        Assert.DoesNotContain(second.Id, session.SelectedObjectIds);
+
+        session.SelectIntersecting(new RectD(300, 300, 20, 20));
+        Assert.Empty(session.SelectedObjectIds);
+    }
 }

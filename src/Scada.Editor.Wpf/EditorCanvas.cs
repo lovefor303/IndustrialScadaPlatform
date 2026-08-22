@@ -21,6 +21,10 @@ public sealed class EditorCanvas : Canvas
     private bool _isPanning;
     private Point _panStart;
     private Vector _panOrigin;
+    private bool _isSelecting;
+    private bool _selectionMoved;
+    private Point _selectionStart;
+    private Rectangle? _selectionRectangle;
 
     private enum HandlePosition
     {
@@ -433,9 +437,22 @@ public sealed class EditorCanvas : Canvas
     {
         if (ReferenceEquals(e.OriginalSource, this))
         {
-            Session?.ClearSelection();
-            Refresh();
+            _isSelecting = true;
+            _selectionMoved = false;
+            _selectionStart = e.GetPosition(this);
+            _selectionRectangle = new Rectangle
+            {
+                Fill = new SolidColorBrush(Color.FromArgb(48, 30, 144, 255)),
+                Stroke = Brushes.DeepSkyBlue,
+                StrokeThickness = 1,
+                IsHitTestVisible = false
+            };
+            Children.Add(_selectionRectangle);
+            SetLeft(_selectionRectangle, _selectionStart.X);
+            SetTop(_selectionRectangle, _selectionStart.Y);
+            CaptureMouse();
             Focus();
+            e.Handled = true;
         }
     }
 
@@ -446,7 +463,14 @@ public sealed class EditorCanvas : Canvas
             return;
         }
 
-        Session.SelectOnly(objectId);
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            Session.ToggleSelection(objectId);
+        }
+        else
+        {
+            Session.SelectOnly(objectId);
+        }
         Refresh();
         Focus();
         e.Handled = true;
@@ -513,6 +537,24 @@ public sealed class EditorCanvas : Canvas
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
+        if (_isSelecting && e.LeftButton == MouseButtonState.Pressed)
+        {
+            var current = e.GetPosition(this);
+            var width = Math.Abs(current.X - _selectionStart.X);
+            var height = Math.Abs(current.Y - _selectionStart.Y);
+            _selectionMoved = width >= 3 || height >= 3;
+            if (_selectionRectangle is not null)
+            {
+                SetLeft(_selectionRectangle, Math.Min(_selectionStart.X, current.X));
+                SetTop(_selectionRectangle, Math.Min(_selectionStart.Y, current.Y));
+                _selectionRectangle.Width = width;
+                _selectionRectangle.Height = height;
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (!_isPanning || e.MiddleButton != MouseButtonState.Pressed)
         {
             return;
@@ -526,6 +568,38 @@ public sealed class EditorCanvas : Canvas
 
     private void OnMouseUp(object sender, MouseButtonEventArgs e)
     {
+        if (e.ChangedButton == MouseButton.Left && _isSelecting)
+        {
+            var end = e.GetPosition(this);
+            ReleaseMouseCapture();
+            _isSelecting = false;
+            if (_selectionRectangle is not null)
+            {
+                Children.Remove(_selectionRectangle);
+                _selectionRectangle = null;
+            }
+
+            if (_selectionMoved && Session is not null)
+            {
+                var startModel = Viewport.ScreenToModel(_selectionStart);
+                var endModel = Viewport.ScreenToModel(end);
+                Session.SelectIntersecting(new RectD(
+                    startModel.X,
+                    startModel.Y,
+                    endModel.X - startModel.X,
+                    endModel.Y - startModel.Y));
+                Refresh();
+            }
+            else if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                Session?.ClearSelection();
+                Refresh();
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (e.ChangedButton != MouseButton.Middle || !_isPanning)
         {
             return;
