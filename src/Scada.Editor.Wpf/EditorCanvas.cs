@@ -16,6 +16,7 @@ namespace Scada.Editor.Wpf;
 public sealed class EditorCanvas : Canvas
 {
     private const string ToolboxDataFormat = "Scada.Editor.ToolboxType";
+    private const double RotationDegreesPerPixel = 0.25;
     private static readonly Cursor RotationCursor = RotationCursorFactory.Create();
     private bool _isPanning;
     private Point _panStart;
@@ -229,8 +230,8 @@ public sealed class EditorCanvas : Canvas
         {
             Width = 8,
             Height = 8,
-            Background = Brushes.Orange,
-            BorderBrush = Brushes.White,
+            Background = Brushes.White,
+            BorderBrush = Brushes.DeepSkyBlue,
             BorderThickness = new Thickness(1),
             Cursor = RotationCursor,
             Tag = "rotation"
@@ -287,7 +288,7 @@ public sealed class EditorCanvas : Canvas
         Session.SelectOnly(objectId);
         Session.UpdateSelectedObject(selected => selected with
         {
-            Rotation = selected.Rotation + e.HorizontalChange
+            Rotation = selected.Rotation + e.HorizontalChange * RotationDegreesPerPixel
         });
         UpdateObjectVisual(objectId);
     }

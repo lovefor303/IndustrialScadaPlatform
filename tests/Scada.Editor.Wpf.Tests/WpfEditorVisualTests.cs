@@ -169,6 +169,10 @@ public sealed class WpfEditorVisualTests
             var handles = canvas.Children.OfType<Thumb>().ToArray();
             Assert.Equal(9, handles.Length);
             Assert.Equal(Cursors.SizeAll, Assert.IsAssignableFrom<FrameworkElement>(Assert.IsType<Border>(canvas.Children[0]).Child).Cursor);
+            Assert.Equal(Brushes.White, handles[0].Background);
+            Assert.Equal(Brushes.DeepSkyBlue, handles[0].BorderBrush);
+            Assert.Equal(handles[0].Background, handles[8].Background);
+            Assert.Equal(handles[0].BorderBrush, handles[8].BorderBrush);
             Assert.Equal(Cursors.SizeNWSE, handles[0].Cursor);
             Assert.Equal(Cursors.SizeNS, handles[1].Cursor);
             Assert.Equal(Cursors.SizeNESW, handles[2].Cursor);
@@ -236,7 +240,7 @@ public sealed class WpfEditorVisualTests
             rotation.RaiseEvent(new DragDeltaEventArgs(-5, 0) { RoutedEvent = Thumb.DragDeltaEvent });
 
             var result = session.ActiveScreen.FindObject(valve.Id)!;
-            Assert.Equal(15, result.Rotation);
+            Assert.Equal(3.75, result.Rotation, 6);
             Assert.True(canvas.Children.Contains(rotation));
 
             rotation.RaiseEvent(new DragCompletedEventArgs(0, 0, false) { RoutedEvent = Thumb.DragCompletedEvent });
