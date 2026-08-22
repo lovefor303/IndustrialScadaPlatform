@@ -55,6 +55,22 @@ public sealed class EditorSession
         _selectedObjectIds.Add(objectId);
     }
 
+    public void SelectMany(IEnumerable<Guid> objectIds)
+    {
+        ArgumentNullException.ThrowIfNull(objectIds);
+        var ids = objectIds.Distinct().ToArray();
+        foreach (var objectId in ids)
+        {
+            if (ActiveScreen.FindObject(objectId) is null)
+            {
+                throw new KeyNotFoundException($"Scene object '{objectId}' was not found.");
+            }
+        }
+
+        _selectedObjectIds.Clear();
+        _selectedObjectIds.UnionWith(ids);
+    }
+
     public void ClearSelection() => _selectedObjectIds.Clear();
 
     public void AddObject(SceneObject sceneObject)
@@ -132,6 +148,22 @@ public sealed class EditorSession
             _selectedObjectIds,
             dx,
             dy));
+    }
+
+    public void AlignSelection(GeometryAlignment alignment)
+    {
+        ReplaceActiveScreen(SceneGeometryOperations.Align(
+            ActiveScreen,
+            _selectedObjectIds,
+            alignment));
+    }
+
+    public void DistributeSelection(GeometryDistribution distribution)
+    {
+        ReplaceActiveScreen(SceneGeometryOperations.Distribute(
+            ActiveScreen,
+            _selectedObjectIds,
+            distribution));
     }
 
     public void UpdateSelectedObject(Func<SceneObject, SceneObject> update)

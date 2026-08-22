@@ -42,6 +42,60 @@ public sealed class SceneGeometryOperationTests
     }
 
     [Fact]
+    public void AlignmentUsesSelectedObjectEdgesAndLeavesPipeGeometryUntouched()
+    {
+        var left = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(20, 40, 40, 30));
+        var middle = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(80, 10, 60, 50));
+        var right = TextObject.Create("设备", new RectD(160, 70, 50, 20));
+        var pipe = PipeObject.Create(new PointD(0, 25), new PointD(20, 25), id: Guid.NewGuid());
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { left, middle, right, pipe });
+
+        var aligned = SceneGeometryOperations.Align(
+            screen,
+            new[] { left.Id, middle.Id, right.Id, pipe.Id },
+            GeometryAlignment.Left);
+
+        Assert.Equal(20, aligned.FindObject(left.Id)!.Bounds.X);
+        Assert.Equal(20, aligned.FindObject(middle.Id)!.Bounds.X);
+        Assert.Equal(20, aligned.FindObject(right.Id)!.Bounds.X);
+        Assert.Equal(pipe, aligned.FindObject(pipe.Id));
+        Assert.Equal(left.Rotation, aligned.FindObject(left.Id)!.Rotation);
+    }
+
+    [Fact]
+    public void DistributionEqualizesGapsWithoutChangingObjectSizesOrMetadata()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 10, 20, 20));
+        var second = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(60, 30, 40, 30));
+        var third = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(180, 50, 30, 40));
+        var pipe = PipeObject.Create(new PointD(5, 5), new PointD(8, 8), id: Guid.NewGuid());
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { first, second, third, pipe });
+
+        var distributed = SceneGeometryOperations.Distribute(
+            screen,
+            new[] { first.Id, second.Id, third.Id, pipe.Id },
+            GeometryDistribution.Horizontal);
+
+        Assert.Equal(0, distributed.FindObject(first.Id)!.Bounds.X);
+        Assert.Equal(180, distributed.FindObject(third.Id)!.Bounds.X);
+        Assert.Equal(80, distributed.FindObject(second.Id)!.Bounds.X);
+        Assert.Equal(second.Bounds.Height, distributed.FindObject(second.Id)!.Bounds.Height);
+        Assert.Equal(pipe, distributed.FindObject(pipe.Id));
+    }
+
+    [Fact]
+    public void AlignmentAndDistributionRequireTwoNonPipeObjects()
+    {
+        var pipe = PipeObject.Create(new PointD(0, 0), new PointD(10, 0));
+        var screen = ScreenDocument.Create("Main", new SceneObject[] { pipe });
+
+        Assert.Throws<InvalidOperationException>(() =>
+            SceneGeometryOperations.Align(screen, new[] { pipe.Id }, GeometryAlignment.Left));
+        Assert.Throws<InvalidOperationException>(() =>
+            SceneGeometryOperations.Distribute(screen, new[] { pipe.Id }, GeometryDistribution.Horizontal));
+    }
+
+    [Fact]
     public void NudgeMovesSelectedObjectsByExactlyOneSceneUnit()
     {
         var label = TextObject.Create("XV-102", new RectD(10, 20, 80, 24));

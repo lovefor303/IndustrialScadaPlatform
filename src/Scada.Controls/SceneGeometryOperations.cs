@@ -43,6 +43,111 @@ public static class SceneGeometryOperations
             _ => throw new ArgumentOutOfRangeException(nameof(direction))
         };
 
+    public static ScreenDocument Align(
+        ScreenDocument screen,
+        IEnumerable<Guid> selectedObjectIds,
+        GeometryAlignment alignment)
+    {
+        ArgumentNullException.ThrowIfNull(screen);
+        var selected = MaterializeSelection(screen, selectedObjectIds);
+        var objects = GetEditableObjects(screen, selected);
+        EnsureAtLeastTwoEditableObjects(objects);
+
+        var isHorizontal = alignment is GeometryAlignment.Left or GeometryAlignment.Center or GeometryAlignment.Right;
+        if (!isHorizontal && alignment is not (GeometryAlignment.Top or GeometryAlignment.Middle or GeometryAlignment.Bottom))
+        {
+            throw new ArgumentOutOfRangeException(nameof(alignment));
+        }
+
+        var minimum = isHorizontal
+            ? objects.Min(sceneObject => sceneObject.Bounds.X)
+            : objects.Min(sceneObject => sceneObject.Bounds.Y);
+        var maximum = isHorizontal
+            ? objects.Max(sceneObject => sceneObject.Bounds.X + sceneObject.Bounds.Width)
+            : objects.Max(sceneObject => sceneObject.Bounds.Y + sceneObject.Bounds.Height);
+        var center = (minimum + maximum) / 2;
+        var leading = alignment switch
+        {
+            GeometryAlignment.Left or GeometryAlignment.Top => minimum,
+            GeometryAlignment.Right or GeometryAlignment.Bottom => maximum,
+            _ => center
+        };
+
+        return ReplaceSelected(screen, selected, sceneObject =>
+        {
+            if (sceneObject is PipeObject)
+            {
+                return sceneObject;
+            }
+
+            var bounds = sceneObject.Bounds;
+            var updated = alignment switch
+            {
+                GeometryAlignment.Left => bounds with { X = leading },
+                GeometryAlignment.Center => bounds with { X = center - bounds.Width / 2 },
+                GeometryAlignment.Right => bounds with { X = leading - bounds.Width },
+                GeometryAlignment.Top => bounds with { Y = leading },
+                GeometryAlignment.Middle => bounds with { Y = center - bounds.Height / 2 },
+                GeometryAlignment.Bottom => bounds with { Y = leading - bounds.Height },
+                _ => throw new ArgumentOutOfRangeException(nameof(alignment))
+            };
+            return sceneObject with { Bounds = updated };
+        });
+    }
+
+    public static ScreenDocument Distribute(
+        ScreenDocument screen,
+        IEnumerable<Guid> selectedObjectIds,
+        GeometryDistribution distribution)
+    {
+        ArgumentNullException.ThrowIfNull(screen);
+        var selected = MaterializeSelection(screen, selectedObjectIds);
+        var objects = GetEditableObjects(screen, selected);
+        EnsureAtLeastTwoEditableObjects(objects);
+        if (objects.Count < 3)
+        {
+            return screen;
+        }
+
+        var horizontal = distribution == GeometryDistribution.Horizontal;
+        if (!horizontal && distribution != GeometryDistribution.Vertical)
+        {
+            throw new ArgumentOutOfRangeException(nameof(distribution));
+        }
+
+        var ordered = (horizontal
+                ? objects.OrderBy(sceneObject => sceneObject.Bounds.X)
+                : objects.OrderBy(sceneObject => sceneObject.Bounds.Y))
+            .ThenBy(sceneObject => sceneObject.Id)
+            .ToArray();
+        var first = ordered[0].Bounds;
+        var last = ordered[^1].Bounds;
+        var start = horizontal ? first.X : first.Y;
+        var end = horizontal ? last.X + last.Width : last.Y + last.Height;
+        var totalSize = ordered.Sum(sceneObject => horizontal ? sceneObject.Bounds.Width : sceneObject.Bounds.Height);
+        var gap = (end - start - totalSize) / (ordered.Length - 1);
+        var next = start;
+        var positions = new Dictionary<Guid, double>();
+        foreach (var sceneObject in ordered)
+        {
+            positions[sceneObject.Id] = next;
+            next += (horizontal ? sceneObject.Bounds.Width : sceneObject.Bounds.Height) + gap;
+        }
+
+        return ReplaceSelected(screen, selected, sceneObject =>
+        {
+            if (sceneObject is PipeObject || !positions.TryGetValue(sceneObject.Id, out var position))
+            {
+                return sceneObject;
+            }
+
+            var bounds = horizontal
+                ? sceneObject.Bounds with { X = position }
+                : sceneObject.Bounds with { Y = position };
+            return sceneObject with { Bounds = bounds };
+        });
+    }
+
     public static ScreenDocument Rotate(
         ScreenDocument screen,
         IEnumerable<Guid> selectedObjectIds,
@@ -119,6 +224,19 @@ public static class SceneGeometryOperations
         }
 
         return selected;
+    }
+
+    private static List<SceneObject> GetEditableObjects(ScreenDocument screen, HashSet<Guid> selected) =>
+        screen.Objects
+            .Where(sceneObject => selected.Contains(sceneObject.Id) && sceneObject is not PipeObject)
+            .ToList();
+
+    private static void EnsureAtLeastTwoEditableObjects(List<SceneObject> objects)
+    {
+        if (objects.Count < 2)
+        {
+            throw new InvalidOperationException("At least two non-pipe objects must be selected.");
+        }
     }
 
     private static SceneObject GetRequired(ScreenDocument screen, Guid id) =>
@@ -242,6 +360,22 @@ public enum GeometryNudgeDirection
     Right,
     Up,
     Down
+}
+
+public enum GeometryAlignment
+{
+    Left,
+    Center,
+    Right,
+    Top,
+    Middle,
+    Bottom
+}
+
+public enum GeometryDistribution
+{
+    Horizontal,
+    Vertical
 }
 
 public enum PipeEndpoint

@@ -42,11 +42,11 @@
 
 **Files:** `SceneGeometryOperations.cs`, `EditorSession.cs`, `EditorSessionTests.cs`
 
-- [ ] Write failing tests for left/center/right and top/middle/bottom alignment using three controls, plus horizontal and vertical equal distribution.
-- [ ] Run the tests and confirm the operation APIs are missing.
-- [ ] Implement selection validation requiring at least two non-pipe objects; preserve widths, heights, rotations, IDs, metadata and all pipe endpoints.
-- [ ] Add session methods that record each operation as one undoable edit and keep the same selection.
-- [ ] Run focused geometry and history tests and commit `feat: add selection alignment and distribution`.
+- [x] Write failing tests for left/center/right and top/middle/bottom alignment using three controls, plus horizontal and vertical equal distribution.
+- [x] Run the tests and confirm the operation APIs are missing.
+- [x] Implement selection validation requiring at least two non-pipe objects; preserve widths, heights, rotations, IDs, metadata and all pipe endpoints.
+- [x] Add session methods that record each operation as one undoable edit and keep the same selection.
+- [x] Run focused geometry and history tests; full verification and commit are the Task 2 checkpoint below.
 
 ## Task 3: Grouping and layer order
 

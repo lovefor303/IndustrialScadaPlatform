@@ -54,21 +54,22 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - The follow-up handle correction is implemented in the current worktree: resize handles use directional double-arrow cursors, the object selection surface keeps the four-way move cursor, the rotation handle uses a generated arc cursor, and resize/rotation drag deltas update the retained visual in place until `DragCompleted` so both positive and negative directions remain usable.
 - Rotation handle styling and sensitivity were corrected: the rotation handle now uses the same white fill and DeepSkyBlue border as resize handles, the custom cursor is deep blue, and horizontal drag input maps to 0.01 degrees per pixel for very fine adjustments.
 - Phase 3-M2 Task 1 is implemented in the working tree: immutable 100-step project history, undo/redo session APIs, redo invalidation after new edits, and independent-pipe history regression tests.
+- Phase 3-M2 Task 2 is implemented in the working tree: selection-scoped left/center/right/top/middle/bottom alignment, horizontal/vertical equal-gap distribution, non-pipe validation and one-step session undo integration.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
 ## Next Action
 
-Phase 3-M2 Task 1 is implemented. Run the full Release build/test gate, commit
-the history changes, then proceed to Task 2 alignment/distribution tests. Do not
-start PLC/Web/WinCC deployment work from this gate.
+Phase 3-M2 Tasks 1 and 2 are implemented. Commit after the full Release
+build/test gate, then proceed to Task 3 grouping/layer tests. Do not start
+PLC/Web/WinCC deployment work from this gate.
 
 Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M2 Task 1 undo/redo history; full verification and commit are next.
+- Active unit: Phase 3-M2 Tasks 1-2; commit after full verification, then Task 3 grouping/layers.
 - Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (156 tests passed); editor focused tests (25 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.

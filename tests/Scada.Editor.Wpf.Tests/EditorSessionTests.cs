@@ -231,4 +231,28 @@ public sealed class EditorSessionTests
         Assert.Equal(pipe.Bindings, restoredPipe.Bindings);
         Assert.Equal(new RectD(115, 96, 80, 60), session.ActiveScreen.FindObject(valve.Id)!.Bounds);
     }
+
+    [Fact]
+    public void AlignmentAndDistributionAreSingleUndoableSessionEdits()
+    {
+        var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 10, 20, 20));
+        var second = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(60, 30, 40, 30));
+        var third = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(180, 50, 30, 40));
+        var project = ProjectDocument.Create(
+            "Productivity test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second, third }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectMany(new[] { first.Id, second.Id, third.Id });
+
+        session.AlignSelection(GeometryAlignment.Top);
+        Assert.Equal(10, session.ActiveScreen.FindObject(third.Id)!.Bounds.Y);
+        Assert.Equal(new[] { first.Id, second.Id, third.Id }, session.SelectedObjectIds);
+        session.Undo();
+        Assert.Equal(50, session.ActiveScreen.FindObject(third.Id)!.Bounds.Y);
+
+        session.DistributeSelection(GeometryDistribution.Horizontal);
+        Assert.Equal(80, session.ActiveScreen.FindObject(second.Id)!.Bounds.X);
+        session.Undo();
+        Assert.Equal(60, session.ActiveScreen.FindObject(second.Id)!.Bounds.X);
+    }
 }
