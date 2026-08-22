@@ -27,6 +27,8 @@ public sealed class EditorCanvas : Canvas
     private Rectangle? _selectionRectangle;
     private EditorSession? _session;
     private bool _suppressProjectRefresh;
+    private bool _isDraggingObject;
+    private Point _objectDragLast;
 
     private enum HandlePosition
     {
@@ -513,12 +515,21 @@ public sealed class EditorCanvas : Canvas
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
         {
             Session.ToggleSelection(objectId);
+            Refresh();
+            Focus();
+            e.Handled = true;
+            return;
         }
-        else
+
+        if (!Session.SelectedObjectIds.Contains(objectId))
         {
             Session.SelectOnly(objectId);
+            Refresh();
         }
-        Refresh();
+
+        _isDraggingObject = true;
+        _objectDragLast = e.GetPosition(this);
+        CaptureMouse();
         Focus();
         e.Handled = true;
     }
@@ -584,6 +595,30 @@ public sealed class EditorCanvas : Canvas
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
+        if (_isDraggingObject && e.LeftButton == MouseButtonState.Pressed && Session is not null)
+        {
+            var current = e.GetPosition(this);
+            var objectDelta = current - _objectDragLast;
+            if (objectDelta.LengthSquared > 0)
+            {
+                _suppressProjectRefresh = true;
+                try
+                {
+                    Session.MoveSelection(objectDelta.X / Viewport.Zoom, objectDelta.Y / Viewport.Zoom);
+                }
+                finally
+                {
+                    _suppressProjectRefresh = false;
+                }
+
+                Refresh();
+                _objectDragLast = current;
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (_isSelecting && e.LeftButton == MouseButtonState.Pressed)
         {
             var current = e.GetPosition(this);
@@ -615,6 +650,15 @@ public sealed class EditorCanvas : Canvas
 
     private void OnMouseUp(object sender, MouseButtonEventArgs e)
     {
+        if (e.ChangedButton == MouseButton.Left && _isDraggingObject)
+        {
+            _isDraggingObject = false;
+            ReleaseMouseCapture();
+            Refresh();
+            e.Handled = true;
+            return;
+        }
+
         if (e.ChangedButton == MouseButton.Left && _isSelecting)
         {
             var end = e.GetPosition(this);

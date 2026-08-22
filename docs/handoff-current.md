@@ -60,6 +60,7 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Phase 3-M2 selection ergonomics are implemented and verified: normal left-click single-selects, Ctrl+left-click toggles selection, and dragging on blank canvas performs intersecting-object frame selection. Frame cleanup removes the owned rectangle by reference, preserving existing scene visuals and handles.
 - Selection-dependent WPF commands now refresh when the session selection changes, so alignment, distribution, grouping and layer commands no longer remain disabled after Ctrl-click or frame selection. The toolbar exposes all alignment and distribution directions.
 - The canvas now subscribes to session project-change notifications, so alignment, distribution, undo/redo, grouping and layer commands redraw immediately without requiring a blank-canvas click. Live resize/rotation drags suppress full redraw during each delta and keep their active handle stable, then refresh on drag completion.
+- Object dragging is implemented: normal left-button drag moves the current selection in model coordinates, clicking an unselected object first selects it, and Ctrl-click remains selection-only. Pipes remain independent objects and move only when selected.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
