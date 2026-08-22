@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
-Updated: 2026-08-20
-Status: Long-term direction approved; Phase 1 and Phase 2 are complete; Phase 3 planning is the next authorized activity.
+Updated: 2026-08-22
+Status: Long-term direction approved; Phase 1, Phase 2 and Phase 3-M1 are complete; Phase 3-M2 planning is the next authorized activity.
 
 ## Product Outcome
 
@@ -52,6 +52,12 @@ Deliverables: project tree, toolbox, multi-screen workspace, dockable properties
 
 Gate: a developer authors and reopens a small process screen without source-code edits or geometry drift. Operators cannot access engineering functions.
 
+Milestone M1 passed on 2026-08-22. The offline WPF editor supports project/session
+workflow, toolbox composition, independent scene editing, properties/bindings/
+dynamics/events, persistence, viewport ergonomics and geometry-drift checks.
+The next milestone is M2: engineering productivity features such as alignment,
+distribution, grouping/layers and undo/redo, with a separate approved plan.
+
 Before implementation: write and approve a separate detailed Phase 3 plan.
 
 ### Phase 4 - Web Runtime and Gateway shell
@@ -96,8 +102,8 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 3 planning.
-Current task: write and approve the WPF engineering-editor plan.
+Current phase: Phase 3 implementation.
+Current task: define and approve the Phase 3-M2 engineering-productivity plan.
 Single operational checkpoint: `docs/handoff-current.md`.
 
 Phase 1 and Phase 2 are complete; the WPF editor, Web Runtime, PLC adapter and WinCC adapter have not started.

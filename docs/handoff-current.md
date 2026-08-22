@@ -58,15 +58,18 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 
 ## Next Action
 
-Run the final Phase 3-M1 verification from this worktree and perform the user-facing visual acceptance of the offline preview. Do not start PLC/Web/WinCC deployment work from this gate.
+Phase 3-M1 has passed automated verification and user-facing visual acceptance.
+Write and approve the Phase 3-M2 plan for engineering productivity features
+(alignment, distribution, grouping/layers and undo/redo). Do not start PLC/Web/
+WinCC deployment work from this gate.
 
 Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M1 implementation and automated gate complete; user-facing visual acceptance is next.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (149 tests passed); editor focused tests (25 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
+- Active unit: Phase 3-M1 complete; Phase 3-M2 planning is next.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (156 tests passed); editor focused tests (25 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
 - Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from user-facing Phase 3-M1 visual acceptance.
@@ -74,7 +77,7 @@ Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks
 
 ## Verification Status
 
-- Phase 1 and Phase 2 final gates passed. Phase 3-M1 automated implementation gate passed: Tasks 1-7 evidence is recorded; PLC/Web/WinCC/runtime features remain explicitly out of scope.
+- Phase 1, Phase 2 and Phase 3-M1 final gates passed. PLC/Web/WinCC/runtime features remain explicitly out of scope.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks

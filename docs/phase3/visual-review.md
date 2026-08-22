@@ -4,7 +4,7 @@
 - Target render: 1920x1080
 - Canvas: dark industrial editor surface with optional grid
 - Objects: vessel, centrifugal pump, automated valve, independent pipe and text
-- Editing affordances: blue selection border, eight resize handles, orange rotation handle
+- Editing affordances: blue selection border, eight resize handles, blue rotation handle with a deep-blue arc cursor
 - Navigation: Ctrl+mouse-wheel zoom around cursor; middle-button pan
 
 The render assertion verifies non-empty pixels at 1920x1080. Object geometry is
