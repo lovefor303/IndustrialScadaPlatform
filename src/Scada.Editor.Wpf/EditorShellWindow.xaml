@@ -101,25 +101,30 @@
                     <TreeView x:Name="ToolboxTree"
                               Background="Transparent"
                               BorderThickness="0"
-                              Foreground="#E6EDF3">
+                              PreviewMouseLeftButtonDown="OnToolboxPreviewMouseLeftButtonDown"
+                              Foreground="#E6EDF3"
+                              PreviewMouseMove="OnToolboxPreviewMouseMove"
+                              PreviewMouseLeftButtonUp="OnToolboxPreviewMouseLeftButtonUp">
                         <TreeViewItem Header="设备">
-                            <TreeViewItem Header="离心泵" />
-                            <TreeViewItem Header="自动阀" />
-                            <TreeViewItem Header="容器" />
-                            <TreeViewItem Header="搅拌器" />
-                            <TreeViewItem Header="过滤器" />
+                            <TreeViewItem Header="离心泵" Tag="equipment.pump.centrifugal" />
+                            <TreeViewItem Header="自动阀" Tag="equipment.valve.automated" />
+                            <TreeViewItem Header="容器" Tag="equipment.vessel" />
+                            <TreeViewItem Header="搅拌器" Tag="equipment.agitator" />
+                            <TreeViewItem Header="过滤器" Tag="equipment.filter" />
                         </TreeViewItem>
                         <TreeViewItem Header="管道与仪表">
-                            <TreeViewItem Header="直管" />
-                            <TreeViewItem Header="弯头" />
-                            <TreeViewItem Header="数值显示" />
-                            <TreeViewItem Header="液位柱" />
-                            <TreeViewItem Header="温度仪表" />
-                            <TreeViewItem Header="压力仪表" />
+                            <TreeViewItem Header="直管" Tag="pipe.straight" />
+                            <TreeViewItem Header="弯头" Tag="pipe.elbow" />
+                            <TreeViewItem Header="三通" Tag="pipe.tee" />
+                            <TreeViewItem Header="数值显示" Tag="instrument.numeric" />
+                            <TreeViewItem Header="液位柱" Tag="instrument.level-bar" />
+                            <TreeViewItem Header="温度仪表" Tag="instrument.temperature" />
+                            <TreeViewItem Header="压力仪表" Tag="instrument.pressure" />
+                            <TreeViewItem Header="流量仪表" Tag="instrument.flow" />
                         </TreeViewItem>
                         <TreeViewItem Header="文本与操作">
-                            <TreeViewItem Header="文本标签" />
-                            <TreeViewItem Header="操作按钮" />
+                            <TreeViewItem Header="文本标签" Tag="text" />
+                            <TreeViewItem Header="操作按钮" Tag="operator.command-button" />
                         </TreeViewItem>
                     </TreeView>
                 </DockPanel>

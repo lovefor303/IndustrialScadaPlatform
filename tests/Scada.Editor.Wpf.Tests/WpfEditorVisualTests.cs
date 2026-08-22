@@ -245,6 +245,29 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void ToolboxLeafItemsExposeStableControlTypeIds()
+    {
+        StaThread.Run(() =>
+        {
+            var window = new EditorShellWindow(EditorRole.Developer);
+            var toolbox = Assert.IsType<TreeView>(window.FindName("ToolboxTree"));
+            var leaves = toolbox.Items
+                .OfType<TreeViewItem>()
+                .SelectMany(item => item.Items.OfType<TreeViewItem>())
+                .SelectMany(item => item.Items.Count == 0
+                    ? new[] { item }
+                    : item.Items.OfType<TreeViewItem>())
+                .ToArray();
+
+            Assert.Contains(leaves, item => Equals(item.Tag, ControlTypeIds.AutomatedValve));
+            Assert.Contains(leaves, item => Equals(item.Tag, ControlTypeIds.StraightPipe));
+            Assert.Contains(leaves, item => Equals(item.Tag, "text"));
+            window.Close();
+            return true;
+        });
+    }
+
+    [Fact]
     public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
     {
         var viewport = new EditorViewport();
