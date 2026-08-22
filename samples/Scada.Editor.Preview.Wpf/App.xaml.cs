@@ -52,6 +52,11 @@ public partial class App : Application
         var store = new RevisionStore(Path.Combine(dataDirectory, "editor.db"));
         await store.InitializeAsync();
         var commands = new EditorCommands(session, store, "preview-developer");
+        var savedDraft = await store.LoadLatestDraftAsync();
+        if (savedDraft is not null && savedDraft.Screens.Count > 0)
+        {
+            session.LoadProject(savedDraft, savedDraft.Screens[0].Name);
+        }
         var window = new EditorShellWindow(EditorRole.Developer, session, commands);
         MainWindow = window;
         window.Show();

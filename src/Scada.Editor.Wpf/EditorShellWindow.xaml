@@ -21,8 +21,10 @@
             <MenuItem Header="文件">
                 <MenuItem Header="新建项目" Command="{Binding NewProjectCommand}" />
                 <MenuItem Header="打开项目" Command="{Binding OpenProjectCommand}" />
+                <MenuItem Header="载入最新草稿" Command="{Binding LoadDraftCommand}" />
                 <Separator />
                 <MenuItem Header="保存草稿" Command="{Binding SaveDraftCommand}" />
+                <MenuItem Header="导出项目" Command="{Binding ExportProjectCommand}" />
                 <MenuItem Header="发布版本" Command="{Binding PublishCommand}" />
                 <MenuItem Header="恢复版本" Command="{Binding RestoreCommand}" />
             </MenuItem>
@@ -53,7 +55,9 @@
         <ToolBar DockPanel.Dock="Top" Background="#2B3239">
             <Button Content="新建" Command="{Binding NewProjectCommand}" Margin="2" Padding="10,4" />
             <Button Content="打开" Command="{Binding OpenProjectCommand}" Margin="2" Padding="10,4" />
+            <Button Content="载入草稿" Command="{Binding LoadDraftCommand}" Margin="2" Padding="10,4" />
             <Button Content="保存草稿" Command="{Binding SaveDraftCommand}" Margin="2" Padding="10,4" />
+            <Button Content="导出项目" Command="{Binding ExportProjectCommand}" Margin="2" Padding="10,4" />
             <Separator />
             <Button Content="撤销" Command="{Binding UndoCommand}" Margin="2" Padding="10,4" />
             <Button Content="重做" Command="{Binding RedoCommand}" Margin="2" Padding="10,4" />

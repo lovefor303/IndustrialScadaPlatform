@@ -1,3 +1,4 @@
+using System.IO;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -33,6 +34,8 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         }
         NewProjectCommand = new AsyncEditorCommand(NewProjectAsync, () => IsEngineeringEnabled);
         OpenProjectCommand = new AsyncEditorCommand(OpenProjectAsync, () => IsEngineeringEnabled);
+        LoadDraftCommand = new AsyncEditorCommand(LoadDraftAsync, () => IsEngineeringEnabled);
+        ExportProjectCommand = new AsyncEditorCommand(ExportProjectAsync, () => IsEngineeringEnabled);
         SaveDraftCommand = new AsyncEditorCommand(SaveDraftAsync, () => IsEngineeringEnabled);
         PublishCommand = new AsyncEditorCommand(PublishAsync, () => IsEngineeringEnabled);
         RestoreCommand = new AsyncEditorCommand(RestoreAsync, () => IsEngineeringEnabled);
@@ -66,6 +69,10 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     public EventsPanelViewModel? EventsPanel { get; }
 
     public ICommand OpenProjectCommand { get; }
+
+    public ICommand LoadDraftCommand { get; }
+
+    public ICommand ExportProjectCommand { get; }
 
     public ICommand SaveDraftCommand { get; }
 
@@ -138,8 +145,50 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
             return;
         }
 
-        await _commands.OpenAsync(path);
-        StatusText = "项目已打开";
+        await ExecuteWithStatusAsync(
+            () => _commands.OpenAsync(path),
+            "项目已打开");
+    }
+
+    private async Task LoadDraftAsync()
+    {
+        if (_commands is null)
+        {
+            StatusText = "尚未打开项目";
+            return;
+        }
+
+        try
+        {
+            var loaded = await _commands.TryLoadLatestDraftAsync();
+            StatusText = loaded ? "已载入最新草稿" : "没有可载入的草稿";
+        }
+        catch (Exception exception) when (exception is IOException
+            or InvalidDataException
+            or System.Text.Json.JsonException
+            or InvalidOperationException)
+        {
+            StatusText = $"载入草稿失败：{exception.Message}";
+        }
+    }
+
+    private async Task ExportProjectAsync()
+    {
+        if (_commands is null || _fileDialog is null)
+        {
+            StatusText = "尚未配置项目文件对话框";
+            return;
+        }
+
+        var path = await _fileDialog.PickSavePathAsync();
+        if (path is null)
+        {
+            return;
+        }
+
+        await ExecuteWithStatusAsync(
+            () => _commands.ExportAsync(path),
+            "项目已导出");
     }
 
     private async Task SaveDraftAsync()
@@ -150,8 +199,9 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
             return;
         }
 
-        await _commands.SaveDraftAsync();
-        StatusText = "草稿已保存";
+        await ExecuteWithStatusAsync(
+            () => _commands.SaveDraftAsync(),
+            "草稿已保存");
     }
 
     private async Task PublishAsync()
@@ -162,8 +212,18 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
             return;
         }
 
-        var revision = await _commands.PublishAsync();
-        StatusText = $"已发布版本 {revision.RevisionNumber}";
+        try
+        {
+            var revision = await _commands.PublishAsync();
+            StatusText = $"已发布版本 {revision.RevisionNumber}";
+        }
+        catch (Exception exception) when (exception is IOException
+            or InvalidDataException
+            or System.Text.Json.JsonException
+            or InvalidOperationException)
+        {
+            StatusText = $"发布失败：{exception.Message}";
+        }
     }
 
     private async Task RestoreAsync()
@@ -174,16 +234,42 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
             return;
         }
 
-        var revisions = await _commands.ListRevisionsAsync();
-        if (revisions.Count == 0)
+        try
         {
-            StatusText = "暂无可恢复版本";
-            return;
-        }
+            var revisions = await _commands.ListRevisionsAsync();
+            if (revisions.Count == 0)
+            {
+                StatusText = "暂无可恢复版本";
+                return;
+            }
 
-        var revision = revisions[^1];
-        await _commands.RestoreAsync(revision.RevisionId);
-        StatusText = $"已恢复版本 {revision.RevisionNumber}";
+            var revision = revisions[^1];
+            await _commands.RestoreAsync(revision.RevisionId);
+            StatusText = $"已恢复版本 {revision.RevisionNumber}";
+        }
+        catch (Exception exception) when (exception is IOException
+            or InvalidDataException
+            or System.Text.Json.JsonException
+            or InvalidOperationException)
+        {
+            StatusText = $"恢复失败：{exception.Message}";
+        }
+    }
+
+    private async Task ExecuteWithStatusAsync(Func<Task> operation, string successText)
+    {
+        try
+        {
+            await operation();
+            StatusText = successText;
+        }
+        catch (Exception exception) when (exception is IOException
+            or InvalidDataException
+            or System.Text.Json.JsonException
+            or InvalidOperationException)
+        {
+            StatusText = $"操作失败：{exception.Message}";
+        }
     }
 
     private bool CanAlign() => IsEngineeringEnabled && _session?.SelectedObjectIds.Count >= 2

@@ -68,6 +68,7 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Phase 3-M3 Task 3 is implemented: variable binding, dynamic and event/action panels expose catalog-backed choices, validated apply commands, Chinese labels and visible validation errors.
 - Phase 3-M3 Task 4 is implemented in the working tree: `EditorShellWindow` accepts injected `EditorCommands`, the preview initializes an isolated SQLite `RevisionStore`, and JSON open/export dialogs are available through the WPF shell.
 - Save/reopen regression coverage preserves control IDs, bounds, rotation and independent pipe endpoints/bends; publish/restore returns modified geometry to the saved revision.
+- The draft/open confusion fix is implemented: internal SQLite drafts have a dedicated “载入最新草稿” command; JSON import/export is explicit; invalid project files are caught and reported in the status bar instead of crashing the async WPF command.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
@@ -85,7 +86,7 @@ implemented and has passed its automated gate; only manual preview review remain
 
 - Active workstream: new industrial SCADA platform.
 - Active unit: Phase 3-M3 manual preview check.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (175 tests passed); `git diff --check` passed. Start the offline preview from this final build for manual review.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (178 tests passed); `git diff --check` passed. Start the offline preview from this final build for manual review.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
 - Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3-M3 plan; continue only from the manual preview review checkpoint.

@@ -88,7 +88,7 @@ public partial class EditorShellWindow : Window
             var dialog = new OpenFileDialog
             {
                 Title = "打开组态项目",
-                Filter = "组态项目 (*.json)|*.json|所有文件 (*.*)|*.*",
+                Filter = "组态项目 (*.json)|*.json",
                 CheckFileExists = true,
                 Multiselect = false
             };
@@ -101,7 +101,7 @@ public partial class EditorShellWindow : Window
             var dialog = new SaveFileDialog
             {
                 Title = "导出组态项目",
-                Filter = "组态项目 (*.json)|*.json|所有文件 (*.*)|*.*",
+                Filter = "组态项目 (*.json)|*.json",
                 DefaultExt = ".json",
                 AddExtension = true
             };

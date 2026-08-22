@@ -102,6 +102,28 @@ public sealed class EditorCommands
         return true;
     }
 
+    public async Task<bool> TryLoadLatestDraftAsync(CancellationToken cancellationToken = default)
+    {
+        if (!await CanDiscardAsync(cancellationToken))
+        {
+            return false;
+        }
+
+        var project = await _store.LoadLatestDraftAsync(cancellationToken);
+        if (project is null)
+        {
+            return false;
+        }
+
+        if (project.Screens.Count == 0)
+        {
+            throw new InvalidDataException("草稿至少需要包含一个画面。");
+        }
+
+        _session.LoadProject(project, project.Screens[0].Name);
+        return true;
+    }
+
     public Task ExportAsync(string filePath, CancellationToken cancellationToken = default) =>
         _store.ExportAsync(_session.Project.ProjectId, filePath, cancellationToken);
 

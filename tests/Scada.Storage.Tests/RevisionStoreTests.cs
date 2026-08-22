@@ -25,6 +25,32 @@ public sealed class RevisionStoreTests
     }
 
     [Fact]
+    public async Task LoadLatestDraftReturnsMostRecentlyUpdatedProject()
+    {
+        var directory = CreateDirectory();
+        try
+        {
+            var store = new RevisionStore(Path.Combine(directory, "latest.db"));
+            await store.InitializeAsync();
+            var first = ProjectDocument.Create("First", screens: new[] { ScreenDocument.Create("Main") });
+            var second = ProjectDocument.Create("Second", screens: new[] { ScreenDocument.Create("Main") });
+            await store.SaveDraftAsync(first);
+            await Task.Delay(10);
+            await store.SaveDraftAsync(second);
+
+            var latest = await store.LoadLatestDraftAsync();
+
+            Assert.NotNull(latest);
+            Assert.Equal(second.ProjectId, latest!.ProjectId);
+            Assert.Equal("Second", latest.Name);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task PublishCreatesImmutableRevisionAndListsPublishedCopy()
     {
         await WithStoreAsync(async (store, _, _) =>
@@ -134,6 +160,13 @@ public sealed class RevisionStoreTests
         {
             Directory.Delete(directory, recursive: true);
         }
+    }
+
+    private static string CreateDirectory()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "IndustrialScadaPlatform.Tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        return directory;
     }
 
     private static ProjectDocument CreateProject()

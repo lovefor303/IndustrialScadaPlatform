@@ -159,6 +159,56 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public async Task InvalidProjectFileReportsAnErrorInsteadOfEscapingTheAsyncCommand()
+    {
+        var directory = IOPath.Combine(IOPath.GetTempPath(), "IndustrialScadaPlatform.EditorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var invalidPath = IOPath.Combine(directory, "draft.db");
+        await File.WriteAllTextAsync(invalidPath, "not a project file");
+
+        try
+        {
+            var store = new RevisionStore(IOPath.Combine(directory, "editor.db"));
+            await store.InitializeAsync();
+            var session = new EditorSession(EditorCommands.CreateProject("Current", "Main"), "Main");
+            var viewModel = new EditorShellViewModel(
+                EditorRole.Developer,
+                new EditorCommands(session, store, "developer"),
+                new TestProjectFileDialog(invalidPath),
+                session);
+
+            viewModel.OpenProjectCommand.Execute(null);
+            for (var attempt = 0; attempt < 20 && viewModel.StatusText == "就绪"; attempt++)
+            {
+                await Task.Delay(25);
+            }
+
+            Assert.StartsWith("操作失败：", viewModel.StatusText);
+            Assert.Equal("Current", session.Project.Name);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    private sealed class TestProjectFileDialog : IProjectFileDialog
+    {
+        private readonly string _path;
+
+        public TestProjectFileDialog(string path)
+        {
+            _path = path;
+        }
+
+        public Task<string?> PickOpenPathAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<string?>(_path);
+
+        public Task<string?> PickSavePathAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<string?>(null);
+    }
+
+    [Fact]
     public void ShellViewModelExposesProductivityCommandsWithEngineeringEnablement()
     {
         var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 40, 40));

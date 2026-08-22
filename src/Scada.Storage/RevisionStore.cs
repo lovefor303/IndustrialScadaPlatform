@@ -94,6 +94,16 @@ public sealed class RevisionStore
         return value is string json ? _serializer.Deserialize(json) : null;
     }
 
+    public async Task<ProjectDocument?> LoadLatestDraftAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT DraftJson FROM Projects ORDER BY UpdatedAt DESC LIMIT 1;";
+        var value = await command.ExecuteScalarAsync(cancellationToken);
+        return value is string json ? _serializer.Deserialize(json) : null;
+    }
+
     public async Task<ProjectRevision> PublishAsync(
         Guid projectId,
         string author,

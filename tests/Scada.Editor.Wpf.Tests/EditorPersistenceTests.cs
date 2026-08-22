@@ -112,6 +112,34 @@ public sealed class EditorPersistenceTests
         }
     }
 
+    [Fact]
+    public async Task LoadLatestDraftReplacesCurrentSessionWithoutNeedingAFilePath()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "IndustrialScadaPlatform.EditorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+
+        try
+        {
+            var store = new RevisionStore(Path.Combine(directory, "editor.db"));
+            await store.InitializeAsync();
+            var savedProject = EditorCommands.CreateProject("Saved draft", "Main");
+            await store.SaveDraftAsync(savedProject);
+            var session = new EditorSession(EditorCommands.CreateProject("Fresh session", "Main"), "Main");
+            var commands = new EditorCommands(session, store, "developer");
+
+            var loaded = await commands.TryLoadLatestDraftAsync();
+
+            Assert.True(loaded);
+            Assert.Equal(savedProject.ProjectId, session.Project.ProjectId);
+            Assert.Equal("Saved draft", session.Project.Name);
+            Assert.False(session.IsDirty);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
     private sealed class TestDiscardPrompt : IUnsavedChangesPrompt
     {
         private readonly bool _answer;
