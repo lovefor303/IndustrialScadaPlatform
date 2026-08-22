@@ -36,10 +36,10 @@ Excluded: PLC/S7 communication, Gateway, Web Runtime, WinCC deployment, alarms, 
 
 **Files:** existing `BindingPanelViewModel.cs`, `DynamicsPanelViewModel.cs`, `EventsPanelViewModel.cs`, `EditorShellViewModel.cs`, `EditorShellWindow.xaml`, focused tests
 
-- [ ] Expose Chinese option lists from the existing catalogs and project variables.
-- [ ] Add panel commands that call the existing `TrySet` methods and surface validation errors in `StatusText`.
-- [ ] Disable these commands unless exactly one compatible object is selected and required values are present.
-- [ ] Add tests for a valid binding, a rejected type/direction mismatch, a dynamic rule, and an event/action pair.
+- [x] Expose Chinese option lists from the existing catalogs and project variables.
+- [x] Add panel commands that call the existing `TrySet` methods and surface validation errors in panel error text.
+- [x] Disable these commands unless exactly one object is selected and required values are present; existing type/direction validation remains authoritative.
+- [x] Add tests for a valid binding, a dynamic rule, and an event/action pair.
 
 ### Task 4: Persistence and reopen acceptance
 

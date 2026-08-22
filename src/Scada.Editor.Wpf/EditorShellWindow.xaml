@@ -176,35 +176,38 @@
                         </ScrollViewer>
                     </TabItem>
                     <TabItem Header="变量">
-                        <StackPanel x:Name="BindingPanel" Margin="12">
+                        <StackPanel x:Name="BindingPanel" Margin="12" DataContext="{Binding BindingPanel}">
                             <TextBlock FontWeight="SemiBold" Text="变量绑定" />
                             <TextBlock Margin="0,8,0,2" Text="控件变量角色" />
-                            <ComboBox />
+                            <ComboBox ItemsSource="{Binding AvailableRoles}" SelectedItem="{Binding RoleName, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Margin="0,8,0,2" Text="项目变量" />
-                            <ComboBox />
-                            <Button Margin="0,10,0,0" Content="应用绑定" />
+                            <ComboBox ItemsSource="{Binding AvailableVariables}" SelectedItem="{Binding VariableKey, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Margin="0,10,0,0" Content="应用绑定" Command="{Binding ApplyCommand}" />
+                            <TextBlock Margin="0,8,0,0" Foreground="#FFCC66" Text="{Binding ErrorText}" TextWrapping="Wrap" />
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="动态">
-                        <StackPanel x:Name="DynamicsPanel" Margin="12">
+                        <StackPanel x:Name="DynamicsPanel" Margin="12" DataContext="{Binding DynamicsPanel}">
                             <TextBlock FontWeight="SemiBold" Text="动态设置" />
                             <TextBlock Margin="0,8,0,2" Text="目标属性" />
-                            <ComboBox />
+                            <ComboBox ItemsSource="{Binding AvailableTargets}" SelectedItem="{Binding TargetProperty, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Margin="0,8,0,2" Text="驱动变量" />
-                            <ComboBox />
+                            <ComboBox ItemsSource="{Binding AvailableVariables}" SelectedItem="{Binding VariableKey, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Margin="0,8,0,2" Text="条件（可选）" />
-                            <TextBox />
-                            <Button Margin="0,10,0,0" Content="应用动态" />
+                            <TextBox Text="{Binding Condition, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Margin="0,10,0,0" Content="应用动态" Command="{Binding ApplyCommand}" />
+                            <TextBlock Margin="0,8,0,0" Foreground="#FFCC66" Text="{Binding ErrorText}" TextWrapping="Wrap" />
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="事件">
-                        <StackPanel x:Name="EventsPanel" Margin="12">
+                        <StackPanel x:Name="EventsPanel" Margin="12" DataContext="{Binding EventsPanel}">
                             <TextBlock FontWeight="SemiBold" Text="事件与动作" />
                             <TextBlock Margin="0,8,0,2" Text="事件" />
-                            <ComboBox />
+                            <ComboBox ItemsSource="{Binding Events}" DisplayMemberPath="ChineseLabel" SelectedValuePath="Id" SelectedValue="{Binding EventId, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Margin="0,8,0,2" Text="动作" />
-                            <ComboBox />
-                            <Button Margin="0,10,0,0" Content="应用事件" />
+                            <ComboBox ItemsSource="{Binding Actions}" DisplayMemberPath="ChineseLabel" SelectedValuePath="Id" SelectedValue="{Binding ActionId, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Margin="0,10,0,0" Content="应用事件" Command="{Binding ApplyCommand}" />
+                            <TextBlock Margin="0,8,0,0" Foreground="#FFCC66" Text="{Binding ErrorText}" TextWrapping="Wrap" />
                         </StackPanel>
                     </TabItem>
                 </TabControl>

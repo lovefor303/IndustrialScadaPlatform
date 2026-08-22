@@ -1,9 +1,11 @@
 using Scada.Controls;
 using Scada.Scene;
+using System.Windows.Input;
+using System.ComponentModel;
 
 namespace Scada.Editor.Wpf;
 
-public sealed class EventsPanelViewModel
+public sealed class EventsPanelViewModel : INotifyPropertyChanged
 {
     private readonly EditorSession _session;
     private readonly IReadOnlyList<LocalizedCapability> _events;
@@ -14,7 +16,17 @@ public sealed class EventsPanelViewModel
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _events = InteractionCatalog.AllEvents;
         _actions = InteractionCatalog.AllActions;
+        ApplyCommand = new EditorCommand(Apply, CanApply);
     }
+
+    public string EventId { get; set; } = string.Empty;
+    public string ActionId { get; set; } = string.Empty;
+    public string ErrorText { get; private set; } = string.Empty;
+    public ICommand ApplyCommand { get; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void Refresh() => (ApplyCommand as EditorCommand)?.Refresh();
 
     public IReadOnlyList<LocalizedCapability> Events => _events;
 
@@ -85,5 +97,16 @@ public sealed class EventsPanelViewModel
 
         errors = validation;
         return validation.Count == 0;
+    }
+
+    private bool CanApply() => _session.SelectedObjectIds.Count == 1
+        && !string.IsNullOrWhiteSpace(EventId)
+        && !string.IsNullOrWhiteSpace(ActionId);
+
+    private void Apply()
+    {
+        TrySet(EventId, ActionId, new Dictionary<string, string>(), out var errors);
+        ErrorText = string.Join("；", errors);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ErrorText)));
     }
 }

@@ -65,14 +65,15 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Undo and redo now also publish project-change notifications, so the canvas immediately restores or reapplies geometry after `Ctrl+Z`/`Ctrl+Y` or the toolbar buttons.
 - Phase 3-M3 plan is recorded in `docs/superpowers/plans/2026-08-22-phase3-m3-functional-editor-shell.md`; Task 1 toolbox wiring is implemented: leaf items carry stable control type IDs and begin real canvas drags.
 - Phase 3-M3 Task 2 is implemented: the selection-aware property panel edits X/Y/width/height/rotation/visibility through the session, validates numeric geometry, updates the canvas immediately and participates in undo history.
+- Phase 3-M3 Task 3 is implemented: variable binding, dynamic and event/action panels expose catalog-backed choices, validated apply commands, Chinese labels and visible validation errors.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
 - The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
 
 ## Next Action
 
 Phase 3-M2 Tasks 1 through 4 and the acceptance gate are complete. Phase 3-M3
-Tasks 1 and 2 are complete. Continue with Task 3: wire variables, dynamics and
-events panels to their existing validated view models.
+Tasks 1 through 3 are complete. Continue with Task 4: inject persistence into
+the preview shell and add save/reopen geometry acceptance.
 
 Phase 1, Phase 2, Phase 3-M1 and Phase 3-M2 gates are complete. Phase 3-M3 has
 not been planned or started.
@@ -81,7 +82,7 @@ not been planned or started.
 
 - Active workstream: new industrial SCADA platform.
 - Active unit: Phase 3-M2 visual acceptance; M2 implementation and gate are complete.
-- Last verified commands: `dotnet test tests/Scada.Editor.Wpf.Tests/Scada.Editor.Wpf.Tests.csproj --configuration Release --no-restore` (38 tests passed); `git diff --check` clean. The offline preview should be rebuilt and restarted after the next M3 change.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (174 tests passed); editor focused tests (39 passed); `git diff --check` clean. The offline preview should be restarted after the next M3 change.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
 - Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from user-facing Phase 3-M2 visual acceptance.

@@ -22,6 +22,9 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         _fileDialog = fileDialog;
         _session = session;
         PropertyPanel = session is null ? null : new PropertyPanelViewModel(session);
+        BindingPanel = session is null ? null : new BindingPanelViewModel(session);
+        DynamicsPanel = session is null ? null : new DynamicsPanelViewModel(session);
+        EventsPanel = session is null ? null : new EventsPanelViewModel(session);
         if (_session is not null)
         {
             _session.SelectionChanged += OnSessionStateChanged;
@@ -58,6 +61,9 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     public ICommand NewProjectCommand { get; }
 
     public PropertyPanelViewModel? PropertyPanel { get; }
+    public BindingPanelViewModel? BindingPanel { get; }
+    public DynamicsPanelViewModel? DynamicsPanel { get; }
+    public EventsPanelViewModel? EventsPanel { get; }
 
     public ICommand OpenProjectCommand { get; }
 
@@ -188,6 +194,9 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     private void OnSessionStateChanged(object? sender, EventArgs e)
     {
         PropertyPanel?.Refresh();
+        BindingPanel?.Refresh();
+        DynamicsPanel?.Refresh();
+        EventsPanel?.Refresh();
         RefreshCommand(UndoCommand);
         RefreshCommand(RedoCommand);
         RefreshCommand(AlignLeftCommand);

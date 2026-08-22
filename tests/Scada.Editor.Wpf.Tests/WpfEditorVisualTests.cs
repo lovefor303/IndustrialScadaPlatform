@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using Scada.Editor.Wpf;
 using Scada.Controls;
+using Scada.Core;
 using Scada.Scene;
 using Xunit;
 
@@ -291,6 +292,43 @@ public sealed class WpfEditorVisualTests
         var updated = Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(valve.Id));
         Assert.Equal(new RectD(120, 140, 160, 90), updated.Bounds);
         Assert.Equal(15, updated.Rotation);
+    }
+
+    [Fact]
+    public void BindingDynamicsAndEventsPanelsExposeValidatedApplyCommands()
+    {
+        var feedback = VariableDefinition.Number("Valve.Position", VariableDataType.Float64, VariableDirection.Feedback, "%");
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(0, 0, 100, 80));
+        var project = ProjectDocument.Create(
+            "Panel command test",
+            new[] { feedback },
+            new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(valve.Id);
+        var viewModel = new EditorShellViewModel(EditorRole.Developer, session: session);
+
+        var binding = Assert.IsType<BindingPanelViewModel>(viewModel.BindingPanel);
+        binding.RoleName = "Position";
+        binding.VariableKey = feedback.Key;
+        Assert.True(binding.ApplyCommand.CanExecute(null));
+        binding.ApplyCommand.Execute(null);
+
+        var dynamics = Assert.IsType<DynamicsPanelViewModel>(viewModel.DynamicsPanel);
+        dynamics.TargetProperty = "Rotation";
+        dynamics.VariableKey = feedback.Key;
+        Assert.True(dynamics.ApplyCommand.CanExecute(null));
+        dynamics.ApplyCommand.Execute(null);
+
+        var events = Assert.IsType<EventsPanelViewModel>(viewModel.EventsPanel);
+        events.EventId = "pointer.left.press";
+        events.ActionId = "command.toggle-bool";
+        Assert.True(events.ApplyCommand.CanExecute(null));
+        events.ApplyCommand.Execute(null);
+
+        var updated = Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(valve.Id));
+        Assert.Equal(feedback.Key, updated.Bindings["Position"].VariableKey);
+        Assert.Equal(feedback.Key, Assert.IsType<DynamicDefinition>(updated.Dynamics["Rotation"]).VariableKey);
+        Assert.Equal("command.toggle-bool", updated.Interactions["pointer.left.press"].ActionName);
     }
 
     [Fact]

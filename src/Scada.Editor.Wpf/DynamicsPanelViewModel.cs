@@ -1,16 +1,39 @@
 using Scada.Core;
 using Scada.Scene;
+using System.Windows.Input;
+using System.ComponentModel;
 
 namespace Scada.Editor.Wpf;
 
-public sealed class DynamicsPanelViewModel
+public sealed class DynamicsPanelViewModel : INotifyPropertyChanged
 {
     private readonly EditorSession _session;
 
     public DynamicsPanelViewModel(EditorSession session)
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
+        ApplyCommand = new EditorCommand(Apply, CanApply);
     }
+
+    public string TargetProperty { get; set; } = string.Empty;
+    public string VariableKey { get; set; } = string.Empty;
+    public VariableDataType ExpectedDataType { get; set; } = VariableDataType.Float64;
+    public VariableDirection ExpectedDirection { get; set; } = VariableDirection.Feedback;
+    public string? Condition { get; set; }
+    public string ErrorText { get; private set; } = string.Empty;
+    public ICommand ApplyCommand { get; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void Refresh()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvailableVariables)));
+        (ApplyCommand as EditorCommand)?.Refresh();
+    }
+
+    public IReadOnlyList<string> AvailableTargets { get; } = ["Visibility", "Rotation", "Value"];
+
+    public IReadOnlyList<string> AvailableVariables => _session.Project.Variables.Select(item => item.Key).ToArray();
 
     public bool TrySet(DynamicDefinition definition, out IReadOnlyList<string> errors)
     {
@@ -59,5 +82,17 @@ public sealed class DynamicsPanelViewModel
 
         errors = validation;
         return validation.Count == 0;
+    }
+
+    private bool CanApply() => _session.SelectedObjectIds.Count == 1
+        && !string.IsNullOrWhiteSpace(TargetProperty)
+        && !string.IsNullOrWhiteSpace(VariableKey);
+
+    private void Apply()
+    {
+        var definition = new DynamicDefinition(TargetProperty, VariableKey, ExpectedDataType, ExpectedDirection, Condition);
+        TrySet(definition, out var errors);
+        ErrorText = string.Join("；", errors);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ErrorText)));
     }
 }
