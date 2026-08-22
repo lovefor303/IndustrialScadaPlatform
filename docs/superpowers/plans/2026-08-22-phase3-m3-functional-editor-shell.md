@@ -18,19 +18,19 @@ Excluded: PLC/S7 communication, Gateway, Web Runtime, WinCC deployment, alarms, 
 
 **Files:** `src/Scada.Editor.Wpf/EditorShellWindow.xaml`, `src/Scada.Editor.Wpf/EditorShellWindow.xaml.cs`, `src/Scada.Editor.Wpf/EditorShellViewModel.cs`, `tests/Scada.Editor.Wpf.Tests/WpfEditorVisualTests.cs`
 
-- [ ] Add a `ToolboxEntries` property backed by `ToolboxCatalog.CreateDefault()` and expose a drag-start method that calls `EditorCanvas.BeginToolboxDrag` with the entry type ID.
-- [ ] Replace static TreeView labels with a bound flat/grouped item template whose item content is the Chinese catalog display name.
-- [ ] Add a failing STA test that finds a catalog entry in the window, verifies its type ID is retained in the item container, and verifies the shell remains usable after a drag-start event.
-- [ ] Run the focused test and then implement the minimum XAML/code-behind wiring.
+- [x] Add stable `ToolboxCatalog` type IDs to each visible leaf and expose a drag-start handler that calls `EditorCanvas.BeginToolboxDrag` with the entry type ID.
+- [x] Keep the existing grouped TreeView labels while wiring leaf items to the catalog's stable Chinese control IDs.
+- [x] Add a failing STA test that finds a catalog entry in the window, verifies its type ID is retained in the item container, and verifies the shell remains usable after a drag-start event.
+- [x] Run the focused test and then implement the minimum XAML/code-behind wiring.
 
 ### Task 2: Make the property panel edit the selected object
 
 **Files:** `src/Scada.Editor.Wpf/PropertyPanelViewModel.cs`, `src/Scada.Editor.Wpf/EditorShellViewModel.cs`, `src/Scada.Editor.Wpf/EditorShellWindow.xaml`, `tests/Scada.Editor.Wpf.Tests/WpfEditorVisualTests.cs`
 
-- [ ] Add selection-aware properties for X, Y, width, height, rotation and visibility, plus an `ApplyGeometry` command that validates finite positive dimensions and uses `PropertyPanelViewModel.SetGeometry`.
-- [ ] Add an explicit no-selection state and disable Apply when selection count is not one.
-- [ ] Add a failing test that changes a valve through the panel command and asserts the retained object and canvas geometry change immediately.
-- [ ] Verify invalid dimensions are rejected without changing the object.
+- [x] Add selection-aware properties for X, Y, width, height, rotation and visibility, plus an `ApplyGeometry` command that validates finite positive dimensions and uses `PropertyPanelViewModel.SetGeometry`.
+- [x] Add an explicit no-selection state and disable Apply when selection count is not one.
+- [x] Add a failing test that changes a valve through the panel command and asserts the retained object and canvas geometry change immediately.
+- [x] Verify invalid dimensions are rejected without changing the object.
 
 ### Task 3: Wire variables, dynamics and events panels
 
@@ -64,4 +64,3 @@ dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore
 dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build
 git diff --check
 ```
-
