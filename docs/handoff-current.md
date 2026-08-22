@@ -6,7 +6,7 @@ Updated: 2026-08-22
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 3-M2 engineering productivity implementation in progress**
+Current phase: **Phase 3-M2 engineering productivity gate passed; visual acceptance next**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -62,25 +62,27 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 
 ## Next Action
 
-Phase 3-M2 Tasks 1 through 4 are implemented. Commit after the full Release
-build/test gate, then run the M2 acceptance review and update the gate record.
-Do not start PLC/Web/WinCC deployment work from this gate.
+Phase 3-M2 Tasks 1 through 4 and the acceptance gate are complete. Perform the
+user-facing visual acceptance of the latest offline preview. After acceptance,
+write and approve the next Phase 3 milestone plan; do not start PLC/Web/WinCC
+deployment work from this gate.
 
-Tasks 1 through 14 and the Phase 1 and Phase 2 gates are complete. Phase 3 Tasks 1 through 4 are complete; Tasks 5 through 7 remain.
+Phase 1, Phase 2, Phase 3-M1 and Phase 3-M2 gates are complete. Phase 3-M3 has
+not been planned or started.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 3-M2 Tasks 1-4; commit after full verification, then M2 acceptance review.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (156 tests passed); editor focused tests (25 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
+- Active unit: Phase 3-M2 visual acceptance; M2 implementation and gate are complete.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (165 tests passed); editor focused tests (30 passed); `git diff --check` clean. The offline preview is running from `samples/Scada.Editor.Preview.Wpf/bin/Release/net10.0-windows/Scada.Editor.Preview.Wpf.exe`.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from user-facing Phase 3-M1 visual acceptance.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 3 plan; continue only from user-facing Phase 3-M2 visual acceptance.
 - Current exclusions: production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
 
-- Phase 1, Phase 2 and Phase 3-M1 final gates passed. PLC/Web/WinCC/runtime features remain explicitly out of scope.
+- Phase 1, Phase 2, Phase 3-M1 and Phase 3-M2 final gates passed. PLC/Web/WinCC/runtime features remain explicitly out of scope.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks
