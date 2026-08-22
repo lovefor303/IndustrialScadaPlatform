@@ -21,10 +21,12 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         _commands = commands;
         _fileDialog = fileDialog;
         _session = session;
+        PropertyPanel = session is null ? null : new PropertyPanelViewModel(session);
         if (_session is not null)
         {
             _session.SelectionChanged += OnSessionStateChanged;
             _session.ProjectChanged += OnSessionStateChanged;
+            PropertyPanel?.Refresh();
         }
         NewProjectCommand = new AsyncEditorCommand(NewProjectAsync, () => IsEngineeringEnabled);
         OpenProjectCommand = new AsyncEditorCommand(OpenProjectAsync, () => IsEngineeringEnabled);
@@ -54,6 +56,8 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     public bool IsEngineeringEnabled => EditorAuthorization.CanEdit(Role);
 
     public ICommand NewProjectCommand { get; }
+
+    public PropertyPanelViewModel? PropertyPanel { get; }
 
     public ICommand OpenProjectCommand { get; }
 
@@ -183,6 +187,7 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
 
     private void OnSessionStateChanged(object? sender, EventArgs e)
     {
+        PropertyPanel?.Refresh();
         RefreshCommand(UndoCommand);
         RefreshCommand(RedoCommand);
         RefreshCommand(AlignLeftCommand);

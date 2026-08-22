@@ -268,6 +268,32 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void PropertyPanelAppliesGeometryToTheSelectedObject()
+    {
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(10, 20, 80, 60));
+        var project = ProjectDocument.Create(
+            "Property panel test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(valve.Id);
+        var viewModel = new EditorShellViewModel(EditorRole.Developer, session: session);
+
+        var panel = Assert.IsType<PropertyPanelViewModel>(viewModel.PropertyPanel);
+        panel.X = "120";
+        panel.Y = "140";
+        panel.Width = "160";
+        panel.Height = "90";
+        panel.Rotation = "15";
+
+        Assert.True(panel.ApplyCommand.CanExecute(null));
+        panel.ApplyCommand.Execute(null);
+
+        var updated = Assert.IsType<ControlObject>(session.ActiveScreen.FindObject(valve.Id));
+        Assert.Equal(new RectD(120, 140, 160, 90), updated.Bounds);
+        Assert.Equal(15, updated.Rotation);
+    }
+
+    [Fact]
     public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
     {
         var viewport = new EditorViewport();
