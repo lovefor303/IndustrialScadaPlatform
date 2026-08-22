@@ -16,7 +16,7 @@ namespace Scada.Editor.Wpf;
 public sealed class EditorCanvas : Canvas
 {
     private const string ToolboxDataFormat = "Scada.Editor.ToolboxType";
-    private const double RotationDegreesPerPixel = 0.25;
+    private const double RotationDegreesPerPixel = 0.05;
     private static readonly Cursor RotationCursor = RotationCursorFactory.Create();
     private bool _isPanning;
     private Point _panStart;
