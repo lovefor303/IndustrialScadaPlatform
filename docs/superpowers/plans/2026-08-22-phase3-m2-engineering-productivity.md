@@ -31,12 +31,12 @@
 
 **Files:** `EditHistory.cs`, `EditorSession.cs`, `EditorSessionTests.cs`
 
-- [ ] Write a failing test that performs two edits, undoes twice, redoes once, and verifies object IDs, geometry, metadata and dirty state.
-- [ ] Run the focused test and confirm it fails because history does not exist.
-- [ ] Implement a bounded history with a configurable capacity of 100 snapshots, clearing the redo stack after a new edit and preserving the initial project snapshot.
-- [ ] Route `ReplaceActiveScreen`, object add/remove and property edits through one history-aware mutation method; viewport zoom/pan must not enter history.
-- [ ] Add `Undo`/`Redo` tests for an independent pipe and a selected control to prove no unrelated object changes.
-- [ ] Run focused tests and commit `feat: add editor undo redo history`.
+- [x] Write a failing test that performs two edits, undoes twice, redoes once, and verifies object IDs, geometry, metadata and dirty state.
+- [x] Run the focused test and confirm it fails because history does not exist.
+- [x] Implement a bounded history with a configurable capacity of 100 snapshots, clearing the redo stack after a new edit and preserving the initial project snapshot.
+- [x] Route `ReplaceActiveScreen`, object add/remove and property edits through one history-aware mutation method; viewport zoom/pan must not enter history.
+- [x] Add `Undo`/`Redo` tests for an independent pipe and a selected control to prove no unrelated object changes.
+- [x] Run focused tests; full verification and commit are the Task 1 checkpoint below.
 
 ## Task 2: Alignment and distribution operations
 
@@ -87,4 +87,3 @@
 | WPF | STA visual/command tests | labels, shortcuts, selection and disabled states |
 | Persistence | serializer/revision round-trip tests | no geometry or metadata drift |
 | Full offline | Release build and complete test suite | repository integration without PLC/runtime |
-

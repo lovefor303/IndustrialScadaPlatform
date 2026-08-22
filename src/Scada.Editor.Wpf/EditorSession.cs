@@ -10,6 +10,7 @@ namespace Scada.Editor.Wpf;
 public sealed class EditorSession
 {
     private readonly HashSet<Guid> _selectedObjectIds = new();
+    private EditHistory _history;
 
     public EditorSession(ProjectDocument project, string activeScreenName)
     {
@@ -25,6 +26,7 @@ public sealed class EditorSession
 
         Project = project;
         ActiveScreenName = activeScreenName;
+        _history = new EditHistory(project);
     }
 
     public ProjectDocument Project { get; private set; }
@@ -37,6 +39,10 @@ public sealed class EditorSession
     public IReadOnlyCollection<Guid> SelectedObjectIds => _selectedObjectIds;
 
     public bool IsDirty { get; private set; }
+
+    public bool CanUndo => _history.CanUndo;
+
+    public bool CanRedo => _history.CanRedo;
 
     public void SelectOnly(Guid objectId)
     {
@@ -66,7 +72,9 @@ public sealed class EditorSession
                 "The replacement screen must retain the active screen name.");
         }
 
-        Project = Project.ReplaceScreen(replacement);
+        var updatedProject = Project.ReplaceScreen(replacement);
+        _history.Record(updatedProject);
+        Project = updatedProject;
         IsDirty = true;
     }
 
@@ -86,8 +94,35 @@ public sealed class EditorSession
 
         Project = project;
         ActiveScreenName = activeScreenName;
+        _history = new EditHistory(project);
         _selectedObjectIds.Clear();
         IsDirty = false;
+    }
+
+    public bool Undo()
+    {
+        if (!_history.Undo())
+        {
+            return false;
+        }
+
+        Project = _history.Current;
+        KeepExistingSelection();
+        IsDirty = true;
+        return true;
+    }
+
+    public bool Redo()
+    {
+        if (!_history.Redo())
+        {
+            return false;
+        }
+
+        Project = _history.Current;
+        KeepExistingSelection();
+        IsDirty = true;
+        return true;
     }
 
     public void MoveSelection(double dx, double dy)
@@ -120,5 +155,10 @@ public sealed class EditorSession
         ReplaceActiveScreen(ActiveScreen.ReplaceObjects(
             ActiveScreen.Objects.Select(sceneObject =>
                 sceneObject.Id == selectedId ? replacement : sceneObject)));
+    }
+
+    private void KeepExistingSelection()
+    {
+        _selectedObjectIds.RemoveWhere(id => ActiveScreen.FindObject(id) is null);
     }
 }

@@ -173,4 +173,62 @@ public sealed class EditorSessionTests
         Assert.False(panel.TrySet("UnknownRole", feedback.Key, out var roleErrors));
         Assert.Contains(roleErrors, error => error.Contains("角色", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void UndoAndRedoRestoreProjectSnapshotsAndClearRedoAfterNewEdit()
+    {
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(10, 20, 80, 60));
+        var project = ProjectDocument.Create(
+            "History test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(valve.Id);
+
+        session.MoveSelection(10, 0);
+        session.MoveSelection(0, 5);
+
+        Assert.True(session.CanUndo);
+        Assert.False(session.CanRedo);
+        Assert.Equal(new RectD(20, 25, 80, 60), session.ActiveScreen.FindObject(valve.Id)!.Bounds);
+
+        session.Undo();
+        Assert.Equal(new RectD(20, 20, 80, 60), session.ActiveScreen.FindObject(valve.Id)!.Bounds);
+        session.Undo();
+        Assert.Equal(valve.Bounds, session.ActiveScreen.FindObject(valve.Id)!.Bounds);
+        Assert.False(session.CanUndo);
+        Assert.True(session.CanRedo);
+
+        session.Redo();
+        Assert.Equal(new RectD(20, 20, 80, 60), session.ActiveScreen.FindObject(valve.Id)!.Bounds);
+        session.MoveSelection(2, 0);
+        Assert.False(session.CanRedo);
+        Assert.Equal(new RectD(22, 20, 80, 60), session.ActiveScreen.FindObject(valve.Id)!.Bounds);
+    }
+
+    [Fact]
+    public void UndoRedoPreserveIndependentPipeGeometryAndStableMetadata()
+    {
+        var valve = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(100, 100, 80, 60));
+        var pipe = PipeObject.Create(
+            new PointD(20, 130),
+            new PointD(100, 130),
+            new[] { new PointD(60, 130) });
+        var project = ProjectDocument.Create(
+            "History pipe test",
+            screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { valve, pipe }) });
+        var session = new EditorSession(project, "Main");
+        session.SelectOnly(valve.Id);
+
+        session.MoveSelection(15, -4);
+        session.Undo();
+        session.Redo();
+
+        var restoredPipe = Assert.IsType<PipeObject>(session.ActiveScreen.FindObject(pipe.Id));
+        Assert.Equal(pipe.Start, restoredPipe.Start);
+        Assert.Equal(pipe.End, restoredPipe.End);
+        Assert.Equal(pipe.Bends, restoredPipe.Bends);
+        Assert.Equal(pipe.Properties, restoredPipe.Properties);
+        Assert.Equal(pipe.Bindings, restoredPipe.Bindings);
+        Assert.Equal(new RectD(115, 96, 80, 60), session.ActiveScreen.FindObject(valve.Id)!.Bounds);
+    }
 }
