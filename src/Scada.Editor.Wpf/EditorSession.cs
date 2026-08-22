@@ -148,6 +148,7 @@ public sealed class EditorSession
         Project = project;
         ActiveScreenName = activeScreenName;
         _history = new EditHistory(project);
+        _groups.Clear();
         _selectedObjectIds.Clear();
         IsDirty = false;
     }
