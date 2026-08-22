@@ -25,6 +25,8 @@ public sealed class EditorCanvas : Canvas
     private bool _selectionMoved;
     private Point _selectionStart;
     private Rectangle? _selectionRectangle;
+    private EditorSession? _session;
+    private bool _suppressProjectRefresh;
 
     private enum HandlePosition
     {
@@ -55,7 +57,28 @@ public sealed class EditorCanvas : Canvas
         MouseUp += OnMouseUp;
     }
 
-    public EditorSession? Session { get; set; }
+    public EditorSession? Session
+    {
+        get => _session;
+        set
+        {
+            if (ReferenceEquals(_session, value))
+            {
+                return;
+            }
+
+            if (_session is not null)
+            {
+                _session.ProjectChanged -= OnSessionProjectChanged;
+            }
+
+            _session = value;
+            if (_session is not null)
+            {
+                _session.ProjectChanged += OnSessionProjectChanged;
+            }
+        }
+    }
 
     public EditorViewport Viewport { get; } = new();
 
@@ -109,6 +132,14 @@ public sealed class EditorCanvas : Canvas
         }
 
         InvalidateVisual();
+    }
+
+    private void OnSessionProjectChanged(object? sender, EventArgs e)
+    {
+        if (!_suppressProjectRefresh)
+        {
+            Refresh();
+        }
     }
 
     public static void BeginToolboxDrag(DependencyObject source, string typeId) =>
@@ -275,10 +306,18 @@ public sealed class EditorCanvas : Canvas
         var dx = e.HorizontalChange / Viewport.Zoom;
         var dy = e.VerticalChange / Viewport.Zoom;
         Session.SelectOnly(tag.ObjectId);
-        Session.UpdateSelectedObject(sceneObject => sceneObject with
+        _suppressProjectRefresh = true;
+        try
         {
-            Bounds = ResizeBounds(sceneObject.Bounds, tag.Position, dx, dy)
-        });
+            Session.UpdateSelectedObject(sceneObject => sceneObject with
+            {
+                Bounds = ResizeBounds(sceneObject.Bounds, tag.Position, dx, dy)
+            });
+        }
+        finally
+        {
+            _suppressProjectRefresh = false;
+        }
         UpdateObjectVisual(tag.ObjectId);
     }
 
@@ -290,10 +329,18 @@ public sealed class EditorCanvas : Canvas
         }
 
         Session.SelectOnly(objectId);
-        Session.UpdateSelectedObject(selected => selected with
+        _suppressProjectRefresh = true;
+        try
         {
-            Rotation = selected.Rotation + e.HorizontalChange * RotationDegreesPerPixel
-        });
+            Session.UpdateSelectedObject(selected => selected with
+            {
+                Rotation = selected.Rotation + e.HorizontalChange * RotationDegreesPerPixel
+            });
+        }
+        finally
+        {
+            _suppressProjectRefresh = false;
+        }
         UpdateObjectVisual(objectId);
     }
 

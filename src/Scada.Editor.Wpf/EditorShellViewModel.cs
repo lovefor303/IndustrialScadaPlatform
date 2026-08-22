@@ -23,7 +23,8 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
         _session = session;
         if (_session is not null)
         {
-            _session.SelectionChanged += OnSelectionChanged;
+            _session.SelectionChanged += OnSessionStateChanged;
+            _session.ProjectChanged += OnSessionStateChanged;
         }
         NewProjectCommand = new AsyncEditorCommand(NewProjectAsync, () => IsEngineeringEnabled);
         OpenProjectCommand = new AsyncEditorCommand(OpenProjectAsync, () => IsEngineeringEnabled);
@@ -180,7 +181,7 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
 
     private bool CanLayer() => IsEngineeringEnabled && _session?.SelectedObjectIds.Count > 0;
 
-    private void OnSelectionChanged(object? sender, EventArgs e)
+    private void OnSessionStateChanged(object? sender, EventArgs e)
     {
         RefreshCommand(AlignLeftCommand);
         RefreshCommand(AlignCenterCommand);
@@ -235,6 +236,7 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     private void Group()
     {
         _session?.GroupSelection();
+        OnSessionStateChanged(this, EventArgs.Empty);
         StatusText = "已组合";
     }
 
@@ -242,6 +244,7 @@ public sealed class EditorShellViewModel : INotifyPropertyChanged
     {
         if (_session?.UngroupSelection() == true)
         {
+            OnSessionStateChanged(this, EventArgs.Empty);
             StatusText = "已取消组合";
         }
     }

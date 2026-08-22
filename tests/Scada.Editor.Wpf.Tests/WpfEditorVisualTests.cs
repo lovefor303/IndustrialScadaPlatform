@@ -165,6 +165,30 @@ public sealed class WpfEditorVisualTests
     }
 
     [Fact]
+    public void GeometryCommandRefreshesCanvasImmediatelyWithoutBlankCanvasClick()
+    {
+        StaThread.Run(() =>
+        {
+            var first = ControlObject.Create(ControlTypeIds.AutomatedValve, new RectD(100, 100, 40, 40));
+            var second = ControlObject.Create(ControlTypeIds.CentrifugalPump, new RectD(240, 180, 60, 60));
+            var project = ProjectDocument.Create(
+                "Immediate refresh test",
+                screens: new[] { ScreenDocument.Create("Main", new SceneObject[] { first, second }) });
+            var session = new EditorSession(project, "Main");
+            session.SelectMany(new[] { first.Id, second.Id });
+            var canvas = new EditorCanvas { Session = session };
+            canvas.Refresh();
+            var viewModel = new EditorShellViewModel(EditorRole.Developer, session: session);
+
+            viewModel.AlignTopCommand.Execute(null);
+
+            var secondVisual = canvas.Children.OfType<Border>().Single(border => Equals(border.Tag, second.Id));
+            Assert.Equal(100, Canvas.GetTop(secondVisual));
+            return true;
+        });
+    }
+
+    [Fact]
     public void ViewportZoomKeepsCursorModelPointAndSupportsGridSnapping()
     {
         var viewport = new EditorViewport();

@@ -41,6 +41,8 @@ public sealed class EditorSession
 
     public event EventHandler? SelectionChanged;
 
+    public event EventHandler? ProjectChanged;
+
     public bool IsDirty { get; private set; }
 
     public bool CanUndo => _history.CanUndo;
@@ -183,6 +185,7 @@ public sealed class EditorSession
         _history.Record(updatedProject);
         Project = updatedProject;
         IsDirty = true;
+        ProjectChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void MarkSaved()
@@ -205,6 +208,7 @@ public sealed class EditorSession
         _groups.Clear();
         _selectedObjectIds.Clear();
         IsDirty = false;
+        ProjectChanged?.Invoke(this, EventArgs.Empty);
         SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
 
