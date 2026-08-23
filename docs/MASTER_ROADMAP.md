@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
 Updated: 2026-08-22
-Status: Long-term direction approved; Phase 1, Phase 2 and Phase 3-M1 are complete; Phase 3-M2 planning is the next authorized activity.
+Status: Long-term direction approved; Phase 1, Phase 2 and Phase 3-M3 automated gate are complete; Phase 4-M1 design review is the next authorized activity.
 
 ## Product Outcome
 
@@ -102,8 +102,8 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 3 implementation.
-Current task: define and approve the Phase 3-M2 engineering-productivity plan.
+Current phase: Phase 4 planning.
+Current task: review and approve the Phase 4-M1 offline Web Runtime design.
 Single operational checkpoint: `docs/handoff-current.md`.
 
 Phase 1 and Phase 2 are complete; the WPF editor, Web Runtime, PLC adapter and WinCC adapter have not started.
