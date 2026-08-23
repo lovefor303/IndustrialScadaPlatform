@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
-Updated: 2026-08-22
-Status: Long-term direction approved; Phase 1, Phase 2 and Phase 3-M3 automated gate are complete; Phase 4-M1 design review is the next authorized activity.
+Updated: 2026-08-23
+Status: Long-term direction approved; Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. The next authorized activity is a separate Phase 4-M2 live-transport design.
 
 ## Product Outcome
 
@@ -52,19 +52,31 @@ Deliverables: project tree, toolbox, multi-screen workspace, dockable properties
 
 Gate: a developer authors and reopens a small process screen without source-code edits or geometry drift. Operators cannot access engineering functions.
 
-Milestone M1 passed on 2026-08-22. The offline WPF editor supports project/session
-workflow, toolbox composition, independent scene editing, properties/bindings/
-dynamics/events, persistence, viewport ergonomics and geometry-drift checks.
-The next milestone is M2: engineering productivity features such as alignment,
-distribution, grouping/layers and undo/redo, with a separate approved plan.
+Milestones M1, M2 and M3 passed on 2026-08-22. The offline WPF editor supports
+project/session workflow, toolbox composition, independent scene editing,
+properties/bindings/dynamics/events, viewport ergonomics, alignment,
+distribution, grouping/layers, undo/redo, persistence and geometry-drift checks.
 
 Before implementation: write and approve a separate detailed Phase 3 plan.
 
 ### Phase 4 - Web Runtime and Gateway shell
 
-Deliverables: ASP.NET Core service, SignalR updates, published-project loading, local authentication, permissions, variable quality, responsive desktop/tablet/phone compositions and Windows/Linux deployment profiles.
+Deliverables: ASP.NET Core service, published-project loading, variable quality,
+responsive desktop/tablet/phone compositions, live transport, authentication,
+permissions and Windows/Linux deployment profiles.
 
-Gate: Windows and Linux test hosts serve the same published project offline; browsers never connect directly to a PLC.
+Milestone M1 passed on 2026-08-23. The offline runtime serves one immutable
+published JSON or RevisionStore revision through a loopback-only ASP.NET Core
+host, reuses the SVG control renderer, provides deterministic simulated values,
+preserves independent pipe geometry and exposes a Chinese read-only responsive
+browser shell. See `docs/phase4-m1-acceptance.md`.
+
+M1 deliberately excludes SignalR/live transport, authentication, PLC/Gateway
+commands, alarms, trends, recipes, batches, PID and WinCC deployment. Those are
+separate designs and gates.
+
+Gate for the full Phase 4 remains: Windows and Linux test hosts serve the same
+published project offline; browsers never connect directly to a PLC.
 
 Before implementation: write and approve a separate detailed Phase 4 plan.
 
@@ -102,8 +114,11 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 4 planning.
-Current task: review and approve the Phase 4-M1 offline Web Runtime design.
+Current phase: Phase 4-M1 complete.
+Current task: prepare a separate Phase 4-M2 live-transport/Gateway design; do not
+implement it under the M1 gate.
 Single operational checkpoint: `docs/handoff-current.md`.
 
-Phase 1 and Phase 2 are complete; the WPF editor, Web Runtime, PLC adapter and WinCC adapter have not started.
+Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 are complete. PLC acquisition,
+Gateway commands, live Web transport, authentication and WinCC adapter remain
+out of scope until their own plans are approved.

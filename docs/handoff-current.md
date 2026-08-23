@@ -6,7 +6,7 @@ Updated: 2026-08-23
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 4-M1 implementation plan ready; awaiting execution mode**
+Current phase: **Phase 4-M1 offline Web Runtime gate passed**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -70,35 +70,44 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Save/reopen regression coverage preserves control IDs, bounds, rotation and independent pipe endpoints/bends; publish/restore returns modified geometry to the saved revision.
 - The draft/open confusion fix is implemented: internal SQLite drafts have a dedicated “载入最新草稿” command; JSON import/export is explicit; invalid project files are caught and reported in the status bar instead of crashing the async WPF command.
 - Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
-- The editor remains offline-only; no PLC, Web Runtime, WinCC adapter or legacy migration has started.
+- The editor remains offline-only; no PLC, live Web transport, WinCC adapter or legacy migration has started.
+- Phase 4-M1 offline Web Runtime is implemented and gated (`6e57942`): published
+  JSON/RevisionStore sources, deterministic simulator, SVG scene projection,
+  read-only ASP.NET Core preview host, responsive Chinese browser shell and
+  controlled diagnostics.
+- Phase 4-M1 acceptance fixture and evidence are recorded in
+  `docs/phase4-m1-acceptance.md`; runtime-focused tests pass 24/24.
+- Browser smoke evidence: desktop and 390x844 phone layouts rendered a nonblank
+  vessel, independent pipe and text with no console errors; health/project/Main
+  HTTP endpoints each returned 200 on loopback.
 
 ## Next Action
 
-Phase 1, Phase 2 and Phase 3-M3 automated gates are complete. The Phase 4-M1
-offline Web Runtime design is recorded at
-`docs/superpowers/specs/2026-08-23-phase4-m1-offline-web-runtime-design.md`, and
-the implementation plan is recorded at
-`docs/superpowers/plans/2026-08-23-phase4-m1-offline-web-runtime.md` (commit
-`bc6ee25`). No Phase 4 source code has been started.
+Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. The
+Phase 4-M1 design, plan and acceptance record are:
 
-The next action is to select execution mode for the plan, then execute Task 1
-through Task 8 with the listed test and acceptance checkpoints. Until then, do
-not add PLC, SignalR, authentication, alarms, trends, recipes, batches, PID or
-WinCC deployment code.
+- `docs/superpowers/specs/2026-08-23-phase4-m1-offline-web-runtime-design.md`
+- `docs/superpowers/plans/2026-08-23-phase4-m1-offline-web-runtime.md`
+- `docs/phase4-m1-acceptance.md`
+
+The next action is to write and approve a separate Phase 4-M2 design for live
+transport/Gateway/authentication. Do not add PLC, SignalR, authentication,
+alarms, trends, recipes, batches, PID or WinCC deployment code under the M1
+checkpoint.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 4-M1 execution-mode review.
-- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (178 tests passed); `git diff --check` passed. Start the offline preview from this final build for manual review.
+- Active unit: Phase 4-M1 completed; Phase 4-M2 design pending.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release` (0 warnings, 0 errors); `dotnet test tests\\Scada.Runtime.Tests\\Scada.Runtime.Tests.csproj --configuration Release` (24 tests passed); `git diff --check` passed. HTTP smoke returned 200 for health, project and Main screen on loopback.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 4-M1 design and the Phase 4-M1 plan; continue only from the selected execution-mode checkpoint.
-- Current exclusions: production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 4-M1 design, the Phase 4-M1 plan and the acceptance record; continue only from the Phase 4-M2 design checkpoint.
+- Current exclusions: live Web transport, Gateway commands, authentication, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
 
-- Phase 1, Phase 2, Phase 3-M1 and Phase 3-M2 final gates passed. PLC/Web/WinCC/runtime features remain explicitly out of scope.
+- Phase 1, Phase 2, Phase 3-M1, Phase 3-M2, Phase 3-M3 and Phase 4-M1 final gates passed. PLC/live Web/WinCC/runtime command features remain explicitly out of scope.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks
