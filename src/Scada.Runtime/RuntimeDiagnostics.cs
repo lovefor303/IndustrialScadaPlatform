@@ -23,6 +23,7 @@ public static class RuntimeDiagnostics
     public const string ScreenNotFound = "screen.not-found";
     public const string VariableUnknown = "variable.unknown";
     public const string ControlUnsupported = "control.unsupported";
+    public const string SourceDisconnected = "source.disconnected";
 
     public static RuntimeDiagnostic Create(
         string code,
