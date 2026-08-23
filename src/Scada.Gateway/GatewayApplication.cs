@@ -33,6 +33,14 @@ public static class GatewayApplication
         builder.Services.AddSingleton(dataProvider);
         builder.Services.AddSingleton(authStore);
         builder.Services.AddSingleton(options);
+        builder.Services.AddSingleton(new RuntimeSnapshotCache(
+            dataProvider.Status.Source,
+            options.UncertainAfter,
+            options.BadAfter));
+        builder.Services.AddSingleton<RuntimeDataCoordinator>();
+        builder.Services.AddHostedService<RuntimeDataCoordinatorHostedService>();
+        builder.Services.AddSingleton(new RuntimeSubscriptionRegistry(options.SubscriptionLimit));
+        builder.Services.AddSignalR();
         builder.Services.ConfigureHttpJsonOptions(json =>
             json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         builder.Services
@@ -65,6 +73,7 @@ public static class GatewayApplication
         var app = builder.Build();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.MapHub<RuntimeHub>("/hubs/runtime");
 
         app.MapGet("/api/runtime/health", (GatewayOptions gatewayOptions) => Results.Ok(new
         {
