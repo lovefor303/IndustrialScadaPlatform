@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "projectId": "11111111-1111-4111-8111-111111111111",
+  "name": "离线运行时示例",
+  "createdAt": "2026-08-23T00:00:00+00:00",
+  "updatedAt": "2026-08-23T00:00:00+00:00",
+  "status": "published",
+  "screens": [
+    {
+      "name": "Main",
+      "objects": [
+        {
+          "$type": "control",
+          "id": "22222222-2222-4222-8222-222222222222",
+          "type": "equipment.vessel",
+          "bounds": { "x": 360, "y": 180, "width": 180, "height": 240 },
+          "rotation": 0,
+          "zIndex": 2,
+          "isVisible": true,
+          "properties": {},
+          "bindings": {},
+          "interactions": {},
+          "dynamics": {},
+          "controlVersion": 1
+        },
+        {
+          "$type": "pipe",
+          "id": "33333333-3333-4333-8333-333333333333",
+          "type": "pipe.straight",
+          "bounds": { "x": 120, "y": 300, "width": 240, "height": 0 },
+          "rotation": 0,
+          "zIndex": 1,
+          "isVisible": true,
+          "properties": {},
+          "bindings": {},
+          "interactions": {},
+          "dynamics": {},
+          "start": { "x": 120, "y": 300 },
+          "end": { "x": 360, "y": 300 },
+          "bends": []
+        },
+        {
+          "$type": "text",
+          "id": "44444444-4444-4444-8444-444444444444",
+          "type": "text",
+          "bounds": { "x": 320, "y": 80, "width": 260, "height": 32 },
+          "rotation": 0,
+          "zIndex": 3,
+          "isVisible": true,
+          "properties": {},
+          "bindings": {},
+          "interactions": {},
+          "dynamics": {},
+          "text": "离线配液运行时"
+        }
+      ]
+    }
+  ],
+  "variables": []
+}

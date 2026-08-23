@@ -8,6 +8,6 @@
     <ProjectReference Include="..\..\src\Scada.Runtime\Scada.Runtime.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Update="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

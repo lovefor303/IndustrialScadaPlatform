@@ -164,7 +164,7 @@ public sealed class RuntimeSceneProjector
             " ",
             points.Select((point, index) =>
                 $"{(index == 0 ? "M" : "L")} {Number(point.X)} {Number(point.Y)}"));
-        var svg = $"<svg xmlns=\"http://www.w3.org/2000/svg\" data-object-id=\"{pipe.Id}\" data-control-type=\"{SecurityElement.Escape(pipe.Type)}\" data-state=\"neutral\" data-quality=\"good\"><path data-part=\"pipe.runtime\" d=\"{path}\" /></svg>";
+        var svg = $"<g data-object-id=\"{pipe.Id}\" data-control-type=\"{SecurityElement.Escape(pipe.Type)}\" data-state=\"neutral\" data-quality=\"good\"><path data-part=\"pipe.runtime\" d=\"{path}\" fill=\"none\" stroke=\"#D79B2B\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /></g>";
         return new RuntimeObjectProjection(
             pipe.Id,
             pipe.Type,
@@ -185,7 +185,7 @@ public sealed class RuntimeSceneProjector
     private static RuntimeObjectProjection ProjectText(TextObject text)
     {
         var escaped = SecurityElement.Escape(text.Text) ?? string.Empty;
-        var svg = $"<svg xmlns=\"http://www.w3.org/2000/svg\" data-object-id=\"{text.Id}\" data-control-type=\"text\" data-state=\"neutral\" data-quality=\"good\"><text x=\"0\" y=\"16\">{escaped}</text></svg>";
+        var svg = $"<g data-object-id=\"{text.Id}\" data-control-type=\"text\" data-state=\"neutral\" data-quality=\"good\"><text x=\"{Number(text.Bounds.X)}\" y=\"{Number(text.Bounds.Y + 16)}\" fill=\"#E6ECEF\" font-family=\"Segoe UI, Microsoft YaHei, sans-serif\" font-size=\"18\">{escaped}</text></g>";
         return new RuntimeObjectProjection(
             text.Id,
             text.Type,
@@ -210,7 +210,7 @@ public sealed class RuntimeSceneProjector
             sceneObject.Id,
             RuntimeDiagnosticSeverity.Warning);
         diagnostics.Add(diagnostic);
-        var svg = $"<svg xmlns=\"http://www.w3.org/2000/svg\" data-object-id=\"{sceneObject.Id}\" data-control-type=\"unsupported\" data-state=\"unknown\" data-quality=\"bad\"><rect x=\"0\" y=\"0\" width=\"{Number(sceneObject.Bounds.Width)}\" height=\"{Number(sceneObject.Bounds.Height)}\" /><text x=\"4\" y=\"16\">不支持</text></svg>";
+        var svg = $"<g data-object-id=\"{sceneObject.Id}\" data-control-type=\"unsupported\" data-state=\"unknown\" data-quality=\"bad\"><rect x=\"{Number(sceneObject.Bounds.X)}\" y=\"{Number(sceneObject.Bounds.Y)}\" width=\"{Number(sceneObject.Bounds.Width)}\" height=\"{Number(sceneObject.Bounds.Height)}\" /><text x=\"{Number(sceneObject.Bounds.X + 4)}\" y=\"{Number(sceneObject.Bounds.Y + 16)}\">不支持</text></g>";
         return new RuntimeObjectProjection(
             sceneObject.Id,
             sceneObject.Type,
