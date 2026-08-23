@@ -1,7 +1,7 @@
 # Phase 4-M2 Live Gateway and SignalR Design
 
 Date: 2026-08-23  
-Status: Proposed for user review  
+Status: Approved by user on 2026-08-23
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
 ## 1. Goal
