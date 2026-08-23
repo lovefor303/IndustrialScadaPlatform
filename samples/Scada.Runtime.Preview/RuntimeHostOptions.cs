@@ -5,6 +5,7 @@ public sealed record RuntimeHostOptions(
     string? DatabasePath,
     Guid? ProjectId,
     Guid? RevisionId,
+    string? AuthDatabasePath,
     string Urls,
     bool AllowNonLoopback = false)
 {
@@ -15,6 +16,7 @@ public sealed record RuntimeHostOptions(
         string? databasePath = null;
         Guid? projectId = null;
         Guid? revisionId = null;
+        string? authDatabasePath = null;
         var urls = "http://127.0.0.1:0";
         var allowNonLoopback = false;
 
@@ -37,6 +39,9 @@ public sealed record RuntimeHostOptions(
                     break;
                 case "--urls":
                     urls = ReadValue(args, ref index, argument);
+                    break;
+                case "--auth-db":
+                    authDatabasePath = ReadValue(args, ref index, argument);
                     break;
                 case "--allow-non-loopback":
                     allowNonLoopback = true;
@@ -63,7 +68,7 @@ public sealed record RuntimeHostOptions(
             throw new ArgumentException("默认只允许回环地址；需要外部监听时请显式提供 --allow-non-loopback。", nameof(args));
         }
 
-        return new RuntimeHostOptions(projectPath, databasePath, projectId, revisionId, urls, allowNonLoopback);
+        return new RuntimeHostOptions(projectPath, databasePath, projectId, revisionId, authDatabasePath, urls, allowNonLoopback);
     }
 
     private static string ReadValue(string[] args, ref int index, string option)

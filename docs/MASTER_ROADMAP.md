@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
 Updated: 2026-08-23
-Status: Long-term direction approved; Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. The Phase 4-M2 live-transport/Gateway design and implementation plan are approved; execution mode is pending.
+Status: Long-term direction approved; Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. Phase 4-M2 Tasks 1-5 are implemented and verified; final browser live integration and acceptance gate remain.
 
 ## Product Outcome
 
@@ -114,10 +114,8 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 4-M1 complete; Phase 4-M2 design and plan written.
-Current task: choose execution mode for
-`docs/superpowers/plans/2026-08-23-phase4-m2-live-gateway.md`; do not implement
-M2 until execution mode is selected.
+Current phase: Phase 4-M2 implementation in progress.
+Current task: complete Web Runtime live browser integration, then run cross-consumer parity/security and the Phase 4-M2 acceptance gate.
 Single operational checkpoint: `docs/handoff-current.md`.
 
 Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 are complete. PLC acquisition,

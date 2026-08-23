@@ -28,6 +28,16 @@
       <span id="screen-status" class="screen-status">正在载入项目...</span>
     </section>
 
+    <section id="login-panel" class="login-panel" hidden>
+      <form id="login-form" class="login-form">
+        <strong>运行时登录</strong>
+        <label>用户名 <input id="login-user" name="userName" autocomplete="username" required></label>
+        <label>密码 <input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">登录</button>
+        <span id="login-status" class="screen-status">需要登录后查看画面</span>
+      </form>
+    </section>
+
     <main class="scene-panel">
       <div id="diagnostic" class="diagnostic" role="status" hidden></div>
       <div id="scene-host" class="scene-host" aria-label="工艺画面">
@@ -40,6 +50,7 @@
       <span id="diagnostic-count">诊断 0</span>
     </footer>
   </div>
+  <script src="lib/signalr.min.js"></script>
   <script src="app.js" defer></script>
 </body>
 </html>

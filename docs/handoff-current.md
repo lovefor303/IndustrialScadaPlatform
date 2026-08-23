@@ -6,7 +6,7 @@ Updated: 2026-08-23
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 4-M2 live Gateway design and implementation plan completed; execution pending**
+Current phase: **Phase 4-M2 live Gateway implementation in progress**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -81,9 +81,20 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
   vessel, independent pipe and text with no console errors; health/project/Main
   HTTP endpoints each returned 200 on loopback.
 
+## Phase 4-M2 Progress
+
+- Task 1 committed as `b9cc324`: shared live runtime contracts, snapshot applier, Gateway project skeleton and stable source-disconnected diagnostic.
+- Task 2 committed as `dbd2add`: simulated provider lifecycle, update events, freshness-aware snapshot cache and coordinator recovery handling.
+- Task 3 committed as `92a76e8`: SQLite AuthStore, first-admin initialization, password hashing, disabled users, roles and authorization diagnostics.
+- Task 4 committed as `709f06f`: authenticated Gateway REST composition with loopback setup, login/logout, published-project access and no write route.
+- Task 5 committed as `6afba27`: read-only SignalR Hub, subscription registry, published-screen/variable validation and coordinator hosted lifecycle.
+- Web Runtime shell is wired for local SignalR 10.0.0, Chinese login/connection/quality states, bounded reconnect and full-snapshot recovery; Preview composes the Gateway and serves static assets.
+- Fresh verification: solution Release build 0 warnings/0 errors; Gateway tests 28/28; Runtime tests 27/27; loopback smoke returned health 200, project 401 before login, `/` 200 and local SignalR asset 200.
+
 ## Next Action
 
-Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. The
+Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. Phase
+4-M2 Tasks 1-5 are implemented and verified. The
 Phase 4-M1 design, plan and acceptance record are:
 
 - `docs/superpowers/specs/2026-08-23-phase4-m1-offline-web-runtime-design.md`
@@ -94,8 +105,8 @@ The Phase 4-M2 design is written at
 `docs/superpowers/specs/2026-08-23-phase4-m2-live-gateway-design.md` and is
 approved. The implementation plan is written at
 `docs/superpowers/plans/2026-08-23-phase4-m2-live-gateway.md`. The next action is
-to choose subagent-driven or inline plan execution. Do not add implementation
-code until execution mode is selected.
+to complete browser live integration, cross-consumer parity/security regression
+and the Phase 4-M2 acceptance gate.
 
 ## Interruption Checkpoint
 
@@ -109,7 +120,7 @@ code until execution mode is selected.
 
 ## Verification Status
 
-- Phase 1, Phase 2, Phase 3-M1, Phase 3-M2, Phase 3-M3 and Phase 4-M1 final gates passed. PLC/live Web/WinCC/runtime command features remain explicitly out of scope.
+- Phase 1, Phase 2, Phase 3-M1, Phase 3-M2, Phase 3-M3 and Phase 4-M1 final gates passed. Phase 4-M2 Tasks 1-5 are verified; final browser live integration and acceptance evidence remain. PLC/field writes and WinCC deployment remain explicitly out of scope.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks

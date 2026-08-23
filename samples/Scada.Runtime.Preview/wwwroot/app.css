@@ -73,6 +73,11 @@ select:disabled { color: #77868b; }
 .screen-status { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .scene-panel { min-height: 0; padding: 12px; background: #101518; position: relative; }
+.login-panel { padding: 12px 16px; border-bottom: 1px solid var(--line); background: #20272b; }
+.login-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.login-form label { color: var(--muted); font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+.login-form input { min-height: 30px; border: 1px solid #526269; background: #151b1e; color: #eef3f4; padding: 4px 8px; font: inherit; }
+.login-form button { min-height: 30px; border: 1px solid #4a6970; background: #28454b; color: #eef3f4; padding: 4px 14px; font: inherit; cursor: pointer; }
 .scene-host { height: 100%; min-height: 260px; border: 1px solid var(--line); background: #202428; overflow: hidden; }
 .scene { display: block; width: 100%; height: 100%; min-height: 260px; background: #202428; }
 

@@ -38,6 +38,7 @@ public static class GatewayApplication
             options.UncertainAfter,
             options.BadAfter));
         builder.Services.AddSingleton<RuntimeDataCoordinator>();
+        builder.Services.AddSingleton<RuntimeSceneProjector>();
         builder.Services.AddHostedService<RuntimeDataCoordinatorHostedService>();
         builder.Services.AddSingleton(new RuntimeSubscriptionRegistry(options.SubscriptionLimit));
         builder.Services.AddSignalR();
@@ -71,6 +72,8 @@ public static class GatewayApplication
                     AuthRole.Admin.ToString())));
 
         var app = builder.Build();
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapHub<RuntimeHub>("/hubs/runtime");
@@ -88,6 +91,42 @@ public static class GatewayApplication
             CancellationToken cancellationToken) =>
             await ReadProjectAsync(source, cancellationToken))
             .RequireAuthorization(RuntimeViewPolicy);
+
+        app.MapGet("/api/runtime/screens/{screenName}", async (
+            string screenName,
+            IRuntimeProjectSource source,
+            RuntimeDataCoordinator coordinator,
+            RuntimeSceneProjector projector,
+            CancellationToken cancellationToken) =>
+        {
+            try
+            {
+                var project = await source.LoadAsync(cancellationToken).ConfigureAwait(false);
+                if (project.Status != ProjectStatus.Published)
+                {
+                    return Results.Json(
+                        new { code = RuntimeDiagnostics.ProjectNotPublished, message = "项目尚未发布，不能进入运行时。" },
+                        statusCode: StatusCodes.Status400BadRequest);
+                }
+
+                var screen = projector.Project(
+                    project,
+                    new RuntimeCoordinatorVariableSource(coordinator),
+                    screenName,
+                    "desktop",
+                    DateTimeOffset.UtcNow);
+                return Results.Ok(screen);
+            }
+            catch (RuntimeSourceException exception)
+            {
+                var status = exception.Diagnostic.Code == RuntimeDiagnostics.ScreenNotFound
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status400BadRequest;
+                return Results.Json(
+                    new { code = exception.Diagnostic.Code, message = exception.Diagnostic.Message },
+                    statusCode: status);
+            }
+        }).RequireAuthorization(RuntimeViewPolicy);
 
         app.MapPost("/api/auth/initialize", async (
             InitializeRequest request,

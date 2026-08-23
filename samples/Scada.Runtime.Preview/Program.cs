@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Scada.Runtime;
 using Scada.Storage;
+using Scada.Gateway;
+using System.Security.Cryptography;
 
 namespace Scada.Runtime.Preview;
 
@@ -15,9 +17,30 @@ public static class Program
             var source = CreateSource(options);
             var project = await source.LoadAsync();
             var simulator = SimulatedVariableSource.CreateDemo(project.Variables);
+            var authPath = options.AuthDatabasePath
+                ?? Path.Combine(AppContext.BaseDirectory, "runtime-auth.db");
+            var auth = new AuthStore(authPath);
+            await auth.InitializeAsync();
+            var setupToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
             var builder = WebApplication.CreateBuilder(Array.Empty<string>());
             builder.WebHost.UseUrls(options.Urls);
-            var app = RuntimeHostApplication.Build(builder, source, simulator);
+            if (options.AllowNonLoopback)
+            {
+                builder.WebHost.UseSetting("detailedErrors", "false");
+            }
+            var app = GatewayApplication.Build(
+                builder,
+                source,
+                simulator,
+                auth,
+                new GatewayOptions(
+                    ProjectName: project.Name,
+                    AuthDatabasePath: authPath,
+                    SetupToken: setupToken));
+            if (!await auth.HasUsersAsync())
+            {
+                Console.WriteLine($"首次初始化地址仅限本机，临时初始化令牌: {setupToken}");
+            }
             await app.StartAsync();
             Console.WriteLine($"离线运行时地址: {string.Join(", ", app.Urls)}");
             await app.WaitForShutdownAsync();

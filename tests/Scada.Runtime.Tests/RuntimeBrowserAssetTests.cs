@@ -18,10 +18,15 @@ public sealed class RuntimeBrowserAssetTests
         Assert.Contains("preserveAspectRatio", html);
         Assert.Contains("app.css", html);
         Assert.Contains("app.js", html);
+        Assert.Contains("signalr.min.js", html);
         Assert.Contains("@media", css);
         Assert.Contains("screen", script);
+        Assert.Contains("HubConnectionBuilder", script);
+        Assert.Contains("RequestFullSnapshot", script);
+        Assert.Contains("登录", html);
+        Assert.Contains("连接", script);
         Assert.DoesNotContain("/api/runtime/commands", script);
-        Assert.DoesNotContain("POST", script, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("/api/runtime/write", script, StringComparison.OrdinalIgnoreCase);
     }
 
     private static string FindRepositoryRoot()
