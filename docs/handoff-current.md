@@ -1,12 +1,12 @@
 # Current Handoff
 
-Updated: 2026-08-22
+Updated: 2026-08-23
 
 ## Authoritative Scope
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 4 planning; M3 automated gate passed and runtime design awaiting review**
+Current phase: **Phase 4-M1 implementation plan ready; awaiting execution mode**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -74,24 +74,26 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 
 ## Next Action
 
-Phase 3-M2 Tasks 1 through 4 and the acceptance gate are complete. Phase 3-M3
-Tasks 1 through 4 are implemented. The final Release build, full solution tests,
-editor focused tests and `git diff --check` all pass. Start the latest preview
-executable for manual review; after that M3 is complete.
+Phase 1, Phase 2 and Phase 3-M3 automated gates are complete. The Phase 4-M1
+offline Web Runtime design is recorded at
+`docs/superpowers/specs/2026-08-23-phase4-m1-offline-web-runtime-design.md`, and
+the implementation plan is recorded at
+`docs/superpowers/plans/2026-08-23-phase4-m1-offline-web-runtime.md` (commit
+`bc6ee25`). No Phase 4 source code has been started.
 
-Phase 1, Phase 2 and Phase 3-M3 automated gates are complete. The proposed Phase
-4-M1 offline Web Runtime design is recorded at
-`docs/superpowers/specs/2026-08-23-phase4-m1-offline-web-runtime-design.md`.
-User review is required before writing the implementation plan or changing code.
+The next action is to select execution mode for the plan, then execute Task 1
+through Task 8 with the listed test and acceptance checkpoints. Until then, do
+not add PLC, SignalR, authentication, alarms, trends, recipes, batches, PID or
+WinCC deployment code.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 4-M1 design review.
+- Active unit: Phase 4-M1 execution-mode review.
 - Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore` (0 warnings, 0 errors); `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build` (178 tests passed); `git diff --check` passed. Start the offline preview from this final build for manual review.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff and the Phase 4-M1 design; continue only from the design-review checkpoint.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 4-M1 design and the Phase 4-M1 plan; continue only from the selected execution-mode checkpoint.
 - Current exclusions: production Web Runtime, Gateway, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
