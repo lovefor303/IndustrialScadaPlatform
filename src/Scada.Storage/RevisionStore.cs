@@ -121,6 +121,18 @@ public sealed class RevisionStore
             throw new InvalidDataException(FormatErrors(errors));
         }
 
+        var draft = _serializer.Deserialize(json);
+        var published = ProjectDocument.FromStorage(
+            draft.ProjectId,
+            draft.SchemaVersion,
+            draft.Name,
+            draft.CreatedAt,
+            draft.UpdatedAt,
+            ProjectStatus.Published,
+            draft.Variables,
+            draft.Screens);
+        var publishedJson = _serializer.Serialize(published);
+
         var revisionNumber = await ReadNextRevisionNumberAsync(connection, projectId, cancellationToken);
         var revision = new ProjectRevision(
             Guid.NewGuid(),
@@ -139,7 +151,7 @@ public sealed class RevisionStore
         insert.Parameters.AddWithValue("$revisionId", revision.RevisionId.ToString());
         insert.Parameters.AddWithValue("$revisionNumber", revision.RevisionNumber);
         insert.Parameters.AddWithValue("$author", revision.Author);
-        insert.Parameters.AddWithValue("$json", json);
+        insert.Parameters.AddWithValue("$json", publishedJson);
         insert.Parameters.AddWithValue("$createdAt", revision.CreatedAt.ToString("O"));
         await insert.ExecuteNonQueryAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
@@ -199,8 +211,17 @@ public sealed class RevisionStore
         Guid revisionId,
         CancellationToken cancellationToken = default)
     {
-        var project = await LoadRevisionAsync(projectId, revisionId, cancellationToken);
-        await SaveDraftAsync(project, cancellationToken);
+        var published = await LoadRevisionAsync(projectId, revisionId, cancellationToken);
+        var draft = ProjectDocument.FromStorage(
+            published.ProjectId,
+            published.SchemaVersion,
+            published.Name,
+            published.CreatedAt,
+            DateTimeOffset.UtcNow,
+            ProjectStatus.Draft,
+            published.Variables,
+            published.Screens);
+        await SaveDraftAsync(draft, cancellationToken);
     }
 
     public async Task ExportAsync(

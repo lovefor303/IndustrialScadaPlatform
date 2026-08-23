@@ -14,6 +14,17 @@ public interface IRuntimeVariableSource
     RuntimeVariableValue Read(string key, DateTimeOffset now);
 }
 
+public sealed class RuntimeSourceException : Exception
+{
+    public RuntimeSourceException(RuntimeDiagnostic diagnostic, Exception? innerException = null)
+        : base(diagnostic.Message, innerException)
+    {
+        Diagnostic = diagnostic;
+    }
+
+    public RuntimeDiagnostic Diagnostic { get; }
+}
+
 public sealed record RuntimeVariableValue(
     string Key,
     object? Value,

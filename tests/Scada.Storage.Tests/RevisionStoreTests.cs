@@ -68,6 +68,7 @@ public sealed class RevisionStoreTests
             Assert.Equal(1, first.RevisionNumber);
             Assert.Equal("engineer", first.Author);
             Assert.Equal(project.Name, published.Name);
+            Assert.Equal(ProjectStatus.Published, published.Status);
             Assert.Equal("Changed Draft", (await store.LoadDraftAsync(project.ProjectId))!.Name);
         });
     }
@@ -88,6 +89,7 @@ public sealed class RevisionStoreTests
             var restored = await store.LoadDraftAsync(project.ProjectId);
             var revisions = await store.ListRevisionsAsync(project.ProjectId);
             Assert.Equal(project.Name, restored!.Name);
+            Assert.Equal(ProjectStatus.Draft, restored.Status);
             Assert.Equal(2, revisions.Count);
             Assert.Collection(
                 revisions,
