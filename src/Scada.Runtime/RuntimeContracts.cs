@@ -37,7 +37,8 @@ public sealed record RuntimeProjectMetadata(
     string Name,
     ProjectStatus Status,
     IReadOnlyList<string> Screens,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    IReadOnlyList<string>? Variables = null);
 
 public sealed record RuntimeObjectProjection(
     Guid Id,

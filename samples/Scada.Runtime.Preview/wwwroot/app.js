@@ -87,7 +87,7 @@
       screenSelector.disabled = false;
       screenSelector.addEventListener("change", () => loadScreen(screenSelector.value));
       await loadScreen(screenSelector.value);
-      await connectLive(project.screens?.[0]);
+      await connectLive(project.screens?.[0], project.variables || []);
     } catch (error) {
       showDiagnostic(`[${error.code}] ${error.message}`);
       qualityIndicator.textContent = "质量未知";
@@ -95,7 +95,7 @@
     }
   }
 
-  async function connectLive(screenName) {
+  async function connectLive(screenName, variables) {
     if (!window.signalR || !screenName) return;
     hub = new signalR.HubConnectionBuilder()
       .withUrl("/hubs/runtime")
@@ -124,7 +124,7 @@
     hub.on("diagnostic", message => showDiagnostic(`[${message.code}] ${message.message}`));
     try {
       await hub.start();
-      await hub.invoke("Subscribe", screenName, []);
+      await hub.invoke("Subscribe", screenName, variables);
       runtimeStatus.textContent = "实时连接正常，现场命令已禁用。";
     } catch (error) {
       runtimeStatus.textContent = "实时连接不可用，现场命令已禁用。";

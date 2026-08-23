@@ -208,7 +208,8 @@ public static class GatewayApplication
                 project.Name,
                 project.Status,
                 project.Screens.Select(screen => screen.Name).ToArray(),
-                project.UpdatedAt));
+                project.UpdatedAt,
+                project.Variables.Select(variable => variable.Key).ToArray()));
         }
         catch (RuntimeSourceException exception)
         {
