@@ -5,10 +5,12 @@
     <RootNamespace>Scada.Gateway</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Scada.Runtime\Scada.Runtime.csproj" />
     <ProjectReference Include="..\Scada.Core\Scada.Core.csproj" />
     <ProjectReference Include="..\Scada.Storage\Scada.Storage.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" />
   </ItemGroup>
 </Project>
