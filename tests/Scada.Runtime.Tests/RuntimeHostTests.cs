@@ -28,6 +28,7 @@ public sealed class RuntimeHostTests
         Assert.Equal(HttpStatusCode.OK, screen.StatusCode);
         Assert.Contains("readOnly", await health.Content.ReadAsStringAsync());
         Assert.Contains("Runtime Host Test", await project.Content.ReadAsStringAsync());
+        Assert.Contains("published", await project.Content.ReadAsStringAsync());
         Assert.Contains("Main", await screen.Content.ReadAsStringAsync());
     }
 

@@ -41,7 +41,7 @@
       .join("");
     const diagnostics = screen.diagnostics || [];
     diagnosticCount.textContent = `诊断 ${diagnostics.length}`;
-    const hasBad = (screen.objects || []).some(object => object.quality === "Bad" || object.quality === 2);
+    const hasBad = (screen.objects || []).some(object => String(object.quality).toLowerCase() === "bad" || object.quality === 2);
     qualityIndicator.textContent = hasBad ? "质量异常" : "质量正常";
     qualityIndicator.className = `indicator ${hasBad ? "indicator-bad" : "indicator-good"}`;
     screenStatus.textContent = `当前画面：${screen.name}`;

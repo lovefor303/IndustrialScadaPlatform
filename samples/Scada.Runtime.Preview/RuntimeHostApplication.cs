@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Scada.Runtime;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Scada.Runtime.Preview;
 
@@ -20,6 +22,8 @@ public static class RuntimeHostApplication
         builder.Services.AddSingleton(projectSource);
         builder.Services.AddSingleton(variableSource);
         builder.Services.AddSingleton(projector ?? new RuntimeSceneProjector());
+        builder.Services.ConfigureHttpJsonOptions(options =>
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         var app = builder.Build();
 
         app.UseDefaultFiles();
