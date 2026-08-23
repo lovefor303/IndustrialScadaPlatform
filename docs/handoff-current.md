@@ -6,7 +6,7 @@ Updated: 2026-08-23
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 4-M1 offline Web Runtime gate passed**
+Current phase: **Phase 4-M2 live Gateway design completed; implementation plan pending**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -90,19 +90,20 @@ Phase 4-M1 design, plan and acceptance record are:
 - `docs/superpowers/plans/2026-08-23-phase4-m1-offline-web-runtime.md`
 - `docs/phase4-m1-acceptance.md`
 
-The next action is to write and approve a separate Phase 4-M2 design for live
-transport/Gateway/authentication. Do not add PLC, SignalR, authentication,
-alarms, trends, recipes, batches, PID or WinCC deployment code under the M1
-checkpoint.
+The Phase 4-M2 design is written at
+`docs/superpowers/specs/2026-08-23-phase4-m2-live-gateway-design.md` and is
+pending written-document review. The next action is to obtain approval of that
+specification, then write a separate Phase 4-M2 implementation plan. Do not add
+implementation code until the plan is approved.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 4-M1 completed; Phase 4-M2 design pending.
+- Active unit: Phase 4-M2 design completed; implementation plan pending.
 - Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release` (0 warnings, 0 errors); `dotnet test tests\\Scada.Runtime.Tests\\Scada.Runtime.Tests.csproj --configuration Release` (24 tests passed); `git diff --check` passed. HTTP smoke returned 200 for health, project and Main screen on loopback.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 4-M1 design, the Phase 4-M1 plan and the acceptance record; continue only from the Phase 4-M2 design checkpoint.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 4-M1 design, the Phase 4-M2 design and the acceptance record; continue only from the Phase 4-M2 written-document review checkpoint.
 - Current exclusions: live Web transport, Gateway commands, authentication, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
