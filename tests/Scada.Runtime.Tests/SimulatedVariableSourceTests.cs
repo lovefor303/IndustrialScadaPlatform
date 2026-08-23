@@ -74,4 +74,41 @@ public sealed class SimulatedVariableSourceTests
         Assert.Single(definitions);
         Assert.Equal("Tank.Level", definitions[0].Key);
     }
+
+    [Fact]
+    public async Task ProviderLifecyclePublishesUpdatesAndCanRecoverAfterDisconnect()
+    {
+        var source = new SimulatedVariableSource(new[]
+        {
+            VariableDefinition.Number("Tank.Level", VariableDataType.Float64, VariableDirection.Feedback)
+        });
+        var updates = new List<RuntimeVariableUpdate>();
+        source.Updated += (_, update) => updates.Add(update);
+
+        Assert.Equal(RuntimeSourceState.Stopped, source.Status.State);
+
+        await source.StartAsync();
+        Assert.Equal(RuntimeSourceState.Connected, source.Status.State);
+
+        source.Set("Tank.Level", 12.5, VariableQuality.Good, SampleTime);
+        var update = Assert.Single(updates);
+        Assert.Equal("Tank.Level", update.Value.Key);
+        Assert.Equal("simulated", update.Source);
+        Assert.Equal(SampleTime, update.Value.Timestamp);
+
+        source.Disconnect();
+        Assert.Equal(RuntimeSourceState.Disconnected, source.Status.State);
+        var disconnected = await source.ReadAsync("Tank.Level", SampleTime.AddSeconds(1));
+        Assert.Null(disconnected.Value);
+        Assert.Equal(VariableQuality.Bad, disconnected.Quality);
+
+        await source.StartAsync();
+        Assert.Equal(RuntimeSourceState.Connected, source.Status.State);
+        var recovered = await source.ReadAsync("Tank.Level", SampleTime.AddSeconds(2));
+        Assert.Equal(12.5, recovered.Value);
+        Assert.Equal(VariableQuality.Good, recovered.Quality);
+
+        await source.StopAsync();
+        await source.DisposeAsync();
+    }
 }
