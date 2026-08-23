@@ -90,6 +90,7 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Task 5 committed as `6afba27`: read-only SignalR Hub, subscription registry, published-screen/variable validation and coordinator hosted lifecycle.
 - Web Runtime shell is wired for local SignalR 10.0.0, Chinese login/connection/quality states, bounded reconnect and full-snapshot recovery; Preview composes the Gateway and serves static assets.
 - Fresh verification: solution Release build 0 warnings/0 errors; Gateway tests 28/28; Runtime tests 27/27; loopback smoke returned health 200, project 401 before login, `/` 200 and local SignalR asset 200.
+- Follow-up fix committed as `5423c17`: published project metadata now includes variable keys, and the browser passes those keys to the validated SignalR subscription instead of attempting an empty subscription.
 
 ## Next Action
 
@@ -105,8 +106,8 @@ The Phase 4-M2 design is written at
 `docs/superpowers/specs/2026-08-23-phase4-m2-live-gateway-design.md` and is
 approved. The implementation plan is written at
 `docs/superpowers/plans/2026-08-23-phase4-m2-live-gateway.md`. The next action is
-to complete browser live integration, cross-consumer parity/security regression
-and the Phase 4-M2 acceptance gate.
+to complete cross-consumer parity/security regression and the Phase 4-M2
+acceptance gate.
 
 ## Interruption Checkpoint
 
