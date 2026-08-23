@@ -50,7 +50,10 @@ public sealed record RuntimeObjectProjection(
     ControlState State,
     VariableQuality Quality,
     bool ReadOnly,
-    IReadOnlyList<RuntimeDiagnostic> Diagnostics);
+    IReadOnlyList<RuntimeDiagnostic> Diagnostics,
+    PointD? PipeStart = null,
+    PointD? PipeEnd = null,
+    IReadOnlyList<PointD>? PipeBends = null);
 
 public sealed record RuntimeScreenDocument(
     string Name,
