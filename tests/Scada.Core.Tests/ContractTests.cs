@@ -16,7 +16,7 @@ public sealed class ContractTests
         var project = ProjectDocument.Create("Demo");
 
         Assert.NotEqual(Guid.Empty, project.ProjectId);
-        Assert.Equal(1, project.SchemaVersion);
+        Assert.Equal(ProjectFormat.CurrentVersion, project.SchemaVersion);
         Assert.Equal("Demo", project.Name);
         Assert.Equal(ProjectStatus.Draft, project.Status);
     }
@@ -95,6 +95,20 @@ public sealed class ContractTests
 
         Assert.Equal(0, updatedPipe.Start.X);
         Assert.Equal(100, updatedPipe.End.X);
+    }
+
+    [Fact]
+    public void PipeEndpointChangesRecomputeBoundsAndPreserveBends()
+    {
+        var bends = new[] { new PointD(20, 70), new PointD(80, 70) };
+        var pipe = PipeObject.Create(new PointD(10, 20), new PointD(90, 30), bends);
+
+        var resized = pipe.WithStart(new PointD(-10, 15)).WithEnd(new PointD(120, 5));
+
+        Assert.Equal(new PointD(-10, 15), resized.Start);
+        Assert.Equal(new PointD(120, 5), resized.End);
+        Assert.Equal(bends, resized.Bends);
+        Assert.Equal(new RectD(-10, 5, 130, 65), resized.Bounds);
     }
 
     [Fact]

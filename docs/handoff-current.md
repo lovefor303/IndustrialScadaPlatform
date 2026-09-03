@@ -1,12 +1,12 @@
 # Current Handoff
 
-Updated: 2026-08-20
+Updated: 2026-08-23
 
 ## Authoritative Scope
 
 Repository: `D:\wpf_XM\IndustrialScadaPlatform`
 
-Current phase: **Phase 1 complete; Phase 2 design approved; implementation plan written and awaiting user review**
+Current phase: **Phase 4-M2 live Gateway implementation in progress**
 
 Approved design: `docs/superpowers/specs/2026-08-19-industrial-scada-platform-design.md`
 
@@ -36,32 +36,92 @@ Phase 2 draft implementation plan: `docs/superpowers/plans/2026-08-20-phase2-ind
 - Commands remain unconfirmed/Bad in simulation; feedback type and range checks are enforced.
 - Task 7 acceptance harness is implemented; the complete Phase 1 gate passed with 33 tests, 0 build warnings and 0 build errors.
 
+## Phase 2 Completion
+
+- The Phase 2 Industrial Control SDK gate passed on 2026-08-20.
+- See `docs/phase2-acceptance.md`, `docs/phase2/source-audit.md`, `docs/phase2/visual-review.md` and `docs/handoff-2026-08-20-phase2.md`.
+- Final verification: Release build 0 warnings/0 errors; 128 tests passed across the solution; 17 Phase 2 acceptance tests passed; generated WPF/SVG artifacts are non-empty and dimension-checked.
+
 ## Current Incomplete State
 
-- No WPF canvas, Web Runtime, PLC communication, WinCC adapter or legacy migration has started.
-- No Phase 2 implementation code has started.
-- The Phase 2 written design was approved on 2026-08-20.
-- The Phase 2 implementation plan was written on 2026-08-20; user review and execution-mode selection are pending.
+- Phase 2 SDK implementation is complete and gated.
+- Phase 3 Task 1 editor session contracts are complete (`a4a859b`).
+- Phase 3 Task 2 WPF shell and authorization gate are complete (`7162977`).
+- Phase 3 Task 3 toolbox drag-in and independent scene editing are complete (`a8e4dbe`).
+- Phase 3 Task 4 properties, variable bindings, dynamics and events are complete (`e4f19bb`).
+- Phase 3 Task 5 persistence core, dirty-discard confirmation and WPF command binding are implemented (`2d01f16`, `96b3a56`, `92c44f3`): `EditorCommands` covers new/open/export/save/publish/list/restore against an injected `RevisionStore`; menu/toolbar commands and status messages are bound; dirty sessions require an injected confirmation before new/open; temporary SQLite round-trip test passes.
+- Phase 3 Task 6 viewport and selection ergonomics are implemented (`2fedf35`, `b0cb221`): cursor-anchored zoom, pan, optional grid snapping/grid rendering, Ctrl+wheel zoom, middle-button pan, eight resize handles, a rotation handle, byte-for-byte scene JSON drift gate, and a non-empty 1920x1080 render assertion.
+- The follow-up handle correction is implemented in the current worktree: resize handles use directional double-arrow cursors, the object selection surface keeps the four-way move cursor, the rotation handle uses a generated arc cursor, and resize/rotation drag deltas update the retained visual in place until `DragCompleted` so both positive and negative directions remain usable.
+- Rotation handle styling and sensitivity were corrected: the rotation handle now uses the same white fill and DeepSkyBlue border as resize handles, the custom cursor is deep blue, and horizontal drag input maps to 0.01 degrees per pixel for very fine adjustments.
+- Phase 3-M2 Task 1 is implemented in the working tree: immutable 100-step project history, undo/redo session APIs, redo invalidation after new edits, and independent-pipe history regression tests.
+- Phase 3-M2 Task 2 is implemented in the working tree: selection-scoped left/center/right/top/middle/bottom alignment, horizontal/vertical equal-gap distribution, non-pipe validation and one-step session undo integration.
+- Phase 3-M2 Task 3 is implemented in the working tree: editor-session-only groups, group selection/ungrouping, and explicit layer-order operations that modify only selected `ZIndex` values.
+- Phase 3-M2 Task 4 is implemented in the working tree: Chinese productivity commands, WPF menu/toolbar bindings, engineering-role enablement and Ctrl+Z/Ctrl+Y/Ctrl+G/Ctrl+Shift+G shortcuts.
+- Phase 3-M2 selection ergonomics are implemented and verified: normal left-click single-selects, Ctrl+left-click toggles selection, and dragging on blank canvas performs intersecting-object frame selection. Frame cleanup removes the owned rectangle by reference, preserving existing scene visuals and handles.
+- Selection-dependent WPF commands now refresh when the session selection changes, so alignment, distribution, grouping and layer commands no longer remain disabled after Ctrl-click or frame selection. The toolbar exposes all alignment and distribution directions.
+- The canvas now subscribes to session project-change notifications, so alignment, distribution, undo/redo, grouping and layer commands redraw immediately without requiring a blank-canvas click. Live resize/rotation drags suppress full redraw during each delta and keep their active handle stable, then refresh on drag completion.
+- Object dragging is implemented: normal left-button drag moves the current selection in model coordinates, clicking an unselected object first selects it, and Ctrl-click remains selection-only. Pipes remain independent objects and move only when selected.
+- Undo/redo command state now refreshes immediately after any project edit, including alignment, so the toolbar/menu no longer stays disabled after an edit.
+- Undo and redo now also publish project-change notifications, so the canvas immediately restores or reapplies geometry after `Ctrl+Z`/`Ctrl+Y` or the toolbar buttons.
+- Phase 3-M3 plan is recorded in `docs/superpowers/plans/2026-08-22-phase3-m3-functional-editor-shell.md`; Task 1 toolbox wiring is implemented: leaf items carry stable control type IDs and begin real canvas drags.
+- Phase 3-M3 Task 2 is implemented: the selection-aware property panel edits X/Y/width/height/rotation/visibility through the session, validates numeric geometry, updates the canvas immediately and participates in undo history.
+- Phase 3-M3 Task 3 is implemented: variable binding, dynamic and event/action panels expose catalog-backed choices, validated apply commands, Chinese labels and visible validation errors.
+- Phase 3-M3 Task 4 is implemented in the working tree: `EditorShellWindow` accepts injected `EditorCommands`, the preview initializes an isolated SQLite `RevisionStore`, and JSON open/export dialogs are available through the WPF shell.
+- Save/reopen regression coverage preserves control IDs, bounds, rotation and independent pipe endpoints/bends; publish/restore returns modified geometry to the saved revision.
+- The draft/open confusion fix is implemented: internal SQLite drafts have a dedicated “载入最新草稿” command; JSON import/export is explicit; invalid project files are caught and reported in the status bar instead of crashing the async WPF command.
+- Phase 3 Task 7 acceptance assets are in the working tree: offline preview host, scope/acceptance notes and visual review notes. The sample contains no PLC addresses or legacy project references.
+- The editor remains offline-only; no PLC, live Web transport, WinCC adapter or legacy migration has started.
+- Phase 4-M1 offline Web Runtime is implemented and gated (`6e57942`): published
+  JSON/RevisionStore sources, deterministic simulator, SVG scene projection,
+  read-only ASP.NET Core preview host, responsive Chinese browser shell and
+  controlled diagnostics.
+- Phase 4-M1 acceptance fixture and evidence are recorded in
+  `docs/phase4-m1-acceptance.md`; runtime-focused tests pass 24/24.
+- Browser smoke evidence: desktop and 390x844 phone layouts rendered a nonblank
+  vessel, independent pipe and text with no console errors; health/project/Main
+  HTTP endpoints each returned 200 on loopback.
+
+## Phase 4-M2 Progress
+
+- Task 1 committed as `b9cc324`: shared live runtime contracts, snapshot applier, Gateway project skeleton and stable source-disconnected diagnostic.
+- Task 2 committed as `dbd2add`: simulated provider lifecycle, update events, freshness-aware snapshot cache and coordinator recovery handling.
+- Task 3 committed as `92a76e8`: SQLite AuthStore, first-admin initialization, password hashing, disabled users, roles and authorization diagnostics.
+- Task 4 committed as `709f06f`: authenticated Gateway REST composition with loopback setup, login/logout, published-project access and no write route.
+- Task 5 committed as `6afba27`: read-only SignalR Hub, subscription registry, published-screen/variable validation and coordinator hosted lifecycle.
+- Web Runtime shell is wired for local SignalR 10.0.0, Chinese login/connection/quality states, bounded reconnect and full-snapshot recovery; Preview composes the Gateway and serves static assets.
+- Fresh verification: solution Release build 0 warnings/0 errors; Gateway tests 28/28; Runtime tests 27/27; loopback smoke returned health 200, project 401 before login, `/` 200 and local SignalR asset 200.
+- Follow-up fix committed as `5423c17`: published project metadata now includes variable keys, and the browser passes those keys to the validated SignalR subscription instead of attempting an empty subscription.
 
 ## Next Action
 
-Obtain the user's review of `docs/superpowers/plans/2026-08-20-phase2-industrial-control-sdk.md` and execution-mode selection. Do not implement Phase 2 code until the plan is approved.
+Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. Phase
+4-M2 Tasks 1-5 are implemented and verified. The
+Phase 4-M1 design, plan and acceptance record are:
 
-Tasks 1 through 7 and the Phase 1 gate are complete. Phase 2 implementation has not started.
+- `docs/superpowers/specs/2026-08-23-phase4-m1-offline-web-runtime-design.md`
+- `docs/superpowers/plans/2026-08-23-phase4-m1-offline-web-runtime.md`
+- `docs/phase4-m1-acceptance.md`
+
+The Phase 4-M2 design is written at
+`docs/superpowers/specs/2026-08-23-phase4-m2-live-gateway-design.md` and is
+approved. The implementation plan is written at
+`docs/superpowers/plans/2026-08-23-phase4-m2-live-gateway.md`. The next action is
+to complete cross-consumer parity/security regression and the Phase 4-M2
+acceptance gate.
 
 ## Interruption Checkpoint
 
 - Active workstream: new industrial SCADA platform.
-- Active unit: Phase 2 implementation-plan review; no Phase 2 implementation task is active.
-- Last verified commands: `dotnet restore IndustrialScadaPlatform.sln`; `dotnet sln IndustrialScadaPlatform.sln list`; `dotnet build IndustrialScadaPlatform.sln --configuration Release --no-restore`; `dotnet test IndustrialScadaPlatform.sln --configuration Release --no-build`; `git diff --check` (8 projects, 0 warnings, 0 errors, 33 tests passed).
+- Active unit: Phase 4-M2 design and implementation plan completed; execution pending.
+- Last verified commands: `dotnet build IndustrialScadaPlatform.sln --configuration Release` (0 warnings, 0 errors); `dotnet test tests\\Scada.Runtime.Tests\\Scada.Runtime.Tests.csproj --configuration Release` (24 tests passed); `git diff --check` passed. HTTP smoke returned 200 for health, project and Main screen on loopback.
 - Legacy boundary note: the legacy repository had pre-existing dirty files when inspected; no command in this task targeted or modified that repository.
 - Intentionally untracked local visual-companion files: `.superpowers/`; these are not product source and must not be committed without an explicit decision.
-- Resume action after any side task: re-read the five controlling documents and the Phase 1 handoff, then continue only with Phase 2 planning.
-- Current exclusions: Phase 2 implementation, WPF editor, Web Runtime, Gateway, PLC communication, WinCC adapter, business modules and legacy migration.
+- Resume action after any side task: re-read `AGENTS.md`, `docs/PROJECT_CONTROL.md`, this handoff, the Phase 4-M1 design, the Phase 4-M2 design, the Phase 4-M2 plan and the acceptance record; continue only from the Phase 4-M2 execution checkpoint.
+- Current exclusions: live Web transport, Gateway commands, authentication, PLC communication, WinCC adapter, business modules, CAD/PDF recognition and legacy migration.
 
 ## Verification Status
 
-- Phase 1 final gate passed. Phase 2 is not implemented and requires its own approved plan.
+- Phase 1, Phase 2, Phase 3-M1, Phase 3-M2, Phase 3-M3 and Phase 4-M1 final gates passed. Phase 4-M2 Tasks 1-5 are verified; final browser live integration and acceptance evidence remain. PLC/field writes and WinCC deployment remain explicitly out of scope.
 - The old配液项目 and PLC projects have not been modified by this repository task.
 
 ## Return Rule After Side Tasks

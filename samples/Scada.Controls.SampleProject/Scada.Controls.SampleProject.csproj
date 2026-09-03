@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Scada.Controls.SampleProject</AssemblyName>
+    <RootNamespace>Scada.Controls.SampleProject</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Scada.Controls\Scada.Controls.csproj" />
+    <ProjectReference Include="..\..\src\Scada.Scene\Scada.Scene.csproj" />
+    <ProjectReference Include="..\..\src\Scada.Simulator\Scada.Simulator.csproj" />
+  </ItemGroup>
+</Project>

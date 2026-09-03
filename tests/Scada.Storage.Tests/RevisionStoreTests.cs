@@ -25,6 +25,32 @@ public sealed class RevisionStoreTests
     }
 
     [Fact]
+    public async Task LoadLatestDraftReturnsMostRecentlyUpdatedProject()
+    {
+        var directory = CreateDirectory();
+        try
+        {
+            var store = new RevisionStore(Path.Combine(directory, "latest.db"));
+            await store.InitializeAsync();
+            var first = ProjectDocument.Create("First", screens: new[] { ScreenDocument.Create("Main") });
+            var second = ProjectDocument.Create("Second", screens: new[] { ScreenDocument.Create("Main") });
+            await store.SaveDraftAsync(first);
+            await Task.Delay(10);
+            await store.SaveDraftAsync(second);
+
+            var latest = await store.LoadLatestDraftAsync();
+
+            Assert.NotNull(latest);
+            Assert.Equal(second.ProjectId, latest!.ProjectId);
+            Assert.Equal("Second", latest.Name);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task PublishCreatesImmutableRevisionAndListsPublishedCopy()
     {
         await WithStoreAsync(async (store, _, _) =>
@@ -42,6 +68,7 @@ public sealed class RevisionStoreTests
             Assert.Equal(1, first.RevisionNumber);
             Assert.Equal("engineer", first.Author);
             Assert.Equal(project.Name, published.Name);
+            Assert.Equal(ProjectStatus.Published, published.Status);
             Assert.Equal("Changed Draft", (await store.LoadDraftAsync(project.ProjectId))!.Name);
         });
     }
@@ -62,6 +89,7 @@ public sealed class RevisionStoreTests
             var restored = await store.LoadDraftAsync(project.ProjectId);
             var revisions = await store.ListRevisionsAsync(project.ProjectId);
             Assert.Equal(project.Name, restored!.Name);
+            Assert.Equal(ProjectStatus.Draft, restored.Status);
             Assert.Equal(2, revisions.Count);
             Assert.Collection(
                 revisions,
@@ -134,6 +162,13 @@ public sealed class RevisionStoreTests
         {
             Directory.Delete(directory, recursive: true);
         }
+    }
+
+    private static string CreateDirectory()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "IndustrialScadaPlatform.Tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        return directory;
     }
 
     private static ProjectDocument CreateProject()

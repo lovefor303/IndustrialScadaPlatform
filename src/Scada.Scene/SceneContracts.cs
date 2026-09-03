@@ -25,7 +25,60 @@ public readonly record struct RectD(double X, double Y, double Width, double Hei
 
 public sealed record BindingDefinition(string VariableKey, string TargetProperty);
 
-public sealed record InteractionDefinition(string EventName, string ActionName);
+/// <summary>
+/// Declarative editor-time dynamic rule. It describes how a variable may drive
+/// a visual property; runtime evaluation belongs to a later runtime module.
+/// </summary>
+public sealed record DynamicDefinition
+{
+    public DynamicDefinition(
+        string targetProperty,
+        string variableKey,
+        VariableDataType expectedDataType,
+        VariableDirection expectedDirection,
+        string? condition = null,
+        IReadOnlyDictionary<string, string>? mapping = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetProperty);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variableKey);
+        TargetProperty = targetProperty;
+        VariableKey = variableKey;
+        ExpectedDataType = expectedDataType;
+        ExpectedDirection = expectedDirection;
+        Condition = condition;
+        Mapping = mapping ?? new Dictionary<string, string>(StringComparer.Ordinal);
+    }
+
+    public string TargetProperty { get; }
+
+    public string VariableKey { get; init; }
+
+    public VariableDataType ExpectedDataType { get; init; }
+
+    public VariableDirection ExpectedDirection { get; init; }
+
+    public string? Condition { get; init; }
+
+    public IReadOnlyDictionary<string, string> Mapping { get; init; }
+}
+
+public sealed record InteractionDefinition
+{
+    public InteractionDefinition(string eventName, string actionName, IReadOnlyDictionary<string, string>? parameters = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(eventName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(actionName);
+        EventName = eventName;
+        ActionName = actionName;
+        Parameters = parameters ?? new Dictionary<string, string>(StringComparer.Ordinal);
+    }
+
+    public string EventName { get; }
+
+    public string ActionName { get; }
+
+    public IReadOnlyDictionary<string, string> Parameters { get; }
+}
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(ControlObject), "control")]
@@ -78,6 +131,11 @@ public abstract record SceneObject
     public IReadOnlyDictionary<string, BindingDefinition> Bindings { get; init; }
 
     public IReadOnlyDictionary<string, InteractionDefinition> Interactions { get; init; }
+
+    public IReadOnlyDictionary<string, DynamicDefinition> Dynamics { get; init; } =
+        new Dictionary<string, DynamicDefinition>(StringComparer.Ordinal);
+
+    public int ControlVersion { get; init; } = 1;
 
     public static SceneObject Create(string type, RectD bounds, Guid? id = null) =>
         ControlObject.Create(type, bounds, id);
@@ -148,6 +206,7 @@ public sealed record PipeObject : SceneObject
 {
     private PipeObject(
         Guid id,
+        string type,
         PointD start,
         PointD end,
         IReadOnlyList<PointD> bends,
@@ -158,7 +217,7 @@ public sealed record PipeObject : SceneObject
         IReadOnlyDictionary<string, string> properties,
         IReadOnlyDictionary<string, BindingDefinition> bindings,
         IReadOnlyDictionary<string, InteractionDefinition> interactions)
-        : base(id, "pipe", bounds, rotation, zIndex, isVisible, properties, bindings, interactions)
+        : base(id, type, bounds, rotation, zIndex, isVisible, properties, bindings, interactions)
     {
         Start = start;
         End = end;
@@ -171,12 +230,18 @@ public sealed record PipeObject : SceneObject
 
     public IReadOnlyList<PointD> Bends { get; init; }
 
-    public static PipeObject Create(PointD start, PointD end, IEnumerable<PointD>? bends = null, Guid? id = null)
+    public static PipeObject Create(
+        PointD start,
+        PointD end,
+        IEnumerable<PointD>? bends = null,
+        Guid? id = null,
+        string type = "pipe.straight")
     {
         var bendList = bends?.ToArray() ?? [];
         var points = new[] { start }.Concat(bendList).Append(end);
         return new PipeObject(
             id ?? Guid.NewGuid(),
+            type,
             start,
             end,
             bendList,
@@ -187,6 +252,31 @@ public sealed record PipeObject : SceneObject
             new Dictionary<string, string>(),
             new Dictionary<string, BindingDefinition>(),
             new Dictionary<string, InteractionDefinition>());
+    }
+
+    public PipeObject WithStart(PointD start) => CopyWithEndpoints(start, End);
+
+    public PipeObject WithEnd(PointD end) => CopyWithEndpoints(Start, end);
+
+    private PipeObject CopyWithEndpoints(PointD start, PointD end)
+    {
+        var bounds = RectD.FromPoints(new[] { start }.Concat(Bends).Append(end));
+        return new PipeObject(
+            Id,
+            Type,
+            start,
+            end,
+            Bends,
+            bounds,
+            Rotation,
+            ZIndex,
+            IsVisible,
+            Properties,
+            Bindings,
+            Interactions)
+        {
+            ControlVersion = ControlVersion
+        };
     }
 }
 
@@ -201,6 +291,38 @@ public sealed record ScreenDocument
     public string Name { get; }
 
     public IReadOnlyList<SceneObject> Objects { get; }
+
+    public ScreenDocument AddObject(SceneObject sceneObject)
+    {
+        ArgumentNullException.ThrowIfNull(sceneObject);
+        if (Objects.Any(existing => existing.Id == sceneObject.Id))
+        {
+            throw new ArgumentException(
+                $"Scene object '{sceneObject.Id}' already exists on screen '{Name}'.",
+                nameof(sceneObject));
+        }
+
+        return Create(Name, Objects.Append(sceneObject));
+    }
+
+    public ScreenDocument RemoveObject(Guid objectId)
+    {
+        if (!Objects.Any(sceneObject => sceneObject.Id == objectId))
+        {
+            throw new KeyNotFoundException($"Scene object '{objectId}' was not found.");
+        }
+
+        return Create(Name, Objects.Where(sceneObject => sceneObject.Id != objectId));
+    }
+
+    public SceneObject? FindObject(Guid objectId) =>
+        Objects.SingleOrDefault(sceneObject => sceneObject.Id == objectId);
+
+    public ScreenDocument ReplaceObjects(IEnumerable<SceneObject> replacements)
+    {
+        ArgumentNullException.ThrowIfNull(replacements);
+        return Create(Name, replacements);
+    }
 
     public static ScreenDocument Create(string name, IEnumerable<SceneObject>? objects = null)
     {

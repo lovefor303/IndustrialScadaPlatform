@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SCADA 离线运行时</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="runtime-shell">
+    <header class="topbar">
+      <div class="brand">SCADA 离线运行时</div>
+      <div class="project-summary">
+        <span class="caption">项目</span>
+        <strong id="project-name">未加载</strong>
+      </div>
+      <div class="runtime-indicators">
+        <span id="quality-indicator" class="indicator indicator-unknown">质量未知</span>
+        <span class="indicator indicator-readonly">只读</span>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="运行时工具栏">
+      <label class="screen-picker" for="screen-selector">
+        <span>画面</span>
+        <select id="screen-selector" disabled></select>
+      </label>
+      <span id="screen-status" class="screen-status">正在载入项目...</span>
+    </section>
+
+    <section id="login-panel" class="login-panel" hidden>
+      <form id="login-form" class="login-form">
+        <strong>运行时登录</strong>
+        <label>用户名 <input id="login-user" name="userName" autocomplete="username" required></label>
+        <label>密码 <input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">登录</button>
+        <span id="login-status" class="screen-status">需要登录后查看画面</span>
+      </form>
+    </section>
+
+    <main class="scene-panel">
+      <div id="diagnostic" class="diagnostic" role="status" hidden></div>
+      <div id="scene-host" class="scene-host" aria-label="工艺画面">
+        <svg id="scene" class="scene" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" role="img" aria-label="工艺流程画面"></svg>
+      </div>
+    </main>
+
+    <footer class="statusbar">
+      <span id="runtime-status">运行时已启动，现场命令已禁用。</span>
+      <span id="diagnostic-count">诊断 0</span>
+    </footer>
+  </div>
+  <script src="lib/signalr.min.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

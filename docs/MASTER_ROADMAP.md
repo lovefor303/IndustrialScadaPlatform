@@ -1,7 +1,7 @@
 # Industrial SCADA Platform Master Roadmap
 
-Updated: 2026-08-19  
-Status: Long-term direction approved; Phase 1 is complete; Phase 2 planning is the next authorized activity.
+Updated: 2026-08-23
+Status: Long-term direction approved; Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 automated gates are complete. Phase 4-M2 Tasks 1-5 are implemented and verified; final browser live integration and acceptance gate remain.
 
 ## Product Outcome
 
@@ -38,13 +38,13 @@ Excluded: WPF, Web, PLC, WinCC, alarms, trends, recipes, batches and legacy migr
 
 Detailed plan: `docs/superpowers/plans/2026-08-19-phase1-core-project-model.md`.
 
-### Phase 2 - Industrial control SDK
+### Phase 2 - Industrial control SDK (complete)
 
 Deliverables: semantic and versioned definitions for pumps, valves, vessels, agitators, filters, pipes, numeric displays, level bars and temperature/pressure instruments; state precedence; animations; WPF and SVG/Web render profiles.
 
-Gate: one sample project renders equivalent equipment states in WPF and Web, with exact-size visual review evidence and command/feedback separation tests.
+Gate: one sample project renders equivalent equipment states in WPF and Web, with exact-size visual review evidence and command/feedback separation tests. Passed; see `docs/phase2-acceptance.md`.
 
-Before implementation: write and approve a separate detailed Phase 2 plan.
+Implementation plan and acceptance record: `docs/superpowers/plans/2026-08-20-phase2-industrial-control-sdk.md` and `docs/phase2-acceptance.md`.
 
 ### Phase 3 - WPF engineering editor
 
@@ -52,13 +52,31 @@ Deliverables: project tree, toolbox, multi-screen workspace, dockable properties
 
 Gate: a developer authors and reopens a small process screen without source-code edits or geometry drift. Operators cannot access engineering functions.
 
+Milestones M1, M2 and M3 passed on 2026-08-22. The offline WPF editor supports
+project/session workflow, toolbox composition, independent scene editing,
+properties/bindings/dynamics/events, viewport ergonomics, alignment,
+distribution, grouping/layers, undo/redo, persistence and geometry-drift checks.
+
 Before implementation: write and approve a separate detailed Phase 3 plan.
 
 ### Phase 4 - Web Runtime and Gateway shell
 
-Deliverables: ASP.NET Core service, SignalR updates, published-project loading, local authentication, permissions, variable quality, responsive desktop/tablet/phone compositions and Windows/Linux deployment profiles.
+Deliverables: ASP.NET Core service, published-project loading, variable quality,
+responsive desktop/tablet/phone compositions, live transport, authentication,
+permissions and Windows/Linux deployment profiles.
 
-Gate: Windows and Linux test hosts serve the same published project offline; browsers never connect directly to a PLC.
+Milestone M1 passed on 2026-08-23. The offline runtime serves one immutable
+published JSON or RevisionStore revision through a loopback-only ASP.NET Core
+host, reuses the SVG control renderer, provides deterministic simulated values,
+preserves independent pipe geometry and exposes a Chinese read-only responsive
+browser shell. See `docs/phase4-m1-acceptance.md`.
+
+M1 deliberately excludes SignalR/live transport, authentication, PLC/Gateway
+commands, alarms, trends, recipes, batches, PID and WinCC deployment. Those are
+separate designs and gates.
+
+Gate for the full Phase 4 remains: Windows and Linux test hosts serve the same
+published project offline; browsers never connect directly to a PLC.
 
 Before implementation: write and approve a separate detailed Phase 4 plan.
 
@@ -96,8 +114,10 @@ Gate: each selected module passes its own acceptance plan without making the gen
 
 ## Current Position
 
-Current phase: Phase 2 planning.
-Current task: write and approve the Industrial Control SDK plan.
+Current phase: Phase 4-M2 implementation in progress.
+Current task: complete Web Runtime live browser integration, then run cross-consumer parity/security and the Phase 4-M2 acceptance gate.
 Single operational checkpoint: `docs/handoff-current.md`.
 
-Phase 1 is complete; no Phase 2 implementation, WPF editor, Web Runtime, PLC adapter or WinCC adapter has started.
+Phase 1, Phase 2, Phase 3-M3 and Phase 4-M1 are complete. PLC acquisition,
+Gateway commands, live Web transport, authentication and WinCC adapter remain
+out of scope until their own plans are approved.

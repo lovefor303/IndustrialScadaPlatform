@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Scada.Controls.Preview.Svg</AssemblyName>
+    <RootNamespace>Scada.Controls.Preview.Svg</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Scada.Controls.Svg\Scada.Controls.Svg.csproj" />
+    <ProjectReference Include="..\Scada.Controls.SampleProject\Scada.Controls.SampleProject.csproj" />
+  </ItemGroup>
+</Project>

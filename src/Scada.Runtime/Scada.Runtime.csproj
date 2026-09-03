@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Scada.Runtime</AssemblyName>
+    <RootNamespace>Scada.Runtime</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scada.Core\Scada.Core.csproj" />
+    <ProjectReference Include="..\Scada.Scene\Scada.Scene.csproj" />
+    <ProjectReference Include="..\Scada.Storage\Scada.Storage.csproj" />
+    <ProjectReference Include="..\Scada.Controls\Scada.Controls.csproj" />
+    <ProjectReference Include="..\Scada.Controls.Svg\Scada.Controls.Svg.csproj" />
+  </ItemGroup>
+</Project>
